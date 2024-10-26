@@ -29,7 +29,7 @@ export default function Input(
 
   return (
     <div
-      className="w-96 flex flex-col h-screen overflow-hidden"
+      className="w-80 flex flex-col h-screen overflow-hidden"
       id="input-container"
     >
       <div className={`overflow-y-auto h-full pl-6 pr-6 bg-gray-100`}>
@@ -76,7 +76,7 @@ function InputBox(
 
   return (
     <div className="flex items-center w-full">
-      <div className="w-24 flex-shrink-0">{name}</div>
+      <div className="flex-grow">{name}</div>
       <TextInput
         value={val}
         onChange={(e) => setVal(e.target.value)}
@@ -100,7 +100,7 @@ function TextInput( {
   return (
     <input
       className={
-        `flex-grow m-0.5 border-2 border-gray-300 rounded-md ${className}`
+        `w-40 m-0.5 ml-2 border-2 border-gray-300 rounded-md ${className}`
       }
       type="text"
       value={value}
