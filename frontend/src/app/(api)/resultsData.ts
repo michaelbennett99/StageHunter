@@ -10,7 +10,7 @@ export interface Result {
 }
 
 export interface ResultsData {
-  grandTour: GrandTour;
+  grand_tour: GrandTour;
   stage_no: number;
   stage_start: string;
   stage_end: string;
