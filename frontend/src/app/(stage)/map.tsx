@@ -33,7 +33,7 @@ export default function Map(
   }
 
   return (
-    <>
+    <div id="map-container-container" className="h-full">
       <button
         onClick={handleButtonClick}
         className="absolute top-2 left-2 z-10 bg-white p-2 rounded-md shadow-md"
@@ -41,10 +41,10 @@ export default function Map(
         Reset
       </button>
       <div
-        className="h-full bg-green-100"
+        className="h-full"
         id="map-container"
         ref={mapContainerRef}
       />
-    </>
+    </div>
   );
 }
