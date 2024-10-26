@@ -1,4 +1,4 @@
-import { numToRank } from './utils';
+import { numToRank, deSnakeCase } from './utils';
 
 describe('numToRank', () => {
   test('returns correct ordinal for 1st', () => {
@@ -59,5 +59,31 @@ describe('numToRank', () => {
 
   test('returns null for non-integer numbers', () => {
     expect(numToRank(1.5)).toBeNull();
+  });
+});
+
+describe('deSnakeCase', () => {
+  test('replaces underscores with spaces and capitalizes each word', () => {
+    expect(deSnakeCase('hello_world')).toBe('Hello World');
+  });
+
+  test('handles multiple underscores', () => {
+    expect(deSnakeCase('hello_world_test')).toBe('Hello World Test');
+  });
+
+  test('handles leading underscores', () => {
+    expect(deSnakeCase('_hello_world_test')).toBe('Hello World Test');
+  });
+
+  test('handles trailing underscores', () => {
+    expect(deSnakeCase('hello_world_test_')).toBe('Hello World Test');
+  });
+
+  test('handles empty string', () => {
+    expect(deSnakeCase('')).toBe('');
+  });
+
+  test('handles string with no underscores', () => {
+    expect(deSnakeCase('helloWorld')).toBe('HelloWorld');
   });
 });

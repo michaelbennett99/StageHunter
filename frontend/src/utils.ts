@@ -24,3 +24,13 @@ export function numToRank(rank: number): string | null {
       return `${rank}th`;
   }
 }
+
+export function deSnakeCase(str: string): string {
+  // replace underscores with spaces and capitalize each word
+  const words = str.split('_');
+  const newStr = words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+    .trim();
+  return newStr;
+}
