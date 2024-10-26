@@ -12,6 +12,5 @@ export default async function Page({
 }: {
   params: Promise<{ stageId: string }>;
 }): Promise<JSX.Element> {
-  const { stageId } = await params;
-  return <h1>Stage {stageId}</h1>;
+  return <></>;
 }

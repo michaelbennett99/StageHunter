@@ -1,5 +1,5 @@
 export default function Map(
   { className }: { className?: string }
 ): JSX.Element {
-  return <div className={className}>Map</div>;
+  return <div className={className} id="map-container">Map</div>;
 }

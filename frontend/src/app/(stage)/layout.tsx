@@ -9,16 +9,17 @@ export default function Layout(
   return (
     <div className="min-h-screen flex flex-col">
       {children}
-      <div className="flex-grow flex flex-row">
+      <div className="flex-grow flex flex-row" id="main-app-container">
         <Suspense fallback={<div>Loading...</div>}>
-          <div className="flex flex-col flex-grow">
+          <div
+            className="flex flex-col flex-grow"
+            id="route-data-container"
+          >
             <Map />
             <Elevation />
           </div>
         </Suspense>
-        <div className="w-96 flex flex-col h-screen overflow-hidden">
-          <Input data={spoof_data} className="overflow-y-auto" />
-        </div>
+        <Input data={spoof_data} />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import { numToRank, deSnakeCase } from '@/utils';
 import { spoof_data } from './data';
 
 export default function Input(
-  { className, data }: { className?: string; data?: ResultsData }
+  { data }: { data?: ResultsData }
 ): JSX.Element {
   const list_elements = Object.entries(data ?? spoof_data)
     .map(([name, data]) => {
@@ -29,13 +29,16 @@ export default function Input(
 
   return (
     <div
-      className={`${className} h-full pl-6 pr-6 bg-gray-100`}
+      className="w-96 flex flex-col h-screen overflow-hidden"
+      id="input-container"
     >
-      <h2 className="font-semibold mt-4 mb-2 text-lg text-center">
-        Guess the stage!
-      </h2>
-      <ul className="flex-grow flex flex-col">{list_elements}</ul>
-      <div className="text-center mt-2 mb-4">Score: 0</div>
+      <div className={`overflow-y-auto h-full pl-6 pr-6 bg-gray-100`}>
+        <h2 className="font-semibold mt-4 mb-2 text-lg text-center">
+          Guess the stage!
+        </h2>
+        <ul className="flex-grow flex flex-col">{list_elements}</ul>
+        <div className="text-center mt-2 mb-4">Score: 0</div>
+      </div>
     </div>
   );
 }
@@ -45,7 +48,7 @@ function InputBoxGroup(
 ): JSX.Element {
   return (
     <>
-      <h3 className="font-semibold mb-2">{name}</h3>
+      <h3 className="font-semibold mb-1">{name}</h3>
       <ul>
         {data.map((d) => (
           <li
@@ -97,7 +100,7 @@ function TextInput( {
   return (
     <input
       className={
-        `flex-grow m-1 border-2 border-gray-300 rounded-md ${className}`
+        `flex-grow m-0.5 border-2 border-gray-300 rounded-md ${className}`
       }
       type="text"
       value={value}
