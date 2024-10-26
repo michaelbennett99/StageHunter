@@ -23,7 +23,7 @@ export default function Map(
     });
 
     return () => mapRef.current?.remove();
-  });
+  }, []);
 
   const handleButtonClick = () => {
     mapRef.current?.flyTo({
