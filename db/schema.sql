@@ -227,6 +227,24 @@ $$;
 
 
 --
+-- Name: get_random_stage_id(); Type: FUNCTION; Schema: racedata; Owner: -
+--
+
+CREATE FUNCTION racedata.get_random_stage_id() RETURNS bigint
+    LANGUAGE sql STABLE PARALLEL SAFE
+    AS $$
+    SELECT
+        (random() * (max_id - min_id) + min_id)::bigint AS stage_id
+    FROM (
+        SELECT
+            MIN(stage_id) AS min_id,
+            MAX(stage_id) AS max_id
+        FROM racedata.stages
+    ) subquery;
+$$;
+
+
+--
 -- Name: get_results(bigint, bigint); Type: FUNCTION; Schema: racedata; Owner: -
 --
 
@@ -539,6 +557,37 @@ UNION ALL
 
 
 --
+-- Name: daily; Type: TABLE; Schema: racedata; Owner: -
+--
+
+CREATE TABLE racedata.daily (
+    daily_id integer NOT NULL,
+    stage_id integer NOT NULL,
+    date date DEFAULT CURRENT_DATE NOT NULL
+);
+
+
+--
+-- Name: daily_daily_id_seq; Type: SEQUENCE; Schema: racedata; Owner: -
+--
+
+CREATE SEQUENCE racedata.daily_daily_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: daily_daily_id_seq; Type: SEQUENCE OWNED BY; Schema: racedata; Owner: -
+--
+
+ALTER SEQUENCE racedata.daily_daily_id_seq OWNED BY racedata.daily.daily_id;
+
+
+--
 -- Name: races; Type: TABLE; Schema: racedata; Owner: -
 --
 
@@ -646,6 +695,13 @@ ALTER TABLE ONLY geog.track_points ALTER COLUMN ogc_fid SET DEFAULT nextval('geo
 
 
 --
+-- Name: daily daily_id; Type: DEFAULT; Schema: racedata; Owner: -
+--
+
+ALTER TABLE ONLY racedata.daily ALTER COLUMN daily_id SET DEFAULT nextval('racedata.daily_daily_id_seq'::regclass);
+
+
+--
 -- Name: track_points track_points_pkey; Type: CONSTRAINT; Schema: geog; Owner: -
 --
 
@@ -667,6 +723,14 @@ ALTER TABLE ONLY geog.tracks
 
 ALTER TABLE ONLY migrations.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: daily daily_pkey; Type: CONSTRAINT; Schema: racedata; Owner: -
+--
+
+ALTER TABLE ONLY racedata.daily
+    ADD CONSTRAINT daily_pkey PRIMARY KEY (daily_id);
 
 
 --
@@ -731,11 +795,33 @@ CREATE INDEX tracks_the_geog_geom_idx ON geog.tracks USING gist (the_geom);
 
 
 --
+-- Name: daily_date_idx; Type: INDEX; Schema: racedata; Owner: -
+--
+
+CREATE INDEX daily_date_idx ON racedata.daily USING btree (date);
+
+
+--
+-- Name: daily_stage_id_idx; Type: INDEX; Schema: racedata; Owner: -
+--
+
+CREATE INDEX daily_stage_id_idx ON racedata.daily USING btree (stage_id);
+
+
+--
 -- Name: track_points track_points_track_id_fkey; Type: FK CONSTRAINT; Schema: geog; Owner: -
 --
 
 ALTER TABLE ONLY geog.track_points
     ADD CONSTRAINT track_points_track_id_fkey FOREIGN KEY (track_fid) REFERENCES geog.tracks(track_id);
+
+
+--
+-- Name: daily daily_stage_id_fkey; Type: FK CONSTRAINT; Schema: racedata; Owner: -
+--
+
+ALTER TABLE ONLY racedata.daily
+    ADD CONSTRAINT daily_stage_id_fkey FOREIGN KEY (stage_id) REFERENCES racedata.stages(stage_id);
 
 
 --
@@ -779,4 +865,6 @@ INSERT INTO migrations.schema_migrations (version) VALUES
     ('20241022111357'),
     ('20241022190726'),
     ('20241028111420'),
-    ('20241028114704');
+    ('20241028114704'),
+    ('20241028120645'),
+    ('20241028121149');
