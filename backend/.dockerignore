@@ -1,0 +1,5 @@
+*.sql
+Dockerfile
+.dockerignore
+README.md
+.env*
