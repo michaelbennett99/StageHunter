@@ -1,23 +1,8 @@
 package db
 
 import (
-	"errors"
+	"github.com/jackc/pgx/v5/pgtype"
 )
-
-type Nullable[T any] struct {
-	Valid bool
-	Value T
-}
-
-func (n *Nullable[T]) Extract() (T, error) {
-	if !n.Valid {
-		var zero T
-		return zero, errors.New("null value")
-	}
-	return n.Value, nil
-}
-
-type StageID int
 
 type GrandTour string
 
@@ -65,4 +50,42 @@ type StageInfo struct {
 	StageStart  string
 	StageEnd    string
 	StageLength float64
+}
+
+type ElevationPoint struct {
+	Distance  float64
+	Elevation int
+}
+
+type Classification string
+
+const (
+	ClassificationStage     Classification = "stage"
+	ClassificationGC        Classification = "gc"
+	ClassificationPoints    Classification = "points"
+	ClassificationMountains Classification = "mountains"
+	ClassificationYouth     Classification = "youth"
+	ClassificationTeams     Classification = "teams"
+)
+
+var classificationMapping = EnumMap[Classification]{
+	"stage":     ClassificationStage,
+	"general":   ClassificationGC,
+	"points":    ClassificationPoints,
+	"mountains": ClassificationMountains,
+	"youth":     ClassificationYouth,
+	"teams":     ClassificationTeams,
+}
+
+func (c *Classification) Scan(src any) error {
+	return ScanEnum(c, src, classificationMapping)
+}
+
+type Result struct {
+	Rank           int
+	Name           pgtype.Text
+	Team           pgtype.Text
+	Time           pgtype.Interval
+	Points         pgtype.Int8
+	Classification Classification
 }
