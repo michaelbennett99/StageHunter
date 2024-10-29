@@ -113,3 +113,86 @@ func GetStageInfoHandler(
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(stage_info)
 }
+
+func GetStageTrackHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	track, err := conn.GetTrack(context.Background(), stage_id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	w.Header().Set("Content-Type", "application/json")
+
+	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		w.Header().Set("Content-Encoding", "gzip")
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+
+		gz.Write([]byte(track))
+		return
+	}
+
+	w.Write([]byte(track))
+}
+
+func GetStageElevationHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	elevation, err := conn.GetElevationProfile(
+		context.Background(), stage_id,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(elevation)
+}
+
+func GetResultsHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	topN, err := strconv.Atoi(r.URL.Query().Get("topN"))
+	if err != nil {
+		topN = 5
+	}
+
+	results, err := conn.GetResults(
+		context.Background(), db.ResultsQueryParams{
+			StageID: stage_id,
+			TopN:    topN,
+		},
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(results)
+}
