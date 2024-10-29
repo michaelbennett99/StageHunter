@@ -1,27 +1,42 @@
 package main
 
 import (
-	"context"
 	"log"
-	"os"
+	"net/http"
 
-	"github.com/jackc/pgx/v5"
+	db "github.com/michaelbennett99/stagehunter/backend/db"
+	myhttp "github.com/michaelbennett99/stagehunter/backend/http"
 )
 
-func run() error {
-	ctx := context.Background()
-
-	conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_URL"))
-	if err != nil {
-		return err
-	}
-	defer conn.Close(ctx)
-
-	return nil
-}
-
 func main() {
-	if err := run(); err != nil {
+	pool, err := db.GetPool()
+	if err != nil {
 		log.Fatal(err)
 	}
+	defer pool.Close()
+
+	http.HandleFunc(
+		"/", myhttp.AddRequestLogger(myhttp.DefaultHandler),
+	)
+	http.HandleFunc(
+		"/daily",
+		myhttp.AddRequestLogger(
+			myhttp.MakeHandler(pool, myhttp.GetDailyHandler),
+		),
+	)
+	http.HandleFunc(
+		"/random",
+		myhttp.AddRequestLogger(
+			myhttp.MakeHandler(pool, myhttp.GetRandomHandler),
+		),
+	)
+	http.HandleFunc(
+		"/stage/info/",
+		myhttp.AddRequestLogger(
+			myhttp.MakeHandler(pool, myhttp.GetStageInfoHandler),
+		),
+	)
+
+	log.Println("Listening on port 8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
