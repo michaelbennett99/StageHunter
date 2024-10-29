@@ -1,8 +1,10 @@
 package http
 
 import (
+	"compress/gzip"
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -73,21 +75,34 @@ func GetRandomHandler(
 	json.NewEncoder(w).Encode(stage_id)
 }
 
+func GetLastURLSegment(r *http.Request) (string, error) {
+	s := strings.TrimRight(r.URL.Path, "/")
+	segments := strings.Split(s, "/")
+	if len(segments) == 0 {
+		return "", errors.New("no segments found")
+	}
+	return segments[len(segments)-1], nil
+}
+
+func GetStageIDFromURL(r *http.Request) (int, error) {
+	segment, err := GetLastURLSegment(r)
+	if err != nil {
+		return 0, err
+	}
+	return strconv.Atoi(segment)
+}
+
 func GetStageInfoHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id := strings.Split(r.URL.Path, "/stage/info/")[1]
-	if stage_id == "" {
-		http.Error(w, "stage_id is required", http.StatusBadRequest)
-	}
-	stage_id_int, err := strconv.Atoi(stage_id)
+	stage_id, err := GetStageIDFromURL(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	stage_info, err := conn.GetStageInfo(
-		context.Background(), stage_id_int,
+		context.Background(), stage_id,
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
