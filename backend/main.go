@@ -37,6 +37,27 @@ func main() {
 		),
 	)
 
+	http.HandleFunc(
+		"/stage/track/",
+		myhttp.AddRequestLogger(
+			myhttp.MakeHandler(pool, myhttp.GetStageTrackHandler),
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/elevation/",
+		myhttp.AddRequestLogger(
+			myhttp.MakeHandler(pool, myhttp.GetStageElevationHandler),
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/results/",
+		myhttp.AddRequestLogger(
+			myhttp.MakeHandler(pool, myhttp.GetResultsHandler),
+		),
+	)
+
 	log.Println("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
