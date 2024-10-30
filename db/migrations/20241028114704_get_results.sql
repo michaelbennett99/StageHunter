@@ -1,6 +1,6 @@
 -- migrate:up
 
-CREATE OR REPLACE FUNCTION racedata.get_results(
+CREATE FUNCTION racedata.get_results(
     p_stage_id bigint,
     p_top_n bigint
 )
