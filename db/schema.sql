@@ -177,56 +177,6 @@ $$;
 
 
 --
--- Name: create_good_results_view(text); Type: FUNCTION; Schema: racedata; Owner: -
---
-
-CREATE FUNCTION racedata.create_good_results_view(table_name text) RETURNS void
-    LANGUAGE plpgsql
-    AS $$
-DECLARE
-    view_name text;
-BEGIN
-    -- TODO: check if table exists in racedata schema
-    IF NOT EXISTS (
-        SELECT 1
-        FROM pg_tables
-        WHERE tablename = table_name AND schemaname = 'racedata'
-    ) THEN
-        RAISE EXCEPTION 'Table % does not exist in racedata schema', table_name;
-    END IF;
-
-    SELECT table_name || '_valid' INTO view_name;
-
-    EXECUTE format('
-        CREATE VIEW racedata.%I AS
-            SELECT
-                *,
-                ROW_NUMBER()
-                OVER (PARTITION BY stage_id ORDER BY (rank).num) AS rn
-            FROM racedata.%I
-            WHERE (rank).info = ''VAL'';
-    ', view_name, table_name);
-END;
-$$;
-
-
---
--- Name: drop_good_results_view(text); Type: FUNCTION; Schema: racedata; Owner: -
---
-
-CREATE FUNCTION racedata.drop_good_results_view(table_name text) RETURNS void
-    LANGUAGE plpgsql
-    AS $$
-DECLARE
-    view_name text;
-BEGIN
-    SELECT table_name || '_valid' INTO view_name;
-    EXECUTE format('DROP VIEW IF EXISTS racedata.%I', view_name);
-END;
-$$;
-
-
---
 -- Name: get_random_stage_id(); Type: FUNCTION; Schema: racedata; Owner: -
 --
 
@@ -241,33 +191,6 @@ CREATE FUNCTION racedata.get_random_stage_id() RETURNS bigint
             MAX(stage_id) AS max_id
         FROM racedata.stages
     ) subquery;
-$$;
-
-
---
--- Name: get_results(bigint, bigint); Type: FUNCTION; Schema: racedata; Owner: -
---
-
-CREATE FUNCTION racedata.get_results(p_stage_id bigint, p_top_n bigint) RETURNS TABLE(rank bigint, rider text, team text, "time" interval, points integer, classification racedata.classification_type)
-    LANGUAGE sql STABLE PARALLEL SAFE
-    AS $$
-    SELECT
-        c.rn AS rank,
-        CASE WHEN c.classification != 'teams'
-            THEN r.first_name || ' ' || r.last_name
-            ELSE NULL
-        END AS rider,
-        t.name AS team,
-        c.time AS time,
-        c.points AS points,
-        c.classification AS classification
-    FROM racedata.classifications_valid c
-    LEFT JOIN racedata.riders r ON c.rider_id = r.rider_id
-    LEFT JOIN racedata.teams t ON c.team_id = t.team_id
-    WHERE
-        c.stage_id = p_stage_id
-        AND c.rn <= p_top_n
-    ORDER BY c.classification, c.rn ASC;
 $$;
 
 
@@ -345,215 +268,6 @@ ALTER SEQUENCE geog.track_points_ogc_fid_seq OWNED BY geog.track_points.ogc_fid;
 CREATE TABLE migrations.schema_migrations (
     version character varying(128) NOT NULL
 );
-
-
---
--- Name: general_classification; Type: TABLE; Schema: racedata; Owner: -
---
-
-CREATE TABLE racedata.general_classification (
-)
-INHERITS (results_templates.timed, results_templates.individual_results);
-
-
---
--- Name: general_classification_valid; Type: VIEW; Schema: racedata; Owner: -
---
-
-CREATE VIEW racedata.general_classification_valid AS
- SELECT result_id,
-    stage_id,
-    team_id,
-    rank,
-    "time",
-    rider_id,
-    row_number() OVER (PARTITION BY stage_id ORDER BY (rank).num) AS rn
-   FROM racedata.general_classification
-  WHERE ((rank).info = 'VAL'::racedata.rank_enum);
-
-
---
--- Name: mountain_classification; Type: TABLE; Schema: racedata; Owner: -
---
-
-CREATE TABLE racedata.mountain_classification (
-)
-INHERITS (results_templates.pointed, results_templates.individual_results);
-
-
---
--- Name: mountain_classification_valid; Type: VIEW; Schema: racedata; Owner: -
---
-
-CREATE VIEW racedata.mountain_classification_valid AS
- SELECT result_id,
-    stage_id,
-    team_id,
-    rank,
-    points,
-    rider_id,
-    row_number() OVER (PARTITION BY stage_id ORDER BY (rank).num) AS rn
-   FROM racedata.mountain_classification
-  WHERE ((rank).info = 'VAL'::racedata.rank_enum);
-
-
---
--- Name: points_classification; Type: TABLE; Schema: racedata; Owner: -
---
-
-CREATE TABLE racedata.points_classification (
-)
-INHERITS (results_templates.pointed, results_templates.individual_results);
-
-
---
--- Name: points_classification_valid; Type: VIEW; Schema: racedata; Owner: -
---
-
-CREATE VIEW racedata.points_classification_valid AS
- SELECT result_id,
-    stage_id,
-    team_id,
-    rank,
-    points,
-    rider_id,
-    row_number() OVER (PARTITION BY stage_id ORDER BY (rank).num) AS rn
-   FROM racedata.points_classification
-  WHERE ((rank).info = 'VAL'::racedata.rank_enum);
-
-
---
--- Name: stage_classification; Type: TABLE; Schema: racedata; Owner: -
---
-
-CREATE TABLE racedata.stage_classification (
-)
-INHERITS (results_templates.timed, results_templates.individual_results);
-
-
---
--- Name: stage_classification_valid; Type: VIEW; Schema: racedata; Owner: -
---
-
-CREATE VIEW racedata.stage_classification_valid AS
- SELECT result_id,
-    stage_id,
-    team_id,
-    rank,
-    "time",
-    rider_id,
-    row_number() OVER (PARTITION BY stage_id ORDER BY (rank).num) AS rn
-   FROM racedata.stage_classification
-  WHERE ((rank).info = 'VAL'::racedata.rank_enum);
-
-
---
--- Name: teams_classification; Type: TABLE; Schema: racedata; Owner: -
---
-
-CREATE TABLE racedata.teams_classification (
-)
-INHERITS (results_templates.timed);
-
-
---
--- Name: teams_classification_valid; Type: VIEW; Schema: racedata; Owner: -
---
-
-CREATE VIEW racedata.teams_classification_valid AS
- SELECT result_id,
-    stage_id,
-    team_id,
-    rank,
-    "time",
-    row_number() OVER (PARTITION BY stage_id ORDER BY (rank).num) AS rn
-   FROM racedata.teams_classification
-  WHERE ((rank).info = 'VAL'::racedata.rank_enum);
-
-
---
--- Name: young_riders_classification; Type: TABLE; Schema: racedata; Owner: -
---
-
-CREATE TABLE racedata.young_riders_classification (
-)
-INHERITS (results_templates.timed, results_templates.individual_results);
-
-
---
--- Name: young_riders_classification_valid; Type: VIEW; Schema: racedata; Owner: -
---
-
-CREATE VIEW racedata.young_riders_classification_valid AS
- SELECT result_id,
-    stage_id,
-    team_id,
-    rank,
-    "time",
-    rider_id,
-    row_number() OVER (PARTITION BY stage_id ORDER BY (rank).num) AS rn
-   FROM racedata.young_riders_classification
-  WHERE ((rank).info = 'VAL'::racedata.rank_enum);
-
-
---
--- Name: classifications_valid; Type: VIEW; Schema: racedata; Owner: -
---
-
-CREATE VIEW racedata.classifications_valid AS
- SELECT stage_classification_valid.stage_id,
-    stage_classification_valid.rn,
-    stage_classification_valid.rider_id,
-    stage_classification_valid.team_id,
-    stage_classification_valid."time",
-    NULL::integer AS points,
-    'stage'::racedata.classification_type AS classification
-   FROM racedata.stage_classification_valid
-UNION ALL
- SELECT general_classification_valid.stage_id,
-    general_classification_valid.rn,
-    general_classification_valid.rider_id,
-    general_classification_valid.team_id,
-    general_classification_valid."time",
-    NULL::integer AS points,
-    'general'::racedata.classification_type AS classification
-   FROM racedata.general_classification_valid
-UNION ALL
- SELECT points_classification_valid.stage_id,
-    points_classification_valid.rn,
-    points_classification_valid.rider_id,
-    points_classification_valid.team_id,
-    NULL::interval AS "time",
-    points_classification_valid.points,
-    'points'::racedata.classification_type AS classification
-   FROM racedata.points_classification_valid
-UNION ALL
- SELECT mountain_classification_valid.stage_id,
-    mountain_classification_valid.rn,
-    mountain_classification_valid.rider_id,
-    mountain_classification_valid.team_id,
-    NULL::interval AS "time",
-    mountain_classification_valid.points,
-    'mountains'::racedata.classification_type AS classification
-   FROM racedata.mountain_classification_valid
-UNION ALL
- SELECT young_riders_classification_valid.stage_id,
-    young_riders_classification_valid.rn,
-    young_riders_classification_valid.rider_id,
-    young_riders_classification_valid.team_id,
-    young_riders_classification_valid."time",
-    NULL::integer AS points,
-    'youth'::racedata.classification_type AS classification
-   FROM racedata.young_riders_classification_valid
-UNION ALL
- SELECT teams_classification_valid.stage_id,
-    teams_classification_valid.rn,
-    NULL::integer AS rider_id,
-    teams_classification_valid.team_id,
-    teams_classification_valid."time",
-    NULL::integer AS points,
-    'teams'::racedata.classification_type AS classification
-   FROM racedata.teams_classification_valid;
 
 
 --
@@ -655,6 +369,62 @@ CREATE VIEW racedata.races_stages_tracks AS
 
 
 --
+-- Name: results; Type: TABLE; Schema: racedata; Owner: -
+--
+
+CREATE TABLE racedata.results (
+    result_id integer NOT NULL,
+    stage_id integer NOT NULL,
+    rank racedata.rank_type NOT NULL,
+    classification racedata.classification_type NOT NULL,
+    team_id integer NOT NULL,
+    rider_id integer,
+    "time" interval,
+    points integer,
+    CONSTRAINT classification_and_time_points CHECK ((((classification = 'stage'::racedata.classification_type) AND (points IS NULL)) OR ((classification = 'general'::racedata.classification_type) AND (points IS NULL)) OR ((classification = 'points'::racedata.classification_type) AND ("time" IS NULL)) OR ((classification = 'mountains'::racedata.classification_type) AND ("time" IS NULL)) OR ((classification = 'youth'::racedata.classification_type) AND (points IS NULL)) OR ((classification = 'teams'::racedata.classification_type) AND (points IS NULL)))),
+    CONSTRAINT not_both_time_and_points_non_null CHECK ((("time" IS NULL) OR (points IS NULL))),
+    CONSTRAINT rider_id_null_for_teams CHECK ((((classification <> 'teams'::racedata.classification_type) AND (rider_id IS NOT NULL)) OR ((classification = 'teams'::racedata.classification_type) AND (rider_id IS NULL))))
+);
+
+
+--
+-- Name: results_result_id_seq; Type: SEQUENCE; Schema: racedata; Owner: -
+--
+
+CREATE SEQUENCE racedata.results_result_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: results_result_id_seq; Type: SEQUENCE OWNED BY; Schema: racedata; Owner: -
+--
+
+ALTER SEQUENCE racedata.results_result_id_seq OWNED BY racedata.results.result_id;
+
+
+--
+-- Name: results_valid; Type: VIEW; Schema: racedata; Owner: -
+--
+
+CREATE VIEW racedata.results_valid AS
+ SELECT result_id,
+    stage_id,
+    row_number() OVER (PARTITION BY stage_id, classification ORDER BY (rank).num) AS rank,
+    classification,
+    team_id,
+    rider_id,
+    "time",
+    points
+   FROM racedata.results
+  WHERE ((rank).info = 'VAL'::racedata.rank_enum);
+
+
+--
 -- Name: riders; Type: TABLE; Schema: racedata; Owner: -
 --
 
@@ -663,6 +433,36 @@ CREATE TABLE racedata.riders (
     first_name text NOT NULL,
     last_name text NOT NULL
 );
+
+
+--
+-- Name: teams; Type: TABLE; Schema: racedata; Owner: -
+--
+
+CREATE TABLE racedata.teams (
+    team_id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+--
+-- Name: riders_teams_results; Type: VIEW; Schema: racedata; Owner: -
+--
+
+CREATE VIEW racedata.riders_teams_results AS
+ SELECT rv.stage_id,
+    rv.rank,
+        CASE
+            WHEN (rv.classification <> 'teams'::racedata.classification_type) THEN ((r.first_name || ' '::text) || r.last_name)
+            ELSE NULL::text
+        END AS rider,
+    t.name AS team,
+    rv."time",
+    rv.points,
+    rv.classification
+   FROM ((racedata.results_valid rv
+     LEFT JOIN racedata.riders r ON ((rv.rider_id = r.rider_id)))
+     LEFT JOIN racedata.teams t ON ((rv.team_id = t.team_id)));
 
 
 --
@@ -678,16 +478,6 @@ CREATE VIEW racedata.stages_elevation AS
 
 
 --
--- Name: teams; Type: TABLE; Schema: racedata; Owner: -
---
-
-CREATE TABLE racedata.teams (
-    team_id integer NOT NULL,
-    name text NOT NULL
-);
-
-
---
 -- Name: track_points ogc_fid; Type: DEFAULT; Schema: geog; Owner: -
 --
 
@@ -699,6 +489,13 @@ ALTER TABLE ONLY geog.track_points ALTER COLUMN ogc_fid SET DEFAULT nextval('geo
 --
 
 ALTER TABLE ONLY racedata.daily ALTER COLUMN daily_id SET DEFAULT nextval('racedata.daily_daily_id_seq'::regclass);
+
+
+--
+-- Name: results result_id; Type: DEFAULT; Schema: racedata; Owner: -
+--
+
+ALTER TABLE ONLY racedata.results ALTER COLUMN result_id SET DEFAULT nextval('racedata.results_result_id_seq'::regclass);
 
 
 --
@@ -739,6 +536,14 @@ ALTER TABLE ONLY racedata.daily
 
 ALTER TABLE ONLY racedata.races
     ADD CONSTRAINT races_pkey PRIMARY KEY (race_id);
+
+
+--
+-- Name: results results_pkey; Type: CONSTRAINT; Schema: racedata; Owner: -
+--
+
+ALTER TABLE ONLY racedata.results
+    ADD CONSTRAINT results_pkey PRIMARY KEY (result_id);
 
 
 --
@@ -809,6 +614,13 @@ CREATE INDEX daily_stage_id_idx ON racedata.daily USING btree (stage_id);
 
 
 --
+-- Name: results_stage_id_classification_idx; Type: INDEX; Schema: racedata; Owner: -
+--
+
+CREATE INDEX results_stage_id_classification_idx ON racedata.results USING btree (stage_id, classification);
+
+
+--
 -- Name: track_points track_points_track_id_fkey; Type: FK CONSTRAINT; Schema: geog; Owner: -
 --
 
@@ -822,6 +634,30 @@ ALTER TABLE ONLY geog.track_points
 
 ALTER TABLE ONLY racedata.daily
     ADD CONSTRAINT daily_stage_id_fkey FOREIGN KEY (stage_id) REFERENCES racedata.stages(stage_id);
+
+
+--
+-- Name: results results_rider_id_fkey; Type: FK CONSTRAINT; Schema: racedata; Owner: -
+--
+
+ALTER TABLE ONLY racedata.results
+    ADD CONSTRAINT results_rider_id_fkey FOREIGN KEY (rider_id) REFERENCES racedata.riders(rider_id);
+
+
+--
+-- Name: results results_stage_id_fkey; Type: FK CONSTRAINT; Schema: racedata; Owner: -
+--
+
+ALTER TABLE ONLY racedata.results
+    ADD CONSTRAINT results_stage_id_fkey FOREIGN KEY (stage_id) REFERENCES racedata.stages(stage_id);
+
+
+--
+-- Name: results results_team_id_fkey; Type: FK CONSTRAINT; Schema: racedata; Owner: -
+--
+
+ALTER TABLE ONLY racedata.results
+    ADD CONSTRAINT results_team_id_fkey FOREIGN KEY (team_id) REFERENCES racedata.teams(team_id);
 
 
 --
@@ -867,4 +703,10 @@ INSERT INTO migrations.schema_migrations (version) VALUES
     ('20241028111420'),
     ('20241028114704'),
     ('20241028120645'),
-    ('20241028121149');
+    ('20241028121149'),
+    ('20241030125825'),
+    ('20241030132510'),
+    ('20241030133211'),
+    ('20241030133930'),
+    ('20241030135526'),
+    ('20241030141025');
