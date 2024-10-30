@@ -14,14 +14,14 @@ CREATE INDEX ON racedata.daily (stage_id);
 
 -- CRON job to insert a new row every day
 
-SELECT cron.schedule(
-    'daily_insert', '0 0 * * *',
-    'INSERT INTO racedata.daily (stage_id)
-    SELECT racedata.get_random_stage_id()'
-);
+-- SELECT cron.schedule(
+--     'daily_insert', '0 0 * * *',
+--     'INSERT INTO racedata.daily (stage_id)
+--     SELECT racedata.get_random_stage_id()'
+-- );
 
 -- migrate:down
 
-SELECT cron.unschedule('daily_insert');
+-- SELECT cron.unschedule('daily_insert');
 
 DROP TABLE racedata.daily;
