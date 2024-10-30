@@ -118,7 +118,16 @@ func (q *Queries) GetElevationProfile(
 }
 
 const getResultsQuery = `
-SELECT * FROM racedata.get_results($1, $2);
+SELECT
+	rank,
+	rider,
+	team,
+	time,
+	points,
+	classification
+FROM racedata.riders_teams_results
+WHERE stage_id = $1 AND rank <= $2
+ORDER BY classification, rank ASC;
 `
 
 type ResultsQueryParams struct {
