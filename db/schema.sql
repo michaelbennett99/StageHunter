@@ -214,30 +214,23 @@ CREATE TABLE geog.track_points (
 
 
 --
--- Name: tracks; Type: TABLE; Schema: geog; Owner: -
---
-
-CREATE TABLE geog.tracks (
-    track_id integer NOT NULL,
-    name character varying,
-    src character varying,
-    link1_href character varying,
-    link1_text character varying,
-    the_geom geog.geometry(LineStringZ,23031)
-);
-
-
---
 -- Name: elevation; Type: MATERIALIZED VIEW; Schema: geog; Owner: -
 --
 
 CREATE MATERIALIZED VIEW geog.elevation AS
- SELECT tp.track_fid,
-    tp.track_seg_point_id,
-    tp.ele,
-    geog.st_length(geog.st_linesubstring(t.the_geom, (0)::double precision, geog.st_linelocatepoint(t.the_geom, tp.the_geom))) AS distance
-   FROM (geog.track_points tp
-     JOIN geog.tracks t ON ((t.track_id = tp.track_fid)))
+ WITH segments AS (
+         SELECT track_points.track_fid,
+            track_points.track_seg_point_id,
+            track_points.ele,
+            geog.st_length(geog.st_makeline(lag(track_points.the_geom, 1, track_points.the_geom) OVER (PARTITION BY track_points.track_fid ORDER BY track_points.track_seg_point_id), track_points.the_geom)) AS distance,
+            track_points.the_geom
+           FROM geog.track_points
+        )
+ SELECT track_fid,
+    track_seg_point_id,
+    ele AS elevation,
+    sum(distance) OVER (PARTITION BY track_fid ORDER BY track_seg_point_id) AS distance
+   FROM segments
   WITH NO DATA;
 
 
@@ -259,6 +252,20 @@ CREATE SEQUENCE geog.track_points_ogc_fid_seq
 --
 
 ALTER SEQUENCE geog.track_points_ogc_fid_seq OWNED BY geog.track_points.ogc_fid;
+
+
+--
+-- Name: tracks; Type: TABLE; Schema: geog; Owner: -
+--
+
+CREATE TABLE geog.tracks (
+    track_id integer NOT NULL,
+    name character varying,
+    src character varying,
+    link1_href character varying,
+    link1_text character varying,
+    the_geom geog.geometry(LineStringZ,23031)
+);
 
 
 --
@@ -471,7 +478,7 @@ CREATE VIEW racedata.riders_teams_results AS
 
 CREATE VIEW racedata.stages_elevation AS
  SELECT s.stage_id,
-    e.ele,
+    e.elevation,
     e.distance
    FROM (racedata.stages s
      JOIN geog.elevation e ON ((s.gpx_id = e.track_fid)));
@@ -579,10 +586,10 @@ ALTER TABLE ONLY racedata.teams
 
 
 --
--- Name: elevation_pkey; Type: INDEX; Schema: geog; Owner: -
+-- Name: elevation_track_fid_track_seg_point_id_idx; Type: INDEX; Schema: geog; Owner: -
 --
 
-CREATE UNIQUE INDEX elevation_pkey ON geog.elevation USING btree (track_fid, track_seg_point_id);
+CREATE UNIQUE INDEX elevation_track_fid_track_seg_point_id_idx ON geog.elevation USING btree (track_fid, track_seg_point_id);
 
 
 --
@@ -590,6 +597,13 @@ CREATE UNIQUE INDEX elevation_pkey ON geog.elevation USING btree (track_fid, tra
 --
 
 CREATE INDEX track_points_the_geog_geom_idx ON geog.track_points USING gist (the_geom);
+
+
+--
+-- Name: track_points_track_seg_idx; Type: INDEX; Schema: geog; Owner: -
+--
+
+CREATE INDEX track_points_track_seg_idx ON geog.track_points USING btree (track_fid, track_seg_point_id);
 
 
 --
@@ -709,4 +723,8 @@ INSERT INTO migrations.schema_migrations (version) VALUES
     ('20241030133211'),
     ('20241030133930'),
     ('20241030135526'),
-    ('20241030141025');
+    ('20241030141025'),
+    ('20241030143326'),
+    ('20241030191710'),
+    ('20241030213402'),
+    ('20241030215240');
