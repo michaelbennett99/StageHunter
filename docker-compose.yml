@@ -10,6 +10,7 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+      - db
 
   backend:
     build:
@@ -21,10 +22,39 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     networks:
       - frontend-network
+      - backend-network
     restart: unless-stopped
     volumes:
       - ~/.pgpass:/root/.pgpass
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    ports:
+      - ${PGPORT}:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+    restart: unless-stopped
+    networks:
+      - backend-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    secrets:
+      - pg_password
+
+volumes:
+  pgdata:
 
 networks:
   frontend-network:
     driver: bridge
+  backend-network:
+    driver: bridge
+
+secrets:
+  pg_password:
+    file: ./.pg_password
