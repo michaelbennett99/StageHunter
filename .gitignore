@@ -1,3 +1,4 @@
 .envrc
 .pg_password
 */dump.sql
+.pgpass
