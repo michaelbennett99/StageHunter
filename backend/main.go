@@ -16,45 +16,54 @@ func main() {
 	defer pool.Close()
 
 	http.HandleFunc(
-		"/", myhttp.AddRequestLogger(myhttp.DefaultHandler),
-	)
-	http.HandleFunc(
 		"/daily",
-		myhttp.AddRequestLogger(
+		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.GetDailyHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
 		),
 	)
 	http.HandleFunc(
 		"/random",
-		myhttp.AddRequestLogger(
+		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.GetRandomHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
 		),
 	)
 	http.HandleFunc(
 		"/stage/info/",
-		myhttp.AddRequestLogger(
+		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.GetStageInfoHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
 		),
 	)
 
 	http.HandleFunc(
 		"/stage/track/",
-		myhttp.AddRequestLogger(
+		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.GetStageTrackHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
 		),
 	)
 
 	http.HandleFunc(
 		"/stage/elevation/",
-		myhttp.AddRequestLogger(
+		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.GetStageElevationHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
 		),
 	)
 
 	http.HandleFunc(
 		"/stage/results/",
-		myhttp.AddRequestLogger(
+		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.GetResultsHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
 		),
 	)
 
