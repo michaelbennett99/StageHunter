@@ -87,7 +87,7 @@ func (q *Queries) GetTrack(
 }
 
 const getElevationProfileQuery = `
-SELECT distance, ele
+SELECT distance, elevation
 FROM racedata.stages_elevation
 WHERE stage_id = $1
 ORDER BY distance;
