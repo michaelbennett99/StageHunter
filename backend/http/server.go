@@ -68,6 +68,19 @@ func GetRandomHandler(
 	json.NewEncoder(w).Encode(stage_id)
 }
 
+func GetAllStagesHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stages, err := conn.GetAllStages(context.Background())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(stages)
+}
+
 func GetLastURLSegment(r *http.Request) (string, error) {
 	s := strings.TrimRight(r.URL.Path, "/")
 	segments := strings.Split(s, "/")

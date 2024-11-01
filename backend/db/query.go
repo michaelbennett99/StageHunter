@@ -32,6 +32,28 @@ func (q *Queries) GetRandomStage(ctx context.Context) (int, error) {
 	return id, nil
 }
 
+const getStagesQuery = `
+SELECT stage_id FROM racedata.stages;
+`
+
+func (q *Queries) GetAllStages(ctx context.Context) ([]int, error) {
+	rows, err := q.conn.Query(ctx, getStagesQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	stages := []int{}
+	for rows.Next() {
+		var stage int
+		if err := rows.Scan(&stage); err != nil {
+			return nil, err
+		}
+		stages = append(stages, stage)
+	}
+	return stages, nil
+}
+
 const getStageInfoQuery = `
 SELECT
 	gt,

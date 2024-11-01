@@ -32,6 +32,14 @@ func main() {
 		),
 	)
 	http.HandleFunc(
+		"/stages",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetAllStagesHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+	http.HandleFunc(
 		"/stage/info/",
 		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.GetStageInfoHandler),
