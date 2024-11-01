@@ -67,7 +67,7 @@ func (q *Queries) GetStageInfo(
 }
 
 const getTrackQuery = `
-SELECT ST_AsGeoJSON(the_geom, 6)
+SELECT ST_AsGeoJSON(ST_Transform(ST_Force2D(the_geom), 4326))
 FROM racedata.stages s
 JOIN geog.tracks t ON s.gpx_id = t.track_id
 WHERE s.stage_id = $1
