@@ -1,3 +1,5 @@
+export const BACKEND_URL = 'http://backend:8080';
+
 export enum GrandTour {
   TOUR = 'TOUR',
   GIRO = 'GIRO',
@@ -22,10 +24,7 @@ export interface ResultsData {
   youth_results?: Result[];
 }
 
-export async function getResultsData(
-  stage_id: number,
-  top_n: number
-): Promise<ResultsData> {
-  const res = await fetch(`/api/results/${stage_id}?top_n=${top_n}`);
-  return res.json();
+export interface ElevationData {
+  elevation: number;
+  distance: number;
 }
