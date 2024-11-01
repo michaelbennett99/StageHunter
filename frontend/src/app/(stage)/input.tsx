@@ -34,7 +34,7 @@ export default function Input(
       className="w-80 flex flex-col h-screen overflow-hidden"
       id="input-container"
     >
-      <div className={`overflow-y-auto h-full pl-6 pr-6 bg-gray-100`}>
+      <div className={`overflow-y-auto h-full pl-6 pr-6 bg-slate-100`}>
         <h2 className="font-semibold mt-4 mb-2 text-lg text-center text-black">
           Guess the stage!
         </h2>
