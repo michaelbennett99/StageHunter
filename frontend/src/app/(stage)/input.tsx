@@ -35,7 +35,7 @@ export default function Input(
       id="input-container"
     >
       <div className={`overflow-y-auto h-full pl-6 pr-6 bg-gray-100`}>
-        <h2 className="font-semibold mt-4 mb-2 text-lg text-center">
+        <h2 className="font-semibold mt-4 mb-2 text-lg text-center text-black">
           Guess the stage!
         </h2>
         <ul className="flex-grow flex flex-col">{list_elements}</ul>
@@ -51,7 +51,7 @@ function InputBoxGroup(
   // A group of input boxes for a single result type
   return (
     <>
-      <h3 className="font-semibold mb-1">{name}</h3>
+      <h3 className="font-semibold mb-1 text-black">{name}</h3>
       <ul>
         {data.map((d) => (
           <li
@@ -81,7 +81,7 @@ function InputBox(
 
   return (
     <div className="flex items-center w-full">
-      <div className="flex-grow">{name}</div>
+      <div className="flex-grow text-black text-sm">{name}</div>
       <TextInput
         value={val}
         onChange={(e) => setVal(e.target.value)}
@@ -107,7 +107,7 @@ function TextInput( {
   return (
     <input
       className={
-        `w-40 m-0.5 ml-2 border-2 border-gray-300 rounded-md ${className}`
+        `w-40 m-0.5 ml-2 border-2 border-gray-300 text-black rounded-md ${className}`
       }
       type="text"
       value={value}
