@@ -30,7 +30,8 @@ export async function getAllStageIDs(): Promise<number[]> {
 
 function parseResults(res: any[], classification: string): Result[] {
   return res.filter((r: any) => (
-    r.classification && r.name && r.rank && r.classification === classification
+    r.classification && (r.name || r.team) && r.rank
+    && r.classification === classification
   )).map((r: any) => ({
     name: r.name ?? r.team,
     rank: r.rank,
@@ -43,7 +44,7 @@ export async function getResultsData(
 ): Promise<ResultsData> {
   const info = await fetchJSON(`${BACKEND_URL}/stage/info/${stage_id}`);
   const res = await fetchJSON(
-    `${BACKEND_URL}/stage/results/${stage_id}?top_n=${top_n}`
+    `${BACKEND_URL}/stage/results/${stage_id}?topN=${top_n}`
   );
   return {
     grand_tour: info.GrandTour,
