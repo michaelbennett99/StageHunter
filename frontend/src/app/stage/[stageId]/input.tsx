@@ -2,9 +2,9 @@
 
 import { useState, ChangeEventHandler } from 'react';
 
-import { ResultsData, Result } from '@/app/(api)/resultsData';
+import { ResultsData, Result } from '@/app/(api)/types';
 import { numToRank, deSnakeCase } from '@/utils';
-import { spoof_data } from './data';
+import { spoof_data } from '../data';
 
 export default function Input(
   { data }: { data?: ResultsData }

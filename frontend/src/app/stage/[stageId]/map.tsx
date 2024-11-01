@@ -1,60 +1,74 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import mapboxgl from 'mapbox-gl';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function Map(
+  { track }: { track: GeoJSON.LineString }
 ): JSX.Element {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  const INITIAL_CENTER: [number, number] = [0, 51.5];
-  const INITIAL_ZOOM = 9;
+  const INITIAL_ZOOM = 7;
+
+  const bounds = useMemo(() => {
+    const track_coords = track.coordinates as [number, number][];
+    const bounds = new mapboxgl.LngLatBounds();
+    track_coords.forEach(coord => bounds.extend(coord));
+    return bounds;
+  }, [track]);
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '';
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current!,
-      center: INITIAL_CENTER,
+      center: bounds.getCenter(),
       zoom: INITIAL_ZOOM,
     });
 
-    const resetButton = document.getElementById('reset-button');
 
-    mapRef.current.on('move', () => {
-      if (atInitialPoint()) {
-        // hide the reset button
-        resetButton?.classList.add('hidden');
-      } else {
-        // show the reset button
-        resetButton?.classList.remove('hidden');
-      }
-    });
+    mapRef.current?.on('load', () =>{
+      mapRef.current?.addSource('route', {
+        type: 'geojson',
+        data: track
+      })
+
+      mapRef.current?.addLayer({
+        id: 'route',
+        type: 'line',
+        source: 'route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#000',
+          'line-width': 4
+        }
+      })
+
+      mapRef.current?.fitBounds(bounds, {
+        padding: 100
+      })
+    })
 
     return () => mapRef.current?.remove();
   }, []);
 
   const handleButtonClick = () => {
-    mapRef.current?.flyTo({
-      center: INITIAL_CENTER,
-      zoom: INITIAL_ZOOM
+    mapRef.current?.fitBounds(bounds, {
+      padding: 100
     })
-  }
-
-  const atInitialPoint = () => {
-    const center = mapRef.current?.getCenter();
-    const zoom = mapRef.current?.getZoom();
-    return zoom === INITIAL_ZOOM && center?.lng === INITIAL_CENTER[0] && center?.lat === INITIAL_CENTER[1];
   }
 
   return (
     <div id="map-container-container" className="h-full relative">
       <button
         onClick={handleButtonClick}
-        className="absolute top-2 right-2 z-10 bg-black text-white p-2 rounded-md shadow-md hidden bg-opacity-50 hover:bg-opacity-100"
+        className="absolute top-2 right-2 z-10 bg-black text-white p-2 rounded-md shadow-md bg-opacity-50 hover:bg-opacity-100"
         id="reset-button"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

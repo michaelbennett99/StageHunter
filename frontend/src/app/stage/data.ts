@@ -1,4 +1,4 @@
-import { ResultsData, GrandTour } from '@/app/(api)/resultsData';
+import { ResultsData, GrandTour } from '@/app/(api)/types';
 
 export const spoof_data: ResultsData = {
   grand_tour: GrandTour.TOUR,
