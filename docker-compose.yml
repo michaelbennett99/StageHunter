@@ -1,5 +1,6 @@
 services:
   frontend:
+    container_name: stagehunter-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -13,6 +14,7 @@ services:
       - db
 
   backend:
+    container_name: stagehunter-backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -25,11 +27,12 @@ services:
       - backend-network
     restart: unless-stopped
     volumes:
-      - ~/.pgpass:/root/.pgpass
+      - ./.pgpass:/root/.pgpass
     depends_on:
       - db
 
   db:
+    container_name: stagehunter-db
     build:
       context: ./db
       dockerfile: Dockerfile
