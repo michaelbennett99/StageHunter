@@ -39,13 +39,6 @@ func MakeHandler(
 	}
 }
 
-func AddRequestLogger(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-		fn(w, r)
-	}
-}
-
 func DefaultHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Request OK"))
