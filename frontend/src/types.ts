@@ -13,6 +13,7 @@ export interface Result {
 
 export interface ResultsData {
   grand_tour: GrandTour;
+  year: number;
   stage_no: number;
   stage_start: string;
   stage_end: string;
@@ -22,6 +23,7 @@ export interface ResultsData {
   points_results?: Result[];
   mountains_results?: Result[];
   youth_results?: Result[];
+  teams_results?: Result[];
 }
 
 export interface ElevationData {

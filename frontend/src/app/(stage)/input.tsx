@@ -2,14 +2,16 @@
 
 import { useState, ChangeEventHandler } from 'react';
 
-import { ResultsData, Result } from '@/app/(api)/types';
+import { ResultsData, Result } from '@/types';
 import { numToRank, deSnakeCase } from '@/utils';
-import { spoof_data } from '../data';
 
 export default function Input(
   { data }: { data?: ResultsData }
 ): JSX.Element {
-  const list_elements = Object.entries(data ?? spoof_data)
+  // Get all the entries in the data object and list them
+  // If the entry is an array, it's a group of entries, so we group them
+  // in an InputBoxGroup
+  const list_elements = Object.entries(data ?? {})
     .map(([name, data]) => {
       const displayName = deSnakeCase(name);
 
@@ -46,6 +48,7 @@ export default function Input(
 function InputBoxGroup(
   { name, data }: { name: string; data: Result[] }
 ): JSX.Element {
+  // A group of input boxes for a single result type
   return (
     <>
       <h3 className="font-semibold mb-1">{name}</h3>
@@ -63,6 +66,8 @@ function InputBoxGroup(
   );
 }
 
+// Compare a string and a value, returning true if left is the string
+// representation of right
 function compare(left: string, right: any): boolean {
   return left === String(right);
 }
@@ -86,6 +91,8 @@ function InputBox(
   );
 }
 
+// A text input box that checks if the input is correct and disables
+// itself if it is
 function TextInput( {
   value,
   onChange,
