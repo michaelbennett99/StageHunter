@@ -29,7 +29,7 @@ export default async function Stage({
             id="route-data-container"
           >
             <Map track={track} />
-            <Elevation />
+            <Elevation data={elevation} />
           </div>
         </Suspense>
         <Input data={results} />
