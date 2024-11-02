@@ -71,5 +71,9 @@ export async function getTrack(
 export async function getElevationData(
   stage_id: string | number
 ): Promise<ElevationData[]> {
-  return fetchJSON(`${BACKEND_URL}/stage/elevation/${stage_id}`);
+  const data = await fetchJSON(`${BACKEND_URL}/stage/elevation/${stage_id}`);
+  return data.map((d: { Elevation: number; Distance: number }) => ({
+    elevation: d.Elevation,
+    distance: d.Distance,
+  }));
 }
