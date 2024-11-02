@@ -93,7 +93,7 @@ function ElevationChart({
                   transform: 'translateY(20px)'
                 }}
               >
-                {(tick / 1000).toFixed(0)}
+                {(tick / 1000).toFixed(0).toString() + 'km'}
               </text>
             </g>
           ))}
@@ -119,7 +119,7 @@ function ElevationChart({
                   alignmentBaseline: 'middle'
                 }}
               >
-                {tick}
+                {tick.toFixed(0).toString() + 'm'}
               </text>
             </g>
           ))}
