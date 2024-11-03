@@ -20,14 +20,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8080:8080
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - ./backend/.env
     networks:
       - frontend-network
       - backend-network
     restart: unless-stopped
     volumes:
-      - ./.pgpass:/root/.pgpass
+      - ./backend/.pgpass:/root/.pgpass
     depends_on:
       - db
 
@@ -37,9 +37,9 @@ services:
       context: ./db
       dockerfile: Dockerfile
     ports:
-      - ${PGPORT}:5432
+      - 5432:5432
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
     restart: unless-stopped
     networks:
@@ -60,4 +60,4 @@ networks:
 
 secrets:
   pg_password:
-    file: ./.pg_password
+    file: ./db/.pg_password
