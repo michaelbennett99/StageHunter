@@ -8,8 +8,6 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-ENV DATABASE_URL=""
-
 RUN go build -v -o /usr/local/bin/app ./main.go
 
 CMD ["app"]
