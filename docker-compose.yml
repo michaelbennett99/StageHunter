@@ -8,6 +8,8 @@ services:
       - 3000:3000
     networks:
       - frontend-network
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=768
     restart: unless-stopped
     depends_on:
       - backend
