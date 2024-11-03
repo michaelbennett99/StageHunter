@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"math"
 
 	"golang.org/x/exp/constraints"
 	"golang.org/x/exp/slices"
@@ -84,7 +85,7 @@ func GetInterpolatedGradientPoints(
 	finalElevation := float64(elevationPoints[nElevationPoints-1].Elevation)
 
 	// Get number of interior points to interpolate
-	numPoints := int(maxDistance / resolution)
+	numPoints := int(math.Floor(maxDistance / resolution))
 	// Add two points to include the first and last points
 	gradientPoints := make([]GradientPoint, numPoints+2)
 
