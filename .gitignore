@@ -3,3 +3,4 @@
 */dump.sql
 .pgpass
 .env
+!.env.example
