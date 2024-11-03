@@ -68,12 +68,6 @@ function ElevationChart({
   return (
     <div ref={containerRef} className="w-full h-full">
       <svg width="100%" height="100%">
-        <path
-          fill="red"
-          stroke="black"
-          strokeWidth={2}
-          d={area(data) || ''}
-        />
         <g
           transform={`translate(0,${height - margin.bottom})`}
           className="x-axis"
@@ -110,6 +104,14 @@ function ElevationChart({
           />
           {y.ticks(5).map(tick => (
             <g key={tick} transform={`translate(0,${y(tick)})`}>
+              <line
+                x1={0}
+                x2={width - margin.left - margin.right}
+                stroke="grey"
+                strokeWidth={1}
+                strokeOpacity={0.5}
+                strokeDasharray="2,2"
+              />
               <line x2={-6} stroke="black" />
               <text
                 style={{
@@ -124,6 +126,13 @@ function ElevationChart({
             </g>
           ))}
         </g>
+
+        <path
+          fill="red"
+          stroke="black"
+          strokeWidth={2}
+          d={area(data) || ''}
+        />
       </svg>
     </div>
   );
