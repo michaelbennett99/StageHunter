@@ -62,7 +62,7 @@ type OrderedElevationPoint interface {
 
 type ElevationPoint struct {
 	Distance  float64
-	Elevation int
+	Elevation float64
 }
 
 func (ep ElevationPoint) Less(other ElevationPoint) bool {
