@@ -2,3 +2,4 @@
 .pg_password
 */dump.sql
 .pgpass
+.env
