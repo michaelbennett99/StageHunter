@@ -56,9 +56,27 @@ type StageInfo struct {
 	StageLength float64
 }
 
+type OrderedElevationPoint interface {
+	Less(other OrderedElevationPoint) bool
+}
+
 type ElevationPoint struct {
 	Distance  float64
 	Elevation int
+}
+
+func (ep ElevationPoint) Less(other ElevationPoint) bool {
+	return ep.Distance < other.Distance
+}
+
+type GradientPoint struct {
+	Distance  float64
+	Elevation float64
+	Gradient  float64
+}
+
+func (gp GradientPoint) Less(other GradientPoint) bool {
+	return gp.Distance < other.Distance
 }
 
 type Classification string

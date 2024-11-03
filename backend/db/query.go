@@ -139,6 +139,21 @@ func (q *Queries) GetElevationProfile(
 	return points, nil
 }
 
+type GradientQueryParams struct {
+	StageID    int
+	Resolution float64
+}
+
+func (q *Queries) GetGradientProfile(
+	ctx context.Context, params GradientQueryParams,
+) ([]GradientPoint, error) {
+	elevationPoints, err := q.GetElevationProfile(ctx, params.StageID)
+	if err != nil {
+		return nil, err
+	}
+	return GetInterpolatedGradientPoints(elevationPoints, params.Resolution)
+}
+
 const getResultsQuery = `
 SELECT
 	rank,

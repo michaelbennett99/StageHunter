@@ -173,6 +173,37 @@ func GetStageElevationHandler(
 	json.NewEncoder(w).Encode(elevation)
 }
 
+func GetStageGradientHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resolution, err := strconv.ParseFloat(r.URL.Query().Get("resolution"), 64)
+	if err != nil {
+		resolution = 10
+	}
+
+	gradient, err := conn.GetGradientProfile(
+		context.Background(), db.GradientQueryParams{
+			StageID:    stage_id,
+			Resolution: resolution,
+		},
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(gradient)
+}
+
 func GetResultsHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {

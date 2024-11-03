@@ -67,6 +67,15 @@ func main() {
 	)
 
 	http.HandleFunc(
+		"/stage/gradient/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetStageGradientHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
 		"/stage/results/",
 		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.GetResultsHandler),
