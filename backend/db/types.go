@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
+
+	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
 
 type GrandTour string
@@ -72,7 +74,7 @@ func (ep ElevationPoint) Less(other ElevationPoint) bool {
 type GradientPoint struct {
 	Distance  float64
 	Elevation float64
-	Gradient  float64
+	Gradient  lib.Optional[float64]
 }
 
 func (gp GradientPoint) Less(other GradientPoint) bool {

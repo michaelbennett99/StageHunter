@@ -6,6 +6,8 @@ import (
 
 	"golang.org/x/exp/constraints"
 	"golang.org/x/exp/slices"
+
+	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
 
 func cmpElevationPoint(i, j ElevationPoint) int {
@@ -76,6 +78,15 @@ func GetInterpolatedGradientPoints(
 	elevationPoints []ElevationPoint,
 	resolution float64,
 ) ([]GradientPoint, error) {
+	// Input validation
+	if resolution <= 0 {
+		return nil, errors.New("resolution must be positive")
+	}
+	if len(elevationPoints) < 2 {
+		return nil, errors.New("must have at least two points")
+	}
+
+	// Sort the points if they are not already sorted
 	if !isSorted(elevationPoints) {
 		slices.SortFunc(elevationPoints, cmpElevationPoint)
 	}
@@ -92,7 +103,7 @@ func GetInterpolatedGradientPoints(
 	gradientPoints[0] = GradientPoint{
 		Distance:  0,
 		Elevation: float64(elevationPoints[0].Elevation),
-		Gradient:  0,
+		Gradient:  lib.NewEmptyOptional[float64](),
 	}
 
 	for i := 1; i <= numPoints; i++ {
@@ -108,7 +119,7 @@ func GetInterpolatedGradientPoints(
 		gradientPoints[i] = GradientPoint{
 			Distance:  distance,
 			Elevation: elevation,
-			Gradient:  gradient,
+			Gradient:  lib.NewOptional(gradient),
 		}
 	}
 
@@ -119,7 +130,7 @@ func GetInterpolatedGradientPoints(
 	gradientPoints[numPoints+1] = GradientPoint{
 		Distance:  maxDistance,
 		Elevation: finalElevation,
-		Gradient:  gradient,
+		Gradient:  lib.NewOptional(gradient),
 	}
 
 	return gradientPoints, nil
