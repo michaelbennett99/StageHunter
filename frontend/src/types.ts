@@ -1,4 +1,4 @@
-export const BACKEND_URL = 'http://stagehunter.cc/api';
+export const BACKEND_URL = 'http://stagehunter-backend:8080';
 
 export enum GrandTour {
   TOUR = 'TOUR',
