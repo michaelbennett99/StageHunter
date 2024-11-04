@@ -1,4 +1,4 @@
-export const BACKEND_URL = 'http://backend:8080';
+export const BACKEND_URL = '/api';
 
 export enum GrandTour {
   TOUR = 'TOUR',
