@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ElevationData } from '@/types';
+import { GradientData } from '@/types';
 
 import * as d3 from 'd3';
 
 export default function Elevation({
   data,
 }: {
-  data: ElevationData[];
+  data: GradientData[];
 }): JSX.Element {
   return (
     <div className="h-1/4 max-h-64 bg-slate-100" id="elevation-container">
@@ -21,7 +21,7 @@ function ElevationChart({
   data,
   margin = { top: 10, right: 10, bottom: 40, left: 40 },
 }: {
-  data: ElevationData[];
+  data: GradientData[];
   margin?: { top: number; right: number; bottom: number; left: number };
 }): JSX.Element {
   const [width, setWidth] = useState(0);
@@ -60,7 +60,7 @@ function ElevationChart({
     .domain(d3.extent(data, d => d.elevation) as [number, number])
     .range([height - margin.bottom, margin.top]);
 
-  const area = d3.area<ElevationData>()
+  const area = d3.area<GradientData>()
     .x(d => x(d.distance))
     .y0(height - margin.bottom)
     .y1(d => y(d.elevation));

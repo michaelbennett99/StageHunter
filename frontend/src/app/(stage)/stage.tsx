@@ -3,10 +3,10 @@ import { Suspense } from 'react';
 import Map from './map';
 import Elevation from './elevation';
 import Input from './input';
-import { ElevationData, ResultsData } from '@/types';
+import { GradientData, ResultsData } from '@/types';
 import {
   getTrack,
-  getElevationData,
+  getGradientData,
   getResultsData
 } from '@/getters';
 
@@ -26,9 +26,9 @@ async function ElevationLoader({
   children
 }: {
   stageId: string | number;
-  children: (elevation: ElevationData[]) => JSX.Element;
+  children: (elevation: GradientData[]) => JSX.Element;
 }): Promise<JSX.Element> {
-  const elevation = await getElevationData(stageId);
+  const elevation = await getGradientData(stageId, 10);
   return children(elevation);
 }
 
@@ -62,7 +62,7 @@ export default async function Stage({
           </Suspense>
           <Suspense fallback={<div>Loading...</div>}>
             <ElevationLoader stageId={stageId}>
-              {(elevation: ElevationData[]) => <Elevation data={elevation} />}
+              {(elevation: GradientData[]) => <Elevation data={elevation} />}
             </ElevationLoader>
           </Suspense>
         </div>
