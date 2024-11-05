@@ -30,3 +30,9 @@ export interface ElevationData {
   elevation: number;
   distance: number;
 }
+
+export interface GradientData {
+  distance: number;
+  elevation: number;
+  gradient: number | null;
+}

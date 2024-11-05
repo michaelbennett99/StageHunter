@@ -1,4 +1,10 @@
-import { BACKEND_URL, Result, ResultsData, ElevationData } from './types';
+import {
+  BACKEND_URL,
+  Result,
+  ResultsData,
+  ElevationData,
+  GradientData
+} from './types';
 
 async function fetchJSON(url: string): Promise<any> {
   const res = await fetch(url, {
@@ -76,4 +82,20 @@ export async function getElevationData(
     elevation: d.Elevation,
     distance: d.Distance,
   }));
+}
+
+export async function getGradientData(
+  stage_id: string | number,
+  resolution: number
+): Promise<GradientData[]> {
+  const data = await fetchJSON(
+    `${BACKEND_URL}/stage/gradient/${stage_id}?resolution=${resolution}`
+  );
+  return data.map(
+    (d: { Distance: number; Elevation: number; Gradient: number | null }) => ({
+      distance: d.Distance,
+      elevation: d.Elevation,
+      gradient: d.Gradient,
+    })
+  );
 }
