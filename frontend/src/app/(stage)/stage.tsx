@@ -28,7 +28,7 @@ async function ElevationLoader({
   stageId: string | number;
   children: (elevation: GradientData[]) => JSX.Element;
 }): Promise<JSX.Element> {
-  const elevation = await getGradientData(stageId, 10);
+  const elevation = await getGradientData(stageId, 1000);
   return children(elevation);
 }
 
