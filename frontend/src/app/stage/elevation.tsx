@@ -14,6 +14,24 @@ function mapColour(
   return d3.interpolateTurbo(normalised);
 }
 
+function getElevation(
+  data: GradientData[],
+  distance: number | null
+): number | null {
+  if (distance === null) return null;
+
+  const index = data.findIndex(d => d.distance > distance);
+  if (index === -1) return null; // distance further than the end of the track
+  if (index === 0) return data[0].elevation; // distance before start of track
+
+  const point1 = data[index - 1];
+  const point2 = data[index];
+
+  const nGrad = point2.gradient! / 1000;
+
+  return point1.elevation + nGrad * (point2.distance - distance);
+}
+
 export default function Elevation({
   data,
   distance,
@@ -53,6 +71,9 @@ function ElevationChart({
   const [height, setHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Map position line state and dependent values
+  const elevation = getElevation(data, distance);
+
   // Effect to handle resizing the SVG
   useEffect(() => {
     const parent = containerRef.current;
@@ -71,15 +92,19 @@ function ElevationChart({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
+  // If the container is not yet rendered, return a placeholder
   if (width === 0 || height === 0) {
     return <div ref={containerRef} className="w-full h-full" />;
   }
 
+  // Define scales, line and area objects
+
+  // Scale for the distance axis
   const x = d3.scaleLinear()
     .domain(d3.extent(data, d => d.distance) as [number, number])
     .range([margin.left, width - margin.right]);
 
+  // Scale for the elevation axis
   const y = d3.scaleLinear()
     .domain(d3.extent(data, d => d.elevation) as [number, number])
     .range([height - margin.bottom, margin.top]);
@@ -101,6 +126,9 @@ function ElevationChart({
     color: mapColour(d.gradient || 0)
   }));
 
+  // Event handlers
+
+  // Handle mouse move over the chart
   const handleMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
     const svgElement = event.currentTarget;
     const rect = svgElement.getBoundingClientRect();
@@ -117,25 +145,6 @@ function ElevationChart({
       setDistance(null);
     }
   }
-
-  // Get the y-coordinate of the black elevation line at distance
-  const elevation = distance !== null ? (() => {
-    // Find the two points that bracket our distance
-    const index = data.findIndex(d => d.distance > distance);
-    if (index === -1) return null;
-    if (index === 0) return y(data[0].elevation);
-
-    const point1 = data[index - 1];
-    const point2 = data[index];
-
-    // Linear interpolation between the two points
-    const t = (distance - point1.distance)
-      / (point2.distance - point1.distance);
-    const interpolatedElevation = point1.elevation
-      + t * (point2.elevation - point1.elevation);
-
-    return y(interpolatedElevation);
-  })() : null;
 
   const elevationLine = (
     <path
@@ -171,13 +180,13 @@ function ElevationChart({
         x1={x(distance)}
         x2={x(distance)}
         y1={height - margin.bottom}
-        y2={elevation! + 5}
+        y2={elevation !== null ? y(elevation) + 5 : height - margin.bottom}
         stroke="black"
         strokeWidth={2}
       />
       <circle
         cx={x(distance)}
-        cy={elevation!}
+        cy={elevation !== null ? y(elevation) : height - margin.bottom}
         r={5}
         fill="none"
         stroke="black"
