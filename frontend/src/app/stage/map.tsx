@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { along } from '@turf/along';
 
@@ -11,6 +11,7 @@ export default function Map(
 ): JSX.Element {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   const INITIAL_ZOOM = 7;
 
@@ -21,29 +22,30 @@ export default function Map(
     return bounds;
   }, [track]);
 
-  // Calculate the highlighted point location
   const point = useMemo(() => {
     if (distance === null) return null;
     return along(track, distance / 1000);
   }, [track, distance]);
 
+  // Initialize map
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '';
 
-    mapRef.current = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: mapContainerRef.current!,
       center: bounds.getCenter(),
       zoom: INITIAL_ZOOM,
     });
 
-    // Stage route track
-    mapRef.current?.on('load', () => {
-      mapRef.current?.addSource('route', {
+    mapRef.current = map;
+
+    map.on('load', () => {
+      map.addSource('route', {
         type: 'geojson',
         data: track
       });
 
-      mapRef.current?.addLayer({
+      map.addLayer({
         id: 'route',
         type: 'line',
         source: 'route',
@@ -57,8 +59,7 @@ export default function Map(
         }
       });
 
-      // Location point
-      mapRef.current?.addSource('point', {
+      map.addSource('point', {
         type: 'geojson',
         data: {
           type: 'FeatureCollection',
@@ -66,7 +67,7 @@ export default function Map(
         }
       });
 
-      mapRef.current?.addLayer({
+      map.addLayer({
         id: 'point',
         type: 'circle',
         source: 'point',
@@ -76,39 +77,40 @@ export default function Map(
         }
       });
 
-      mapRef.current?.fitBounds(bounds, {
+      map.fitBounds(bounds, {
         padding: 100
       });
+
+      setIsMapReady(true);
     });
 
-    return () => mapRef.current?.remove();
+    return () => {
+      setIsMapReady(false);
+      map.remove();
+    };
   }, []);
 
   // Update point location
   useEffect(() => {
-    if (!mapRef.current?.isStyleLoaded()) return;
+    if (!isMapReady || !mapRef.current) return;
 
-    const source = mapRef.current?.getSource('point') as mapboxgl.GeoJSONSource;
+    try {
+      const source = mapRef.current.getSource('point') as mapboxgl.GeoJSONSource;
 
-    if (point === null) {
       source.setData({
         type: 'FeatureCollection',
-        features: []
+        features: point ? [point] : []
       });
-      return;
-    };
-
-    source.setData({
-      type: 'FeatureCollection',
-      features: [point]
-    });
-  }, [point]);
+    } catch (error) {
+      console.error('Error updating point:', error);
+    }
+  }, [point, isMapReady]);
 
   const handleButtonClick = () => {
     mapRef.current?.fitBounds(bounds, {
       padding: 100
-    })
-  }
+    });
+  };
 
   return (
     <div id="map-container-container" className="h-full relative">
