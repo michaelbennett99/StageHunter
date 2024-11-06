@@ -146,8 +146,7 @@ function ElevationChart({
     }
   }
 
-  // Elements for the chart
-
+  // Elements for the chart that we need to render
   const elevationLine = (
     <path
       fill="none"
@@ -250,15 +249,15 @@ function XAxis(
       {x.ticks(nTicks).map(tick => (
         <g key={tick} transform={`translate(${x(tick)},0)`}>
           <line y2={6} stroke="black" />
-          <text
+          <TickLabel
+            tick={tick}
+            labelFn={labelFn}
             style={{
               fontSize: '10px',
               textAnchor: 'middle',
               transform: 'translateY(20px)'
             }}
-          >
-            {labelFn(tick)}
-          </text>
+          />
         </g>
       ))}
     </g>
@@ -296,18 +295,28 @@ function YAxis(
             strokeDasharray="2,2"
           />
           <line x2={-6} stroke="black" />
-          <text
+          <TickLabel
+            tick={tick}
+            labelFn={labelFn}
             style={{
               fontSize: '10px',
               textAnchor: 'end',
               transform: 'translateX(-8px)',
               alignmentBaseline: 'middle'
             }}
-          >
-            {labelFn(tick)}
-          </text>
+          />
         </g>
       ))}
     </g>
   );
+}
+
+function TickLabel(
+  { tick, labelFn, style }: {
+    tick: number;
+    labelFn: (tick: number) => string;
+    style?: React.CSSProperties;
+  }
+): JSX.Element {
+  return <text style={style}>{labelFn(tick)}</text>;
 }
