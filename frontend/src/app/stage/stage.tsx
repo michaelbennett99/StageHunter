@@ -32,7 +32,7 @@ export default async function Stage({
   stageId: string | number;
 }): Promise<JSX.Element> {
   const stageLength = await getStageLength(stageId);
-  const resolution = stageLength < 50 ? 10 : 200;
+  const resolution = stageLength < 50 ? 50 : 200;
   const [track, gradientData] = await Promise.all([
     getTrack(stageId),
     getGradientData(stageId, resolution)

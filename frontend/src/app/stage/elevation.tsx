@@ -164,12 +164,13 @@ function ElevationChart({
   const areaGradients = data
     .slice(1)
     .map((d, i) => {
-      const startOffset = `${(data[i].distance / totalDistance) * 100}%`;
-      const endOffset = `${(d.distance / totalDistance) * 100}%`;
+      const startOffset = data[i].distance / totalDistance;
+      const endOffset = d.distance / totalDistance;
+      const segDistance = endOffset - startOffset;
       const color = mapColour(d.gradient || 0);
       return {
-        startOffset,
-        endOffset,
+        startOffset: startOffset,
+        endOffset: endOffset,
         color
       };
     })
