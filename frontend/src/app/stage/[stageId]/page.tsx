@@ -1,4 +1,4 @@
-import Stage from '@/app/(stage)/stage';
+import Stage from '@/app/stage/stage';
 import { getAllStageIDs } from '@/getters';
 
 export const dynamicParams = false;

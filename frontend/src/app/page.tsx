@@ -1,4 +1,4 @@
-import Stage from '@/app/(stage)/stage';
+import Stage from '@/app/stage/stage';
 import { getDailyStageId } from '@/getters';
 
 export default async function Page(): Promise<JSX.Element> {
