@@ -2,11 +2,12 @@
 
 import { useRef, useEffect, useMemo } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { along } from '@turf/along';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function Map(
-  { track }: { track: GeoJSON.LineString }
+  { track, distance }: { track: GeoJSON.LineString, distance: number | null }
 ): JSX.Element {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -20,6 +21,12 @@ export default function Map(
     return bounds;
   }, [track]);
 
+  // Calculate the highlighted point location
+  const point = useMemo(() => {
+    if (distance === null) return null;
+    return along(track, distance / 1000);
+  }, [track, distance]);
+
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '';
 
@@ -29,12 +36,12 @@ export default function Map(
       zoom: INITIAL_ZOOM,
     });
 
-
-    mapRef.current?.on('load', () =>{
+    // Stage route track
+    mapRef.current?.on('load', () => {
       mapRef.current?.addSource('route', {
         type: 'geojson',
         data: track
-      })
+      });
 
       mapRef.current?.addLayer({
         id: 'route',
@@ -48,15 +55,54 @@ export default function Map(
           'line-color': '#000',
           'line-width': 4
         }
-      })
+      });
+
+      // Location point
+      mapRef.current?.addSource('point', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+
+      mapRef.current?.addLayer({
+        id: 'point',
+        type: 'circle',
+        source: 'point',
+        paint: {
+          'circle-color': '#000',
+          'circle-radius': 10
+        }
+      });
 
       mapRef.current?.fitBounds(bounds, {
         padding: 100
-      })
-    })
+      });
+    });
 
     return () => mapRef.current?.remove();
   }, []);
+
+  // Update point location
+  useEffect(() => {
+    if (!mapRef.current?.isStyleLoaded()) return;
+
+    const source = mapRef.current?.getSource('point') as mapboxgl.GeoJSONSource;
+
+    if (point === null) {
+      source.setData({
+        type: 'FeatureCollection',
+        features: []
+      });
+      return;
+    };
+
+    source.setData({
+      type: 'FeatureCollection',
+      features: [point]
+    });
+  }, [point]);
 
   const handleButtonClick = () => {
     mapRef.current?.fitBounds(bounds, {
