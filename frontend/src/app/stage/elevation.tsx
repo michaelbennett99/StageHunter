@@ -209,6 +209,7 @@ function ElevationChart({
           height={height}
           y={y}
           nTicks={5}
+          labelFn={tick => tick.toFixed(0).toString() + 'm'}
         />
         {elevationLine}
         {areaGradientFill}
@@ -219,6 +220,7 @@ function ElevationChart({
           height={height}
           x={x}
           nTicks={10}
+          labelFn={tick => (tick / 1000).toFixed(0).toString() + 'km'}
         />
       </svg>
     </div>
@@ -226,12 +228,13 @@ function ElevationChart({
 }
 
 function XAxis(
-  { margin, width, height, x, nTicks }: {
+  { margin, width, height, x, nTicks, labelFn }: {
     margin: { top: number; right: number; bottom: number; left: number };
     width: number;
     height: number;
     x: d3.ScaleLinear<number, number>;
     nTicks: number;
+    labelFn: (tick: number) => string;
   }
 ): JSX.Element {
   return (
@@ -254,7 +257,7 @@ function XAxis(
               transform: 'translateY(20px)'
             }}
           >
-            {(tick / 1000).toFixed(0).toString() + 'km'}
+            {labelFn(tick)}
           </text>
         </g>
       ))}
@@ -263,12 +266,13 @@ function XAxis(
 }
 
 function YAxis(
-  { margin, width, height, y, nTicks }: {
+  { margin, width, height, y, nTicks, labelFn }: {
     margin: { top: number; right: number; bottom: number; left: number };
     width: number;
     height: number;
     y: d3.ScaleLinear<number, number>;
     nTicks: number;
+    labelFn: (tick: number) => string;
   }
 ): JSX.Element {
   return (
@@ -300,7 +304,7 @@ function YAxis(
               alignmentBaseline: 'middle'
             }}
           >
-            {tick.toFixed(0).toString() + 'm'}
+            {labelFn(tick)}
           </text>
         </g>
       ))}
