@@ -23,10 +23,22 @@ RUN npm install -g pnpm
 
 # Copy all the files we need
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# COPY . .
 
 # Expose port 3000
 EXPOSE 3000
 
 # Start the app
 CMD ["pnpm", "dev"]
+
+FROM base AS production
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+EXPOSE 3000
+
+RUN ["pnpm", "build"]
+
+CMD ["pnpm", "start"]
