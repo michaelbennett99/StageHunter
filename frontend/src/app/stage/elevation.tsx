@@ -409,7 +409,7 @@ function MouseOverLineText(
       ...texts.map(text => getTextWidth(text, fontSize))
     );
     setBoxWidth(maxWidth + (boxPadding * 2));
-  }, [texts.join(''), fontSize, boxPadding]);
+  }, [maxTextsLength, fontSize, boxPadding]);
 
   // Calculate the box dimensions
   const boxHeight = (fontSize * texts.length) + (boxPadding * 2);
