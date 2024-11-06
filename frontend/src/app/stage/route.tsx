@@ -17,7 +17,7 @@ export default function Route({
 
   return (
     <div className="flex flex-col flex-grow" id="route-data-container">
-      <Map track={track} />
+      <Map track={track} distance={distance} />
       <Elevation
         data={elevation}
         distance={distance}
