@@ -10,6 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@turf/along": "^7.1.0",
+    "@turf/helpers": "^7.1.0",
     "client-only": "^0.0.1",
     "d3": "^7.9.0",
     "mapbox-gl": "^3.7.0",
