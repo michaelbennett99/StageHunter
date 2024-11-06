@@ -5,13 +5,18 @@ import { GradientData } from '@/types';
 
 import * as d3 from 'd3';
 
+function sigmoid(x: number, a: number, b: number): number {
+  return (a / (1 + Math.exp(-b * x)));
+}
+
 function mapColour(
   gradient: number,
 ): string {
-  const max = 20;
-  const scaled = (gradient + max) / (2 * max);
-  const normalised = Math.cbrt((scaled - 0.5)/4) + 0.5;
-  return d3.interpolateTurbo(normalised);
+  // ["#bd0000", "#effbe9", "#0082ad"]
+  const colour = d3.scaleDiverging(
+    d3.interpolateSpectral
+  ).interpolator();
+  return colour(sigmoid(-gradient, 1, 0.15));
 }
 
 function getElevation(
@@ -68,7 +73,7 @@ function ElevationChart({
   data,
   distance,
   setDistance,
-  margin = { top: 10, right: 10, bottom: 40, left: 40 },
+  margin = { top: 10, right: 70, bottom: 30, left: 50 },
 }: {
   data: GradientData[];
   distance: number | null;
@@ -166,7 +171,6 @@ function ElevationChart({
     .map((d, i) => {
       const startOffset = data[i].distance / totalDistance;
       const endOffset = d.distance / totalDistance;
-      const segDistance = endOffset - startOffset;
       const color = mapColour(d.gradient || 0);
       return {
         startOffset: startOffset,
@@ -234,6 +238,12 @@ function ElevationChart({
             const kmNum = km.endsWith('.00') ? km.slice(0, -3) : km;
             return kmNum + 'km';
           }}
+        />
+        <GradientLegend
+          mapColour={mapColour}
+          gradientData={data}
+          margin={margin}
+          dims={{ width, height }}
         />
       </svg>
     </div>
@@ -535,6 +545,88 @@ function MouseOverLine(
         gradientPoint={hoverPoint}
         textProps={allTextProps}
       />
+    </g>
+  );
+}
+
+function GradientLegend(
+  {
+    mapColour,
+    gradientData,
+    margin,
+    dims,
+    nTicks = 5,
+    width = 20,
+  }: {
+    mapColour: (gradient: number) => string;
+    gradientData: GradientData[];
+    margin: { left: number; top: number; right: number; bottom: number };
+    dims: { width: number; height: number };
+    nTicks?: number;
+    width?: number;
+    height?: number;
+  }
+): JSX.Element {
+  // Dimensions
+  const padding = 10;
+  const legendLeft = dims.width - margin.right + padding;
+  const legendTop = margin.top;
+  const legendHeight = dims.height - margin.top - margin.bottom;
+
+  const maxAbsGradient = Math.max(
+    ...gradientData.map(d => Math.abs(d.gradient || 0))
+  );
+
+  const g = d3.scaleLinear()
+    .domain([-maxAbsGradient, maxAbsGradient])
+    .range([legendHeight, 0]);
+
+  const colourDomain = d3.range(
+    -maxAbsGradient,
+    maxAbsGradient,
+    2 * maxAbsGradient / 100
+  );
+  const colourRange = colourDomain.map(mapColour);
+
+  const legendGradientDef = (
+    <linearGradient id="legendGradient" x1="0" x2="0" y1="1" y2="0">
+      {colourRange.map((colour, i) => (
+        <stop key={i} offset={`${i / colourRange.length}`} stopColor={colour} />
+      ))}
+    </linearGradient>
+  );
+  return (
+    <g transform={`translate(${legendLeft},${legendTop})`}>
+      <defs>
+        {legendGradientDef}
+      </defs>
+      <rect
+        x={0}
+        y={0}
+        width={width}
+        height={legendHeight}
+        stroke="black"
+        strokeWidth={1}
+        fill="url(#legendGradient)"
+      />
+      {g.ticks(nTicks).map(tick => (
+        <g
+          key={tick}
+          transform={`translate(${width},${g(tick)})`}
+        >
+          <line x2={6} stroke="black" />
+          <TickLabel
+            tick={tick}
+            labelFn={tick => tick.toFixed(0).toString() + '%'}
+            style={{
+              fontSize: '10px',
+              textAnchor: 'start',
+              alignmentBaseline: 'middle',
+              transform: 'translateX(8px)'
+            }}
+          />
+        </g>
+      ))}
     </g>
   );
 }
