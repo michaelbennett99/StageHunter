@@ -1,7 +1,7 @@
 import Route from './route';
 import Results from './results';
 
-import { getTrack, getGradientData } from '@/getters';
+import { getTrack, getGradientData, getStageLength } from '@/getters';
 // import { GradientData } from '@/types';
 
 // async function TrackLoader({
@@ -31,9 +31,11 @@ export default async function Stage({
 }: {
   stageId: string | number;
 }): Promise<JSX.Element> {
+  const stageLength = await getStageLength(stageId);
+  const resolution = stageLength < 50 ? 10 : 200;
   const [track, gradientData] = await Promise.all([
     getTrack(stageId),
-    getGradientData(stageId, 200)
+    getGradientData(stageId, resolution)
   ]);
   return (
     <div className="min-h-screen flex flex-col">

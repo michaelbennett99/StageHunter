@@ -44,6 +44,13 @@ function parseResults(res: any[], classification: string): Result[] {
   }));
 }
 
+export async function getStageLength(
+  stage_id: string | number
+): Promise<number> {
+  const info = await fetchJSON(`${BACKEND_URL}/stage/info/${stage_id}`);
+  return info.StageLength;
+}
+
 export async function getResultsData(
   stage_id: string | number,
   top_n: string | number
