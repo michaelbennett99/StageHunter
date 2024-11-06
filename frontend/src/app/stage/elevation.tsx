@@ -17,19 +17,28 @@ function mapColour(
 function getElevation(
   data: GradientData[],
   distance: number | null
-): number | null {
+): GradientData | null {
   if (distance === null) return null;
 
   const index = data.findIndex(d => d.distance > distance);
   if (index === -1) return null; // distance further than the end of the track
-  if (index === 0) return data[0].elevation; // distance before start of track
+  if (index === 0) return {
+    distance: distance,
+    elevation: data[0].elevation,
+    gradient: null
+  }; // distance before start of track
 
   const point1 = data[index - 1];
   const point2 = data[index];
 
   const nGrad = point2.gradient! / 1000;
 
-  return point1.elevation + nGrad * (point2.distance - distance);
+  const elevation =  point1.elevation + nGrad * (point2.distance - distance);
+  return {
+    distance: distance,
+    elevation: elevation,
+    gradient: point2.gradient
+  }
 }
 
 export default function Elevation({
@@ -72,7 +81,7 @@ function ElevationChart({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Map position line state and dependent values
-  const elevation = getElevation(data, distance);
+  const hoverPoint = getElevation(data, distance);
 
   // Effect to handle resizing the SVG
   useEffect(() => {
@@ -175,27 +184,6 @@ function ElevationChart({
     />
   );
 
-  const mouseOverLine = distance !== null && (
-    <g>
-      <line
-        x1={x(distance)}
-        x2={x(distance)}
-        y1={height - margin.bottom}
-        y2={elevation !== null ? y(elevation) + 5 : height - margin.bottom}
-        stroke="black"
-        strokeWidth={2}
-      />
-      <circle
-        cx={x(distance)}
-        cy={elevation !== null ? y(elevation) : height - margin.bottom}
-        r={5}
-        fill="none"
-        stroke="black"
-        strokeWidth={2}
-      />
-    </g>
-  );
-
   return (
     <div ref={containerRef} className="w-full h-full">
       <svg width="100%" height="100%" onMouseMove={handleMouseMove}>
@@ -212,7 +200,13 @@ function ElevationChart({
         />
         {elevationLine}
         {areaGradientFill}
-        {mouseOverLine}
+        <MouseOverLine
+          hoverPoint={hoverPoint}
+          margin={margin}
+          height={height}
+          x={x}
+          y={y}
+        />
         <XAxis
           margin={margin}
           width={width}
@@ -319,4 +313,73 @@ function TickLabel(
   }
 ): JSX.Element {
   return <text style={style}>{labelFn(tick)}</text>;
+}
+
+function SVGTextBox(
+  { xpos, ypos, text }: { xpos: number; ypos: number; text: string }
+): JSX.Element {
+  return (
+    <text
+      x={xpos}
+      y={ypos}
+    >
+      {text}
+    </text>
+  );
+}
+
+function MouseOverLineText(
+  { xpos, ypos, gradientPoint }: {
+    xpos: number;
+    ypos: number;
+    gradientPoint: GradientData;
+  }
+): JSX.Element {
+  const text = `
+    ${(gradientPoint.distance / 1000).toFixed(0).toString()}km\n
+    ${gradientPoint.elevation.toFixed(0).toString()}m\n
+    ${gradientPoint.gradient?.toFixed(0).toString() ?? '0'}%
+  `;
+  return <SVGTextBox xpos={xpos} ypos={ypos} text={text} />;
+}
+
+function MouseOverLine(
+  { hoverPoint, margin, height, x, y }: {
+    hoverPoint: GradientData | null;
+    margin: { top: number; right: number; bottom: number; left: number };
+    height: number;
+    x: d3.ScaleLinear<number, number>;
+    y: d3.ScaleLinear<number, number>;
+  }
+): JSX.Element {
+  if (hoverPoint === null) return <></>;
+
+  const distancePos = x(hoverPoint.distance);
+  const elevationPos = y(hoverPoint.elevation);
+
+  return (
+    <g>
+      <line
+        x1={distancePos}
+        x2={distancePos}
+        y1={height - margin.bottom}
+        y2={elevationPos + 5}
+        stroke="black"
+        strokeWidth={2}
+      />
+      <circle
+        cx={distancePos}
+        cy={elevationPos}
+        r={5}
+        fill="none"
+        stroke="black"
+        strokeWidth={2}
+      />
+      <MouseOverLineText
+        xpos={distancePos}
+        ypos={elevationPos}
+        gradientPoint={hoverPoint}
+      />
+    </g>
+  );
 }
