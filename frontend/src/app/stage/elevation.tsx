@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GradientData } from '@/types';
 
 import * as d3 from 'd3';
@@ -129,12 +129,6 @@ function ElevationChart({
     .y0(height - margin.bottom)
     .y1(d => y(d.elevation));
 
-  // Create the gradient fill for the area under the line
-  const areaGradients = data.map((d, i) => ({
-    offset: `${(i / (data.length - 1)) * 100}%`,
-    color: mapColour(d.gradient || 0)
-  }));
-
   // Event handlers
 
   // Handle mouse move over the chart
@@ -165,14 +159,35 @@ function ElevationChart({
     />
   );
 
+  // Create the gradient fill for the area under the line
+  const totalDistance = data[data.length - 1].distance;
+  const areaGradients = data
+    .slice(1)
+    .map((d, i) => {
+      const startOffset = `${(data[i].distance / totalDistance) * 100}%`;
+      const endOffset = `${(d.distance / totalDistance) * 100}%`;
+      const color = mapColour(d.gradient || 0);
+      return {
+        startOffset,
+        endOffset,
+        color
+      };
+    })
+
   const areaGradientDef = (
     <linearGradient id="areaGradient" x1="0" x2="1" y1="0" y2="0">
       {areaGradients.map((grad, i) => (
-        <stop
-          key={i}
-          offset={grad.offset}
-          stopColor={grad.color}
-        />
+        <React.Fragment key={i}>
+          <stop
+            offset={grad.startOffset}
+            stopColor={grad.color}
+          />
+          <stop
+            key={`end-${i}`}
+            offset={grad.endOffset}
+            stopColor={grad.color}
+          />
+        </React.Fragment>
       ))}
     </linearGradient>
   );
@@ -213,7 +228,7 @@ function ElevationChart({
           height={height}
           x={x}
           nTicks={10}
-          labelFn={tick => (tick / 1000).toFixed(0).toString() + 'km'}
+          labelFn={tick => (tick / 1000).toPrecision(2).toString() + 'km'}
         />
       </svg>
     </div>
@@ -379,10 +394,12 @@ function MouseOverLineText(
 
   // Create the text content to measure
   const texts = [
-    `${(gradientPoint.distance / 1000).toFixed(0).toString()}km`,
+    `${(gradientPoint.distance / 1000).toPrecision(2).toString()}km`,
     `${gradientPoint.elevation.toFixed(0).toString()}m`,
     `${gradientPoint.gradient?.toFixed(0).toString() ?? '0'}%`
   ];
+
+  const maxTextsLength = Math.max(...texts.map(text => text.length));
 
   // Calculate the maximum text width
   const [boxWidth, setBoxWidth] = useState(0);
