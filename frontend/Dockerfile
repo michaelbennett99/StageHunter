@@ -1,4 +1,19 @@
+# Frontend Dockerfile
+# -------------------
 # Dockerfile for a nextjs frontend
+#
+# Development Mode:
+# Required volumes:
+# - ./frontend:/app   # Mount the frontend source code to allow hot reloading
+# - /app/.next        # Don't copy .next from base image
+# - /app/node_modules # Don't copy node_modules from base image
+#
+# Production Mode:
+# No required volumes, source will be copied into image
+#
+# All modes:
+# - Listens on port 3000
+
 # Set base image
 FROM node:20-alpine AS base
 
