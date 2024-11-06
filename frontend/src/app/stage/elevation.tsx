@@ -228,7 +228,11 @@ function ElevationChart({
           height={height}
           x={x}
           nTicks={10}
-          labelFn={tick => (tick / 1000).toPrecision(2).toString() + 'km'}
+          labelFn={tick => {
+            const km = (tick / 1000).toFixed(2);
+            const kmNum = km.endsWith('.00') ? km.slice(0, -3) : km;
+            return kmNum + 'km';
+          }}
         />
       </svg>
     </div>
@@ -394,7 +398,7 @@ function MouseOverLineText(
 
   // Create the text content to measure
   const texts = [
-    `${(gradientPoint.distance / 1000).toPrecision(2).toString()}km`,
+    `${(gradientPoint.distance / 1000).toFixed(0).toString()}km`,
     `${gradientPoint.elevation.toFixed(0).toString()}m`,
     `${gradientPoint.gradient?.toFixed(0).toString() ?? '0'}%`
   ];
