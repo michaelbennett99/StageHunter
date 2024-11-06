@@ -11,9 +11,6 @@ importers:
       '@turf/along':
         specifier: ^7.1.0
         version: 7.1.0
-      '@turf/helpers':
-        specifier: ^7.1.0
-        version: 7.1.0
       client-only:
         specifier: ^0.0.1
         version: 0.0.1
