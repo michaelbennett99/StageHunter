@@ -16,30 +16,42 @@ function mapColour(
 
 export default function Elevation({
   data,
+  distance,
+  setDistance
 }: {
   data: GradientData[];
+  distance: number | null;
+  setDistance: (distance: number | null) => void;
 }): JSX.Element {
   return (
     <div
       className="h-1/4 max-h-64 min-h-16 bg-slate-100"
       id="elevation-container"
     >
-      <ElevationChart data={data} />
+      <ElevationChart
+        data={data}
+        distance={distance}
+        setDistance={setDistance}
+      />
     </div>
   );
 }
 
 function ElevationChart({
   data,
+  distance,
+  setDistance,
   margin = { top: 10, right: 10, bottom: 40, left: 40 },
 }: {
   data: GradientData[];
+  distance: number | null;
+  setDistance: (distance: number | null) => void;
   margin?: { top: number; right: number; bottom: number; left: number };
 }): JSX.Element {
+  // Positioning state
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
-
 
   // Effect to handle resizing the SVG
   useEffect(() => {
