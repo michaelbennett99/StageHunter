@@ -101,93 +101,165 @@ function ElevationChart({
     color: mapColour(d.gradient || 0)
   }));
 
+  const handleMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    const svgElement = event.currentTarget;
+    const rect = svgElement.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const inX = mouseX >= margin.left && mouseX <= width - margin.right;
+    const inY = mouseY >= margin.top && mouseY <= height - margin.bottom;
+
+    if (inX && inY) {
+      const value = x.invert(mouseX);
+      setDistance(value);
+    } else {
+      setDistance(null);
+    }
+  }
+
+  // Get the y-coordinate of the black elevation line at distance
+  const elevation = distance !== null ? (() => {
+    // Find the two points that bracket our distance
+    const index = data.findIndex(d => d.distance > distance);
+    if (index === -1) return null;
+    if (index === 0) return y(data[0].elevation);
+
+    const point1 = data[index - 1];
+    const point2 = data[index];
+
+    // Linear interpolation between the two points
+    const t = (distance - point1.distance)
+      / (point2.distance - point1.distance);
+    const interpolatedElevation = point1.elevation
+      + t * (point2.elevation - point1.elevation);
+
+    return y(interpolatedElevation);
+  })() : null;
+
+  const elevationLine = (
+    <path
+      fill="none"
+      stroke="black"
+      strokeWidth={2}
+      d={line(data) || ''}
+    />
+  );
+
+  const areaGradientDef = (
+    <linearGradient id="areaGradient" x1="0" x2="1" y1="0" y2="0">
+      {areaGradients.map((grad, i) => (
+        <stop
+          key={i}
+          offset={grad.offset}
+          stopColor={grad.color}
+        />
+      ))}
+    </linearGradient>
+  );
+
+  const areaGradientFill = (
+    <path
+      fill="url(#areaGradient)"
+      d={area(data) || ''}
+    />
+  );
+
+  const mouseOverLine = distance !== null && (
+    <g>
+      <line
+        x1={x(distance)}
+        x2={x(distance)}
+        y1={height - margin.bottom}
+        y2={elevation! + 5}
+        stroke="black"
+        strokeWidth={2}
+      />
+      <circle
+        cx={x(distance)}
+        cy={elevation!}
+        r={5}
+        fill="none"
+        stroke="black"
+        strokeWidth={2}
+      />
+    </g>
+  );
+
+  const xAxis = (
+    <g
+      transform={`translate(0,${height - margin.bottom})`}
+      className="x-axis"
+    >
+      <line
+        x1={margin.left}
+        x2={width - margin.right}
+        stroke="black"
+      />
+      {x.ticks(10).map(tick => (
+        <g key={tick} transform={`translate(${x(tick)},0)`}>
+          <line y2={6} stroke="black" />
+          <text
+            style={{
+            fontSize: '10px',
+              textAnchor: 'middle',
+              transform: 'translateY(20px)'
+            }}
+          >
+            {(tick / 1000).toFixed(0).toString() + 'km'}
+          </text>
+        </g>
+      ))}
+    </g>
+  );
+
+  const yAxis = (
+    <g
+      transform={`translate(${margin.left},0)`}
+      className="y-axis"
+    >
+      <line
+        y1={margin.top}
+        y2={height - margin.bottom}
+        stroke="black"
+      />
+      {y.ticks(5).map(tick => (
+        <g key={tick} transform={`translate(0,${y(tick)})`}>
+          <line
+            x1={0}
+            x2={width - margin.left - margin.right}
+            stroke="grey"
+            strokeWidth={1}
+            strokeOpacity={0.5}
+            strokeDasharray="2,2"
+          />
+          <line x2={-6} stroke="black" />
+          <text
+            style={{
+              fontSize: '10px',
+              textAnchor: 'end',
+              transform: 'translateX(-8px)',
+              alignmentBaseline: 'middle'
+            }}
+          >
+            {tick.toFixed(0).toString() + 'm'}
+          </text>
+        </g>
+      ))}
+    </g>
+  );
+
   return (
     <div ref={containerRef} className="w-full h-full">
-      <svg width="100%" height="100%">
+      <svg width="100%" height="100%" onMouseMove={handleMouseMove}>
         <defs>
-          {/* Create the gradient fill for the area under the line */}
-          <linearGradient id="areaGradient" x1="0" x2="1" y1="0" y2="0">
-            {areaGradients.map((grad, i) => (
-              <stop
-                key={i}
-                offset={grad.offset}
-                stopColor={grad.color}
-              />
-            ))}
-          </linearGradient>
+          {areaGradientDef}
         </defs>
-
-        <g
-          transform={`translate(0,${height - margin.bottom})`}
-          className="x-axis"
-        >
-          <line
-            x1={margin.left}
-            x2={width - margin.right}
-            stroke="black"
-          />
-          {x.ticks(10).map(tick => (
-            <g key={tick} transform={`translate(${x(tick)},0)`}>
-              <line y2={6} stroke="black" />
-              <text
-                style={{
-                  fontSize: '10px',
-                  textAnchor: 'middle',
-                  transform: 'translateY(20px)'
-                }}
-              >
-                {(tick / 1000).toFixed(0).toString() + 'km'}
-              </text>
-            </g>
-          ))}
-        </g>
-
-        <g
-          transform={`translate(${margin.left},0)`}
-          className="y-axis"
-        >
-          <line
-            y1={margin.top}
-            y2={height - margin.bottom}
-            stroke="black"
-          />
-          {y.ticks(5).map(tick => (
-            <g key={tick} transform={`translate(0,${y(tick)})`}>
-              <line
-                x1={0}
-                x2={width - margin.left - margin.right}
-                stroke="grey"
-                strokeWidth={1}
-                strokeOpacity={0.5}
-                strokeDasharray="2,2"
-              />
-              <line x2={-6} stroke="black" />
-              <text
-                style={{
-                  fontSize: '10px',
-                  textAnchor: 'end',
-                  transform: 'translateX(-8px)',
-                  alignmentBaseline: 'middle'
-                }}
-              >
-                {tick.toFixed(0).toString() + 'm'}
-              </text>
-            </g>
-          ))}
-        </g>
-
-        {/* Black elevation line */}
-        <path
-          fill="none"
-          stroke="black"
-          strokeWidth={2}
-          d={line(data) || ''}
-        />
-        {/* Gradient fill under the line */}
-        <path
-          fill="url(#areaGradient)"
-          d={area(data) || ''}
-        />
+        {xAxis}
+        {yAxis}
+        {elevationLine}
+        {areaGradientFill}
+        {mouseOverLine}
       </svg>
     </div>
   );
