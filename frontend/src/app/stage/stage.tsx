@@ -33,7 +33,7 @@ export default async function Stage({
 }): Promise<JSX.Element> {
   const [track, gradientData] = await Promise.all([
     getTrack(stageId),
-    getGradientData(stageId, 1000)
+    getGradientData(stageId, 100)
   ]);
   return (
     <div className="min-h-screen flex flex-col">
