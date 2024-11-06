@@ -146,6 +146,8 @@ function ElevationChart({
     }
   }
 
+  // Elements for the chart
+
   const elevationLine = (
     <path
       fill="none"
@@ -195,7 +197,44 @@ function ElevationChart({
     </g>
   );
 
-  const xAxis = (
+  return (
+    <div ref={containerRef} className="w-full h-full">
+      <svg width="100%" height="100%" onMouseMove={handleMouseMove}>
+        <defs>
+          {areaGradientDef}
+        </defs>
+        <YAxis
+          margin={margin}
+          width={width}
+          height={height}
+          y={y}
+          nTicks={5}
+        />
+        {elevationLine}
+        {areaGradientFill}
+        {mouseOverLine}
+        <XAxis
+          margin={margin}
+          width={width}
+          height={height}
+          x={x}
+          nTicks={10}
+        />
+      </svg>
+    </div>
+  );
+}
+
+function XAxis(
+  { margin, width, height, x, nTicks }: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    width: number;
+    height: number;
+    x: d3.ScaleLinear<number, number>;
+    nTicks: number;
+  }
+): JSX.Element {
+  return (
     <g
       transform={`translate(0,${height - margin.bottom})`}
       className="x-axis"
@@ -205,12 +244,12 @@ function ElevationChart({
         x2={width - margin.right}
         stroke="black"
       />
-      {x.ticks(10).map(tick => (
+      {x.ticks(nTicks).map(tick => (
         <g key={tick} transform={`translate(${x(tick)},0)`}>
           <line y2={6} stroke="black" />
           <text
             style={{
-            fontSize: '10px',
+              fontSize: '10px',
               textAnchor: 'middle',
               transform: 'translateY(20px)'
             }}
@@ -221,8 +260,18 @@ function ElevationChart({
       ))}
     </g>
   );
+}
 
-  const yAxis = (
+function YAxis(
+  { margin, width, height, y, nTicks }: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    width: number;
+    height: number;
+    y: d3.ScaleLinear<number, number>;
+    nTicks: number;
+  }
+): JSX.Element {
+  return (
     <g
       transform={`translate(${margin.left},0)`}
       className="y-axis"
@@ -232,7 +281,7 @@ function ElevationChart({
         y2={height - margin.bottom}
         stroke="black"
       />
-      {y.ticks(5).map(tick => (
+      {y.ticks(nTicks).map(tick => (
         <g key={tick} transform={`translate(0,${y(tick)})`}>
           <line
             x1={0}
@@ -256,20 +305,5 @@ function ElevationChart({
         </g>
       ))}
     </g>
-  );
-
-  return (
-    <div ref={containerRef} className="w-full h-full">
-      <svg width="100%" height="100%" onMouseMove={handleMouseMove}>
-        <defs>
-          {areaGradientDef}
-        </defs>
-        {xAxis}
-        {yAxis}
-        {elevationLine}
-        {areaGradientFill}
-        {mouseOverLine}
-      </svg>
-    </div>
   );
 }
