@@ -20,7 +20,10 @@ export default function Elevation({
   data: GradientData[];
 }): JSX.Element {
   return (
-    <div className="h-1/4 max-h-64 bg-slate-100" id="elevation-container">
+    <div
+      className="h-1/4 max-h-64 min-h-16 bg-slate-100"
+      id="elevation-container"
+    >
       <ElevationChart data={data} />
     </div>
   );
