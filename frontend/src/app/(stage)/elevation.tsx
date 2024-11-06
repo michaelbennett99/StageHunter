@@ -5,6 +5,15 @@ import { GradientData } from '@/types';
 
 import * as d3 from 'd3';
 
+function mapColour(
+  gradient: number,
+): string {
+  const max = 20;
+  const scaled = (gradient + max) / (2 * max);
+  const normalised = Math.cbrt((scaled - 0.5)/4) + 0.5;
+  return d3.interpolateTurbo(normalised);
+}
+
 export default function Elevation({
   data,
 }: {
@@ -60,14 +69,39 @@ function ElevationChart({
     .domain(d3.extent(data, d => d.elevation) as [number, number])
     .range([height - margin.bottom, margin.top]);
 
+  // Line for the actual elevation line plot
+  const line = d3.line<GradientData>()
+    .x(d => x(d.distance))
+    .y(d => y(d.elevation));
+
+  // Area for the gradient fill under the elevation line
   const area = d3.area<GradientData>()
     .x(d => x(d.distance))
     .y0(height - margin.bottom)
     .y1(d => y(d.elevation));
 
+  // Create the gradient fill for the area under the line
+  const areaGradients = data.map((d, i) => ({
+    offset: `${(i / (data.length - 1)) * 100}%`,
+    color: mapColour(d.gradient || 0)
+  }));
+
   return (
     <div ref={containerRef} className="w-full h-full">
       <svg width="100%" height="100%">
+        <defs>
+          {/* Create the gradient fill for the area under the line */}
+          <linearGradient id="areaGradient" x1="0" x2="1" y1="0" y2="0">
+            {areaGradients.map((grad, i) => (
+              <stop
+                key={i}
+                offset={grad.offset}
+                stopColor={grad.color}
+              />
+            ))}
+          </linearGradient>
+        </defs>
+
         <g
           transform={`translate(0,${height - margin.bottom})`}
           className="x-axis"
@@ -127,10 +161,16 @@ function ElevationChart({
           ))}
         </g>
 
+        {/* Black elevation line */}
         <path
-          fill="red"
+          fill="none"
           stroke="black"
           strokeWidth={2}
+          d={line(data) || ''}
+        />
+        {/* Gradient fill under the line */}
+        <path
+          fill="url(#areaGradient)"
           d={area(data) || ''}
         />
       </svg>
