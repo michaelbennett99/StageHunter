@@ -1,15 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { GradientData } from '@/api/types';
 
 import { useResize } from '@/effects/resize';
 
 import { getInterpolatedGradientPoint } from './data';
 import { handleSVGMouseMove } from './interaction';
-import { AreaGradientDef } from './gradient';
+import {
+  AreaGradientDef,
+  AreaGradientFill,
+  ElevationLine
+} from './graph';
+import { GradientLegend } from './legend';
 import { YAxis, XAxis } from './axes';
-import { GradientLegend } from './gradient';
 import { MouseOverLine } from './mouseOver';
 import * as d3 from 'd3';
 
@@ -113,22 +117,7 @@ function ElevationChart({
     });
   }
 
-  // Elements for the chart that we need to render
-  const elevationLine = (
-    <path
-      fill="none"
-      stroke="black"
-      strokeWidth={2}
-      d={line(data) || ''}
-    />
-  );
-
-  const areaGradientFill = (
-    <path
-      fill="url(#areaGradient)"
-      d={area(data) || ''}
-    />
-  );
+  const areaGradientId = 'areaGradient';
 
   return (
     <div ref={containerRef} className="w-full h-full">
@@ -139,7 +128,7 @@ function ElevationChart({
         onMouseLeave={() => setDistance(null)}
       >
         <defs>
-          <AreaGradientDef data={data} />
+          <AreaGradientDef data={data} id={areaGradientId} />
         </defs>
         <YAxis
           margin={margin}
@@ -149,8 +138,8 @@ function ElevationChart({
           nTicks={5}
           labelFn={tick => tick.toFixed(0).toString() + 'm'}
         />
-        {elevationLine}
-        {areaGradientFill}
+        <ElevationLine d={line(data) || ''} />
+        <AreaGradientFill d={area(data) || ''} id={areaGradientId} />
         <MouseOverLine
           hoverPoint={hoverPoint}
           margin={margin}

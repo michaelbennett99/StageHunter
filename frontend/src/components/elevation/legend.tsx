@@ -1,45 +1,9 @@
-import React from 'react';
 import * as d3 from 'd3';
 
 import { GradientData } from '@/api/types';
 
 import { mapGradientColour } from './colour';
 import { TickLabel } from './axes';
-type ColourMap = { startOffset: number, endOffset: number, color: string };
-
-function makeColourMap(data: GradientData[]): ColourMap[] {
-  const totalDistance = data[data.length - 1].distance;
-  return data
-    .slice(1)
-    .map((d, i) => {
-      const startOffset = data[i].distance / totalDistance;
-      const endOffset = d.distance / totalDistance;
-      const color = mapGradientColour(d.gradient || 0);
-      return { startOffset, endOffset, color };
-    });
-}
-
-export function AreaGradientDef({ data }: { data: GradientData[] }) {
-  const areaGradients = makeColourMap(data);
-  return (
-    <linearGradient id="areaGradient" x1="0" x2="1" y1="0" y2="0">
-      {areaGradients.map((grad, i) => (
-        <React.Fragment key={i}>
-          <stop
-            offset={grad.startOffset}
-            stopColor={grad.color}
-          />
-          <stop
-            key={`end-${i}`}
-            offset={grad.endOffset}
-            stopColor={grad.color}
-          />
-        </React.Fragment>
-      ))}
-    </linearGradient>
-  );
-}
-
 export function GradientLegend(
   {
     gradientData,
