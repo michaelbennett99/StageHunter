@@ -5,8 +5,15 @@ import { GradientData } from '@/api/types';
 
 import { useResize } from '@/effects/resize';
 
-import { mapGradientColour } from './colour';
 import { getInterpolatedGradientPoint } from './data';
+
+
+import { handleSVGMouseMove } from './interaction';
+
+
+import { AreaGradientDef } from './gradient';
+import { YAxis, XAxis } from './axes';
+import { GradientLegend } from './gradient';
 
 import * as d3 from 'd3';
 
@@ -49,6 +56,14 @@ function ElevationChart({
   const [height, setHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Positioning derived values
+  const graphTop = margin.top;
+  const graphLeft = margin.left;
+  const graphWidth = width - margin.left - margin.right;
+  const graphHeight = height - margin.top - margin.bottom;
+  const graphBottom = graphHeight + graphTop;
+  const graphRight = graphLeft + graphWidth;
+
   // Map position line state and dependent values
   const hoverPoint = useMemo(
     () => getInterpolatedGradientPoint(data, distance),
@@ -67,12 +82,12 @@ function ElevationChart({
   // Scale for the distance axis
   const x = d3.scaleLinear()
     .domain(d3.extent(data, d => d.distance) as [number, number])
-    .range([margin.left, width - margin.right]);
+    .range([graphLeft, graphRight]);
 
   // Scale for the elevation axis
   const y = d3.scaleLinear()
     .domain(d3.extent(data, d => d.elevation) as [number, number])
-    .range([height - margin.bottom, margin.top]);
+    .range([graphBottom, graphTop]);
 
   // Line for the actual elevation line plot
   const line = d3.line<GradientData>()
@@ -82,27 +97,24 @@ function ElevationChart({
   // Area for the gradient fill under the elevation line
   const area = d3.area<GradientData>()
     .x(d => x(d.distance))
-    .y0(height - margin.bottom)
+    .y0(graphBottom)
     .y1(d => y(d.elevation));
 
   // Event handlers
 
   // Handle mouse move over the chart
-  const handleMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
-    const svgElement = event.currentTarget;
-    const rect = svgElement.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
+  const onMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    handleSVGMouseMove(event, (mouseX, mouseY) => {
+      const inX = (mouseX >= graphLeft) && (mouseX <= graphRight);
+      const inY = (mouseY >= graphTop) && (mouseY <= graphBottom);
 
-    const inX = mouseX >= margin.left && mouseX <= width - margin.right;
-    const inY = mouseY >= margin.top && mouseY <= height - margin.bottom;
-
-    if (inX && inY) {
-      const value = x.invert(mouseX);
-      setDistance(value);
-    } else {
-      setDistance(null);
-    }
+      if (inX && inY) {
+        const distance = x.invert(mouseX);
+        setDistance(distance);
+      } else {
+        setDistance(null);
+      }
+    });
   }
 
   // Elements for the chart that we need to render
@@ -113,39 +125,6 @@ function ElevationChart({
       strokeWidth={2}
       d={line(data) || ''}
     />
-  );
-
-  // Create the gradient fill for the area under the line
-  const totalDistance = data[data.length - 1].distance;
-  const areaGradients = data
-    .slice(1)
-    .map((d, i) => {
-      const startOffset = data[i].distance / totalDistance;
-      const endOffset = d.distance / totalDistance;
-      const color = mapGradientColour(d.gradient || 0);
-      return {
-        startOffset: startOffset,
-        endOffset: endOffset,
-        color
-      };
-    })
-
-  const areaGradientDef = (
-    <linearGradient id="areaGradient" x1="0" x2="1" y1="0" y2="0">
-      {areaGradients.map((grad, i) => (
-        <React.Fragment key={i}>
-          <stop
-            offset={grad.startOffset}
-            stopColor={grad.color}
-          />
-          <stop
-            key={`end-${i}`}
-            offset={grad.endOffset}
-            stopColor={grad.color}
-          />
-        </React.Fragment>
-      ))}
-    </linearGradient>
   );
 
   const areaGradientFill = (
@@ -160,11 +139,11 @@ function ElevationChart({
       <svg
         width="100%"
         height="100%"
-        onMouseMove={handleMouseMove}
+        onMouseMove={onMouseMove}
         onMouseLeave={() => setDistance(null)}
       >
         <defs>
-          {areaGradientDef}
+          <AreaGradientDef data={data} />
         </defs>
         <YAxis
           margin={margin}
@@ -196,7 +175,6 @@ function ElevationChart({
           }}
         />
         <GradientLegend
-          mapColour={mapGradientColour}
           gradientData={data}
           margin={margin}
           dims={{ width, height }}
@@ -204,101 +182,6 @@ function ElevationChart({
       </svg>
     </div>
   );
-}
-
-function XAxis(
-  { margin, width, height, x, nTicks, labelFn }: {
-    margin: { top: number; right: number; bottom: number; left: number };
-    width: number;
-    height: number;
-    x: d3.ScaleLinear<number, number>;
-    nTicks: number;
-    labelFn: (tick: number) => string;
-  }
-): JSX.Element {
-  return (
-    <g
-      transform={`translate(0,${height - margin.bottom})`}
-      className="x-axis"
-    >
-      <line
-        x1={margin.left}
-        x2={width - margin.right}
-        stroke="black"
-      />
-      {x.ticks(nTicks).map(tick => (
-        <g key={tick} transform={`translate(${x(tick)},0)`}>
-          <line y2={6} stroke="black" />
-          <TickLabel
-            tick={tick}
-            labelFn={labelFn}
-            style={{
-              fontSize: '10px',
-              textAnchor: 'middle',
-              transform: 'translateY(20px)'
-            }}
-          />
-        </g>
-      ))}
-    </g>
-  );
-}
-
-function YAxis(
-  { margin, width, height, y, nTicks, labelFn }: {
-    margin: { top: number; right: number; bottom: number; left: number };
-    width: number;
-    height: number;
-    y: d3.ScaleLinear<number, number>;
-    nTicks: number;
-    labelFn: (tick: number) => string;
-  }
-): JSX.Element {
-  return (
-    <g
-      transform={`translate(${margin.left},0)`}
-      className="y-axis"
-    >
-      <line
-        y1={margin.top}
-        y2={height - margin.bottom}
-        stroke="black"
-      />
-      {y.ticks(nTicks).map(tick => (
-        <g key={tick} transform={`translate(0,${y(tick)})`}>
-          <line
-            x1={0}
-            x2={width - margin.left - margin.right}
-            stroke="grey"
-            strokeWidth={1}
-            strokeOpacity={0.5}
-            strokeDasharray="2,2"
-          />
-          <line x2={-6} stroke="black" />
-          <TickLabel
-            tick={tick}
-            labelFn={labelFn}
-            style={{
-              fontSize: '10px',
-              textAnchor: 'end',
-              transform: 'translateX(-8px)',
-              alignmentBaseline: 'middle'
-            }}
-          />
-        </g>
-      ))}
-    </g>
-  );
-}
-
-function TickLabel(
-  { tick, labelFn, style }: {
-    tick: number;
-    labelFn: (tick: number) => string;
-    style?: React.CSSProperties;
-  }
-): JSX.Element {
-  return <text style={style}>{labelFn(tick)}</text>;
 }
 
 function SVGTextBox(
@@ -501,88 +384,6 @@ function MouseOverLine(
         gradientPoint={hoverPoint}
         textProps={allTextProps}
       />
-    </g>
-  );
-}
-
-function GradientLegend(
-  {
-    mapColour,
-    gradientData,
-    margin,
-    dims,
-    nTicks = 5,
-    width = 20,
-  }: {
-    mapColour: (gradient: number) => string;
-    gradientData: GradientData[];
-    margin: { left: number; top: number; right: number; bottom: number };
-    dims: { width: number; height: number };
-    nTicks?: number;
-    width?: number;
-    height?: number;
-  }
-): JSX.Element {
-  // Dimensions
-  const padding = 10;
-  const legendLeft = dims.width - margin.right + padding;
-  const legendTop = margin.top;
-  const legendHeight = dims.height - margin.top - margin.bottom;
-
-  const maxAbsGradient = Math.max(
-    ...gradientData.map(d => Math.abs(d.gradient || 0))
-  );
-
-  const g = d3.scaleLinear()
-    .domain([-maxAbsGradient, maxAbsGradient])
-    .range([legendHeight, 0]);
-
-  const colourDomain = d3.range(
-    -maxAbsGradient,
-    maxAbsGradient,
-    2 * maxAbsGradient / 100
-  );
-  const colourRange = colourDomain.map(mapColour);
-
-  const legendGradientDef = (
-    <linearGradient id="legendGradient" x1="0" x2="0" y1="1" y2="0">
-      {colourRange.map((colour, i) => (
-        <stop key={i} offset={`${i / colourRange.length}`} stopColor={colour} />
-      ))}
-    </linearGradient>
-  );
-  return (
-    <g transform={`translate(${legendLeft},${legendTop})`}>
-      <defs>
-        {legendGradientDef}
-      </defs>
-      <rect
-        x={0}
-        y={0}
-        width={width}
-        height={legendHeight}
-        stroke="black"
-        strokeWidth={1}
-        fill="url(#legendGradient)"
-      />
-      {g.ticks(nTicks).map(tick => (
-        <g
-          key={tick}
-          transform={`translate(${width},${g(tick)})`}
-        >
-          <line x2={6} stroke="black" />
-          <TickLabel
-            tick={tick}
-            labelFn={tick => tick.toFixed(0).toString() + '%'}
-            style={{
-              fontSize: '10px',
-              textAnchor: 'start',
-              alignmentBaseline: 'middle',
-              transform: 'translateX(8px)'
-            }}
-          />
-        </g>
-      ))}
     </g>
   );
 }
