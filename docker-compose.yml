@@ -1,7 +1,12 @@
+# docker-compose.yml
+# Required environment variables:
+# TARGET - The target environment to build the frontend for
+#   (development, production)
+
 services:
   nginx:
     container_name: stagehunter-nginx
-    image: nginx
+    image: nginx:1.27.2
     ports:
       - 80:80
     networks:
@@ -18,9 +23,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: development
-    ports:
-      - 3000:3000
+      target: ${TARGET}
     volumes:
       - ./frontend:/app
       - /app/.next
@@ -39,8 +42,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - 8080:8080
     env_file:
       - ./backend/.env
     networks:
@@ -57,8 +58,6 @@ services:
     build:
       context: ./db
       dockerfile: Dockerfile
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
