@@ -1,49 +1,47 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { GradientData } from '@/api/types';
+import { sigmoid, interpolateObject } from '@/utils/math';
+import { mapColour } from '@/utils/colours';
 
 import * as d3 from 'd3';
 
-function sigmoid(x: number, a: number, b: number): number {
-  return (a / (1 + Math.exp(-b * x)));
+// Define the gradient colour mapping
+const colourInterpolator = d3.scaleDiverging(
+  d3.interpolateSpectral
+).interpolator();
+
+const gradientTransformation = (gradient: number): number => {
+  return sigmoid(-gradient, 0.18);
 }
 
-function mapColour(
-  gradient: number,
-): string {
-  // ["#bd0000", "#effbe9", "#0082ad"]
-  const colour = d3.scaleDiverging(
-    d3.interpolateSpectral
-  ).interpolator();
-  return colour(sigmoid(-gradient, 1, 0.18));
-}
+const mapGradientColour = (gradient: number): string => mapColour(
+  gradient,
+  colourInterpolator,
+  gradientTransformation
+);
 
-function getElevation(
+function getInterpolatedGradientPoint(
   data: GradientData[],
   distance: number | null
 ): GradientData | null {
-  if (distance === null) return null;
+  const interpolator = (
+    point1: GradientData,
+    point2: GradientData,
+    distance: number
+  ): GradientData => {
+    const nGrad = point2.gradient! / 1000;
 
-  const index = data.findIndex(d => d.distance > distance);
-  if (index === -1) return null; // distance further than the end of the track
-  if (index === 0) return {
-    distance: distance,
-    elevation: data[0].elevation,
-    gradient: null
-  }; // distance before start of track
-
-  const point1 = data[index - 1];
-  const point2 = data[index];
-
-  const nGrad = point2.gradient! / 1000;
-
-  const elevation =  point1.elevation + nGrad * (point2.distance - distance);
-  return {
-    distance: distance,
-    elevation: elevation,
-    gradient: point2.gradient
+    const elevation =  point1.elevation + nGrad * (point2.distance - distance);
+    return {
+      distance: distance,
+      elevation: elevation,
+      gradient: point2.gradient
+    };
   }
+
+  return interpolateObject(data, d => d.distance, distance, interpolator);
 }
 
 export default function Elevation({
@@ -86,7 +84,10 @@ function ElevationChart({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Map position line state and dependent values
-  const hoverPoint = getElevation(data, distance);
+  const hoverPoint = useMemo(
+    () => getInterpolatedGradientPoint(data, distance),
+    [data, distance]
+  );
 
   // Effect to handle resizing the SVG
   useEffect(() => {
@@ -171,7 +172,7 @@ function ElevationChart({
     .map((d, i) => {
       const startOffset = data[i].distance / totalDistance;
       const endOffset = d.distance / totalDistance;
-      const color = mapColour(d.gradient || 0);
+      const color = mapGradientColour(d.gradient || 0);
       return {
         startOffset: startOffset,
         endOffset: endOffset,
@@ -245,7 +246,7 @@ function ElevationChart({
           }}
         />
         <GradientLegend
-          mapColour={mapColour}
+          mapColour={mapGradientColour}
           gradientData={data}
           margin={margin}
           dims={{ width, height }}
