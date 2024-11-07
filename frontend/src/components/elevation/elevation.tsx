@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { GradientData } from '@/api/types';
 
+import { useResize } from '@/effects/resize';
+
 import { mapGradientColour } from './colour';
 import { getInterpolatedGradientPoint } from './data';
 
@@ -53,24 +55,8 @@ function ElevationChart({
     [data, distance]
   );
 
-  // Effect to handle resizing the SVG
-  useEffect(() => {
-    const parent = containerRef.current;
-    if (parent) {
-      setWidth(parent.clientWidth);
-      setHeight(parent.clientHeight);
-    }
-
-    const handleResize = () => {
-      if (parent) {
-        setWidth(parent.clientWidth);
-        setHeight(parent.clientHeight);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Hook to handle resizing the SVG
+  useResize(containerRef, setWidth, setHeight);
   // If the container is not yet rendered, return a placeholder
   if (width === 0 || height === 0) {
     return <div ref={containerRef} className="w-full h-full" />;
