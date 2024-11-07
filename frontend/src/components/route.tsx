@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import Map from './map';
 import Elevation from './elevation';
-import { GradientData } from '@/types';
+import { GradientData } from '@/api/types';
 
 export default function Route({
   track,

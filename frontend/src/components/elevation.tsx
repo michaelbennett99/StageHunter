@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { GradientData } from '@/types';
+import { GradientData } from '@/api/types';
 
 import * as d3 from 'd3';
 

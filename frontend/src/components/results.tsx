@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 
 import Input from './input';
-import { ResultsData } from '@/types';
-import { getResultsData } from '@/getters';
+import { ResultsData } from '@/api/types';
+import { getResultsData } from '@/api/getters';
 
 async function ResultsLoader({
   stageId,

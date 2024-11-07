@@ -1,7 +1,7 @@
 import Route from './route';
 import Results from './results';
 
-import { getTrack, getGradientData, getStageLength } from '@/getters';
+import { getTrack, getGradientData, getStageLength } from '@/api/getters';
 // import { GradientData } from '@/types';
 
 // async function TrackLoader({

@@ -2,8 +2,8 @@
 
 import { useState, ChangeEventHandler } from 'react';
 
-import { ResultsData, Result } from '@/types';
-import { numToRank, deSnakeCase } from '@/utils';
+import { ResultsData, Result } from '@/api/types';
+import { numToRank, deSnakeCase } from '@/utils/utils';
 
 export default function Input(
   { data }: { data?: ResultsData }

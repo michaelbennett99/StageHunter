@@ -1,5 +1,5 @@
-import Stage from '@/app/stage/stage';
-import { getAllStageIDs } from '@/getters';
+import Stage from '@/components/stage';
+import { getAllStageIDs } from '@/api/getters';
 
 export const dynamicParams = false;
 
