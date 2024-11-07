@@ -16,7 +16,7 @@ function mapColour(
   const colour = d3.scaleDiverging(
     d3.interpolateSpectral
   ).interpolator();
-  return colour(sigmoid(-gradient, 1, 0.15));
+  return colour(sigmoid(-gradient, 1, 0.18));
 }
 
 function getElevation(
