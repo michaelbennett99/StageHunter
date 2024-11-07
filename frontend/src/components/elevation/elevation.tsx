@@ -2,47 +2,11 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { GradientData } from '@/api/types';
-import { sigmoid, interpolateObject } from '@/utils/math';
-import { mapColour } from '@/utils/colours';
+
+import { mapGradientColour } from './colour';
+import { getInterpolatedGradientPoint } from './data';
 
 import * as d3 from 'd3';
-
-// Define the gradient colour mapping
-const colourInterpolator = d3.scaleDiverging(
-  d3.interpolateSpectral
-).interpolator();
-
-const gradientTransformation = (gradient: number): number => {
-  return sigmoid(-gradient, 0.18);
-}
-
-const mapGradientColour = (gradient: number): string => mapColour(
-  gradient,
-  colourInterpolator,
-  gradientTransformation
-);
-
-function getInterpolatedGradientPoint(
-  data: GradientData[],
-  distance: number | null
-): GradientData | null {
-  const interpolator = (
-    point1: GradientData,
-    point2: GradientData,
-    distance: number
-  ): GradientData => {
-    const nGrad = point2.gradient! / 1000;
-
-    const elevation =  point1.elevation + nGrad * (point2.distance - distance);
-    return {
-      distance: distance,
-      elevation: elevation,
-      gradient: point2.gradient
-    };
-  }
-
-  return interpolateObject(data, d => d.distance, distance, interpolator);
-}
 
 export default function Elevation({
   data,
