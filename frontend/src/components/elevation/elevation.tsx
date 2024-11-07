@@ -1,12 +1,15 @@
 'use client';
 
+// Client Libraries
+import * as d3 from 'd3';
 import React, { useState, useRef, useMemo } from 'react';
+
+// Graph Data and Functions
 import { GradientData } from '@/api/types';
-
 import { useResize } from '@/effects/resize';
-
 import { getInterpolatedGradientPoint } from './data';
 import { handleSVGMouseMove } from './interaction';
+// JSX Graph Components
 import {
   AreaGradientDef,
   AreaGradientFill,
@@ -15,7 +18,6 @@ import {
 import { GradientLegend } from './legend';
 import { YAxis, XAxis } from './axes';
 import { MouseOverLine } from './mouseOver';
-import * as d3 from 'd3';
 
 export default function Elevation({
   data,
