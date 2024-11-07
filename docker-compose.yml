@@ -31,7 +31,7 @@ services:
     networks:
       - frontend-network
     environment:
-      - NODE_OPTIONS=--max-old-space-size=768
+      - NODE_OPTIONS=${NODE_OPTIONS}
     restart: unless-stopped
     depends_on:
       - backend
