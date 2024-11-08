@@ -14,6 +14,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify secrets
+        run: |
+          echo "${{ vars.AWS_HOST }}"
+          echo "${{ vars.AWS_USER }}"
+          echo "${{ secrets.AWS_PVT_KEY }}"
+
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.1.0
         with:
