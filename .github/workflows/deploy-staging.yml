@@ -29,6 +29,8 @@ jobs:
               gunzip ./db/dump.sql.gz
 
             # # Marshal environment variables and create secret files
+            export NODE_OPTIONS=${{ vars.NODE_OPTIONS }}
+
             # # For frontend
             touch ./frontend/.env
             echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.MAPBOX_ACCESS_TOKEN }}" >> ./frontend/.env
@@ -52,5 +54,4 @@ jobs:
             # docker compose \
             #   -f docker-compose.yml \
             #   -f docker-compose.staging.yml \
-            #   up -d \
-            #   -e NODE_OPTIONS=${{ vars.NODE_OPTIONS }}
+            #   up -d
