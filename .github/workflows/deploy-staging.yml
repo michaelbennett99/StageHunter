@@ -50,15 +50,13 @@ jobs:
             echo "${{ secrets.PG_PASSWORD }}" > ./db/.pg_password
 
             # # Build
-            # docker-compose \
-            #   -f docker-compose.yml \
-            #   -f docker-compose.staging.yml \
-            #   build \
-            #   -e NODE_OPTIONS=${{ vars.NODE_OPTIONS }}
+            docker-compose \
+              -f docker-compose.yml \
+              -f docker-compose.staging.yml \
+              build
 
-            # # Deploy
-            # docker-compose \
-            #   -f docker-compose.yml \
-            #   -f docker-compose.staging.yml \
-            #   up -d \
-            #   -e NODE_OPTIONS=${{ vars.NODE_OPTIONS }}
+            # Deploy
+            docker-compose \
+              -f docker-compose.yml \
+              -f docker-compose.staging.yml \
+              up -d
