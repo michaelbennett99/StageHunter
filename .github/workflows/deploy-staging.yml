@@ -11,15 +11,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Verify secrets
-        run: |
-          echo "${{ vars.AWS_HOST }}"
-          echo "${{ vars.AWS_USER }}"
-          echo "${{ secrets.AWS_PVT_KEY }}"
-
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.1.0
         with:
@@ -28,9 +19,9 @@ jobs:
           key: ${{ secrets.AWS_PVT_KEY }}
           script: |
             # Remove any existing clone and clone fresh
-            rm -rf StageHunter && \
+            rm -rf ./StageHunter && \
               git clone -b dev git@github.com:michaelbennett99/StageHunter.git && \
-              cd StageHunter
+              cd ./StageHunter
 
             # Download SQL dump directly on EC2, unzip and put it where it's
             # expected to be by the db container
