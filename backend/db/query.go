@@ -2,6 +2,10 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
+
+	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
 
 const getDailyStageQuery = `
@@ -10,11 +14,33 @@ WHERE daily_id = (SELECT MAX(daily_id) FROM racedata.daily)
 LIMIT 1;
 `
 
+const addDailyStageQuery = `
+INSERT INTO racedata.daily (stage_id)
+SELECT racedata.get_random_stage_id();
+`
+
 func (q *Queries) GetDailyStage(ctx context.Context) (int, error) {
-	var id int
 	row := q.conn.QueryRow(ctx, getDailyStageQuery)
+
+	var id int
 	if err := row.Scan(&id); err != nil {
 		return 0, err
+	}
+
+	// Check that the date is today. If not, add a new stage today and recurse
+	var date pgtype.Date
+	if err := row.Scan(&date); err != nil {
+		return 0, err
+	}
+	dateValue, err := date.DateValue()
+	if err != nil {
+		return 0, err
+	}
+	if !lib.IsToday(dateValue.Time) {
+		if _, err := q.conn.Exec(ctx, addDailyStageQuery); err != nil {
+			return 0, err
+		}
+		return q.GetDailyStage(ctx)
 	}
 	return id, nil
 }
