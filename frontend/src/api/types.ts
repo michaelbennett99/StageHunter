@@ -18,7 +18,7 @@ export interface ResultsData {
   stage_start: boolean;
   stage_end: boolean;
   stage_results: number;
-  gc_results: number;
+  GC_results: number;
   points_results?: number;
   mountains_results?: number;
   youth_results?: number;

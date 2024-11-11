@@ -65,7 +65,7 @@ export async function getResultsData(
     stage_start: true,
     stage_end: true,
     stage_results: parseResults(res, 'stage').length,
-    gc_results: parseResults(res, 'gc').length,
+    GC_results: parseResults(res, 'gc').length,
     points_results: parseResults(res, 'points').length,
     mountains_results: parseResults(res, 'mountains').length,
     youth_results: parseResults(res, 'youth').length,
