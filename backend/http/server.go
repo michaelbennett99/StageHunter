@@ -7,11 +7,13 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/michaelbennett99/stagehunter/backend/db"
+	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
 
 func logRequest(r *http.Request) {
@@ -285,45 +287,112 @@ func VerifyResultHandler(
 	}
 
 	urlParams := r.URL.Query()
+	if !urlParams.Has("r") || !urlParams.Has("c") || !urlParams.Has("p") {
+		http.Error(
+			w,
+			"Query parameters 'r', 'c' and 'p' are required",
+			http.StatusBadRequest,
+		)
+		return
+	}
 
-	rank, err := strconv.Atoi(urlParams.Get("rank"))
+	rank, err := strconv.Atoi(urlParams.Get("r"))
 	if err != nil {
 		http.Error(
-			w, "Query parameter 'rank' is required", http.StatusBadRequest,
+			w, "Query parameter 'r' must be an integer",
+			http.StatusBadRequest,
 		)
 		return
 	}
-
-	classification := db.Classification(urlParams.Get("classification"))
+	classification := db.Classification(urlParams.Get("c"))
 	if !classification.IsValid() {
 		http.Error(
-			w, "Query parameter 'classification' is required",
+			w, "Query parameter 'c' must be a valid classification",
 			http.StatusBadRequest,
 		)
 		return
 	}
-
-	payload := urlParams.Get("payload")
-	if payload == "" {
-		http.Error(
-			w, "Query parameter 'payload' is required",
-			http.StatusBadRequest,
-		)
-		return
-	}
+	payload := urlParams.Get("p")
 
 	params := db.VerifyResultGuessParams{
 		StageID:        stage_id,
 		Rank:           rank,
 		Classification: classification,
-		Guess:          strings.ReplaceAll(payload, "_", " "),
 	}
-
-	verified, err := conn.VerifyResultGuess(context.Background(), params)
+	answer, err := conn.VerifyResultGuess(context.Background(), params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	verified := lib.AreNormEqual(payload, answer.Reduce())
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(verified)
+}
+
+func VerifyInfoHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	stage_info, err := conn.GetStageInfo(context.Background(), stage_id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Get guess from the query params
+	queryParams := r.URL.Query()
+	if !queryParams.Has("f") || !queryParams.Has("v") {
+		http.Error(
+			w, "Query parameters 'f' and 'v' are required",
+			http.StatusBadRequest,
+		)
+		return
+	}
+	guessField := queryParams.Get("f")
+	guessValue := queryParams.Get("v")
+
+	// Get the field from the stage info
+	v := reflect.ValueOf(stage_info)
+	f := v.FieldByName(guessField)
+	if !f.IsValid() {
+		possibleFields := []string{}
+		for i := 0; i < v.NumField(); i++ {
+			possibleFields = append(possibleFields, v.Type().Field(i).Name)
+		}
+		http.Error(
+			w,
+			"Invalid f parameter. Possible values are: "+
+				strings.Join(possibleFields, ", "),
+			http.StatusBadRequest,
+		)
+		return
+	}
+	fieldValue := f.Interface()
+	var answer string
+	switch v := fieldValue.(type) {
+	case string:
+		answer = v
+	case db.StageType:
+		answer = string(v)
+	case db.GrandTour:
+		answer = string(v)
+	case int:
+		answer = strconv.Itoa(v)
+	default:
+		http.Error(
+			w, "Unsupported field type", http.StatusInternalServerError,
+		)
+		return
+	}
+
+	verified := lib.AreNormEqual(guessValue, answer)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

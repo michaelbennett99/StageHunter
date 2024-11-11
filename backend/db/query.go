@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"errors"
-	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -92,8 +91,7 @@ SELECT
 	stage_number,
 	stage_type,
 	stage_start,
-	stage_end,
-	stage_length
+	stage_end
 FROM racedata.races_stages
 WHERE stage_id = $1
 LIMIT 1;
@@ -267,7 +265,6 @@ type VerifyResultGuessParams struct {
 	StageID        int
 	Rank           int
 	Classification Classification
-	Guess          string
 }
 
 type RiderOrTeam struct {
@@ -298,7 +295,7 @@ func (r *RiderOrTeam) Reduce() string {
 
 func (q *Queries) VerifyResultGuess(
 	ctx context.Context, params VerifyResultGuessParams,
-) (bool, error) {
+) (RiderOrTeam, error) {
 	// Make the query
 	rows, err := q.conn.Query(ctx, verifyGuessQuery, pgx.NamedArgs{
 		"stage_id":       params.StageID,
@@ -306,7 +303,7 @@ func (q *Queries) VerifyResultGuess(
 		"classification": params.Classification,
 	})
 	if err != nil {
-		return false, err
+		return RiderOrTeam{}, err
 	}
 	defer rows.Close()
 
@@ -316,23 +313,12 @@ func (q *Queries) VerifyResultGuess(
 		Team  *string
 	}])
 	if err != nil {
-		return false, err
+		return RiderOrTeam{}, err
 	}
 	riderOrTeam, err := NewRiderOrTeam(row.Rider, row.Team)
 	if err != nil {
-		return false, err
+		return RiderOrTeam{}, err
 	}
 
-	// Normalise the guess and the answer
-	unAccentedGuess, err := lib.StripAccents(params.Guess)
-	if err != nil {
-		return false, err
-	}
-	unaccentedAnswer, err := lib.StripAccents(riderOrTeam.Reduce())
-	if err != nil {
-		return false, err
-	}
-
-	// Compare the normalised guess and answer
-	return strings.EqualFold(unaccentedAnswer, unAccentedGuess), nil
+	return riderOrTeam, nil
 }

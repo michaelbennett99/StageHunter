@@ -43,3 +43,22 @@ func StripAccents(s string) (string, error) {
 	}
 	return t, nil
 }
+
+func AreNormEqual(a, b string) bool {
+	// Strip accents
+	unAccentedA, err := StripAccents(a)
+	if err != nil {
+		return false
+	}
+	unAccentedB, err := StripAccents(b)
+	if err != nil {
+		return false
+	}
+
+	// Replace underscores with spaces
+	unAccentedA = strings.ReplaceAll(unAccentedA, "_", " ")
+	unAccentedB = strings.ReplaceAll(unAccentedB, "_", " ")
+
+	// Compare the normalised strings
+	return strings.EqualFold(unAccentedA, unAccentedB)
+}
