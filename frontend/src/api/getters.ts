@@ -39,7 +39,7 @@ function parseResults(res: any[], classification: string): Result[] {
     r.classification && (r.name || r.team) && r.rank
     && r.classification === classification
   )).map((r: any) => ({
-    name: r.name ?? r.team,
+    name: r.rider ?? r.team,
     rank: r.rank,
   }));
 }
@@ -65,7 +65,6 @@ export async function getResultsData(
     stage_no: info.StageNumber,
     stage_start: info.StageStart,
     stage_end: info.StageEnd,
-    stage_length: info.StageLength,
     stage_results: parseResults(res, 'stage'),
     gc_results: parseResults(res, 'gc'),
     points_results: parseResults(res, 'points'),

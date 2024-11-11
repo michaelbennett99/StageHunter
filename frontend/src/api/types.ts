@@ -17,7 +17,6 @@ export interface ResultsData {
   stage_no: number;
   stage_start: string;
   stage_end: string;
-  stage_length: number;
   stage_results: Result[];
   gc_results: Result[];
   points_results?: Result[];
