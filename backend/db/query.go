@@ -9,7 +9,7 @@ import (
 )
 
 const getDailyStageQuery = `
-SELECT stage_id FROM racedata.daily
+SELECT stage_id, date FROM racedata.daily
 WHERE daily_id = (SELECT MAX(daily_id) FROM racedata.daily)
 LIMIT 1;
 `
@@ -23,15 +23,12 @@ func (q *Queries) GetDailyStage(ctx context.Context) (int, error) {
 	row := q.conn.QueryRow(ctx, getDailyStageQuery)
 
 	var id int
-	if err := row.Scan(&id); err != nil {
+	var date pgtype.Date
+	if err := row.Scan(&id, &date); err != nil {
 		return 0, err
 	}
 
 	// Check that the date is today. If not, add a new stage today and recurse
-	var date pgtype.Date
-	if err := row.Scan(&date); err != nil {
-		return 0, err
-	}
 	dateValue, err := date.DateValue()
 	if err != nil {
 		return 0, err
