@@ -17,6 +17,10 @@ export default function Input(
       const displayName = deSnakeCase(name);
 
       if (typeof data === 'number') {
+        if (data === 0) {
+          return <li key={name}></li>;
+        }
+
         return (
           <li key={name}>
             <InputBoxGroup name={displayName} data={data} />
