@@ -233,3 +233,43 @@ func GetResultsHandler(
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(results)
 }
+
+func GetRidersHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	riders, err := conn.GetRiders(context.Background(), stage_id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(riders)
+}
+
+func GetTeamsHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	teams, err := conn.GetTeams(context.Background(), stage_id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(teams)
+}

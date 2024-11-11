@@ -10,6 +10,7 @@ import (
 	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
 
+// GrandTour enum
 type GrandTour string
 
 const (
@@ -28,6 +29,7 @@ func (gt *GrandTour) Scan(src any) error {
 	return ScanEnum(gt, src, grandTourMapping)
 }
 
+// StageType enum
 type StageType string
 
 const (
@@ -48,6 +50,7 @@ func (st *StageType) Scan(src any) error {
 	return ScanEnum(st, src, stageTypeMapping)
 }
 
+// StageInfo struct
 type StageInfo struct {
 	GrandTour   GrandTour
 	Year        int
@@ -58,6 +61,7 @@ type StageInfo struct {
 	StageLength float64
 }
 
+// ElevationPoint struct
 type OrderedElevationPoint interface {
 	Less(other OrderedElevationPoint) bool
 }
@@ -71,6 +75,7 @@ func (ep ElevationPoint) Less(other ElevationPoint) bool {
 	return ep.Distance < other.Distance
 }
 
+// GradientPoint struct
 type GradientPoint struct {
 	Distance  float64
 	Elevation float64
@@ -81,6 +86,7 @@ func (gp GradientPoint) Less(other GradientPoint) bool {
 	return gp.Distance < other.Distance
 }
 
+// Classification enum
 type Classification string
 
 const (
@@ -105,6 +111,7 @@ func (c *Classification) Scan(src any) error {
 	return ScanEnum(c, src, classificationMapping)
 }
 
+// Duration struct
 type Duration struct {
 	Duration time.Duration
 	Valid    bool
@@ -132,9 +139,10 @@ func (d *Duration) Scan(src any) error {
 	return nil
 }
 
+// Result struct
 type Result struct {
 	Rank           int            `json:"rank"`
-	Name           pgtype.Text    `json:"-"`
+	Rider          pgtype.Text    `json:"-"`
 	Team           pgtype.Text    `json:"-"`
 	Time           Duration       `json:"-"`
 	Points         pgtype.Int8    `json:"-"`
@@ -145,7 +153,7 @@ func (r *Result) MarshalJSON() ([]byte, error) {
 	type Alias Result
 	aux := struct {
 		Alias
-		Name   *string `json:"name,omitempty"`
+		Rider  *string `json:"rider,omitempty"`
 		Team   *string `json:"team,omitempty"`
 		Time   *string `json:"time,omitempty"`
 		Points *int64  `json:"points,omitempty"`
@@ -153,8 +161,8 @@ func (r *Result) MarshalJSON() ([]byte, error) {
 
 	aux.Alias = Alias(*r)
 
-	if r.Name.Valid {
-		aux.Name = &r.Name.String
+	if r.Rider.Valid {
+		aux.Rider = &r.Rider.String
 	}
 	if r.Team.Valid {
 		aux.Team = &r.Team.String
