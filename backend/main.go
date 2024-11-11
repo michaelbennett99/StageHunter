@@ -102,6 +102,15 @@ func main() {
 		),
 	)
 
+	http.HandleFunc(
+		"/stage/results/verify/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.VerifyStageHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
 	log.Println("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

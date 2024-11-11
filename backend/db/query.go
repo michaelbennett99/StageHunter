@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"errors"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -251,4 +253,86 @@ func (q *Queries) GetTeams(ctx context.Context, stageID int) ([]string, error) {
 		return nil, err
 	}
 	return teams, nil
+}
+
+const verifyGuessQuery = `
+SELECT rider, team FROM racedata.riders_teams_results
+WHERE
+	stage_id = @stage_id
+	AND rank = @rank
+	AND classification = @classification
+`
+
+type VerifyResultGuessParams struct {
+	StageID        int
+	Rank           int
+	Classification Classification
+	Guess          string
+}
+
+type RiderOrTeam struct {
+	isRider bool
+	value   string
+}
+
+func NewRiderOrTeam(rider, team *string) (RiderOrTeam, error) {
+	// Team should always be non-nil
+	if team == nil {
+		return RiderOrTeam{}, errors.New("team cannot be nil")
+	}
+	// Set the value to the rider if it is non-nil
+	if rider != nil {
+		return RiderOrTeam{isRider: true, value: *rider}, nil
+	}
+	// Otherwise, the value is the team
+	return RiderOrTeam{isRider: false, value: *team}, nil
+}
+
+func (r *RiderOrTeam) IsRider() bool {
+	return r.isRider
+}
+
+func (r *RiderOrTeam) Reduce() string {
+	return r.value
+}
+
+func (q *Queries) VerifyResultGuess(
+	ctx context.Context, params VerifyResultGuessParams,
+) (bool, error) {
+	// Make the query
+	rows, err := q.conn.Query(ctx, verifyGuessQuery, pgx.NamedArgs{
+		"stage_id":       params.StageID,
+		"rank":           params.Rank,
+		"classification": params.Classification,
+	})
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	// Get the rider or team from the result
+	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[struct {
+		Rider *string
+		Team  *string
+	}])
+	if err != nil {
+		return false, err
+	}
+	riderOrTeam, err := NewRiderOrTeam(row.Rider, row.Team)
+	if err != nil {
+		return false, err
+	}
+
+	// Normalise the guess and the answer
+	unAccentedGuess, err := lib.StripAccents(params.Guess)
+	if err != nil {
+		return false, err
+	}
+	unaccentedAnswer, err := lib.StripAccents(riderOrTeam.Reduce())
+	if err != nil {
+		return false, err
+	}
+
+	// Compare the normalised guess and answer
+	return strings.EqualFold(unaccentedAnswer, unAccentedGuess), nil
 }

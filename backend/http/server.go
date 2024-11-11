@@ -273,3 +273,59 @@ func GetTeamsHandler(
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(teams)
 }
+
+func VerifyStageHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	// Get query params
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, "You must specify a stage ID", http.StatusBadRequest)
+		return
+	}
+
+	urlParams := r.URL.Query()
+
+	rank, err := strconv.Atoi(urlParams.Get("rank"))
+	if err != nil {
+		http.Error(
+			w, "Query parameter 'rank' is required", http.StatusBadRequest,
+		)
+		return
+	}
+
+	classification := db.Classification(urlParams.Get("classification"))
+	if !classification.IsValid() {
+		http.Error(
+			w, "Query parameter 'classification' is required",
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	payload := urlParams.Get("payload")
+	if payload == "" {
+		http.Error(
+			w, "Query parameter 'payload' is required",
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	params := db.VerifyResultGuessParams{
+		StageID:        stage_id,
+		Rank:           rank,
+		Classification: classification,
+		Guess:          strings.ReplaceAll(payload, "_", " "),
+	}
+
+	verified, err := conn.VerifyResultGuess(context.Background(), params)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(verified)
+}
