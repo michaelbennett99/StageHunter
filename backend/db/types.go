@@ -97,7 +97,7 @@ const (
 	ClassificationTeams     Classification = "teams"
 )
 
-var classificationMapping = EnumMap[Classification]{
+var ClassificationMapping = EnumMap[Classification]{
 	"stage":     ClassificationStage,
 	"general":   ClassificationGC,
 	"points":    ClassificationPoints,
@@ -107,11 +107,11 @@ var classificationMapping = EnumMap[Classification]{
 }
 
 func (c *Classification) Scan(src any) error {
-	return ScanEnum(c, src, classificationMapping)
+	return ScanEnum(c, src, ClassificationMapping)
 }
 
 func (c Classification) IsValid() bool {
-	return IsValidValue(c, classificationMapping)
+	return IsValidValue(c, ClassificationMapping)
 }
 
 // Duration struct

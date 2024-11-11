@@ -307,19 +307,20 @@ func VerifyResultHandler(
 	classification := db.Classification(urlParams.Get("c"))
 	if !classification.IsValid() {
 		http.Error(
-			w, "Query parameter 'c' must be a valid classification",
+			w,
+			"Query parameter 'c' must be a valid classification.",
 			http.StatusBadRequest,
 		)
 		return
 	}
 	payload := urlParams.Get("p")
 
-	params := db.VerifyResultGuessParams{
+	params := db.GetRiderOrTeamParams{
 		StageID:        stage_id,
 		Rank:           rank,
 		Classification: classification,
 	}
-	answer, err := conn.VerifyResultGuess(context.Background(), params)
+	answer, err := conn.GetRiderOrTeam(context.Background(), params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

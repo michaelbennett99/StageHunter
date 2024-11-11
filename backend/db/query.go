@@ -253,7 +253,7 @@ func (q *Queries) GetTeams(ctx context.Context, stageID int) ([]string, error) {
 	return teams, nil
 }
 
-const verifyGuessQuery = `
+const getRiderOrTeamQuery = `
 SELECT rider, team FROM racedata.riders_teams_results
 WHERE
 	stage_id = @stage_id
@@ -261,7 +261,7 @@ WHERE
 	AND classification = @classification
 `
 
-type VerifyResultGuessParams struct {
+type GetRiderOrTeamParams struct {
 	StageID        int
 	Rank           int
 	Classification Classification
@@ -293,11 +293,11 @@ func (r *RiderOrTeam) Reduce() string {
 	return r.value
 }
 
-func (q *Queries) VerifyResultGuess(
-	ctx context.Context, params VerifyResultGuessParams,
+func (q *Queries) GetRiderOrTeam(
+	ctx context.Context, params GetRiderOrTeamParams,
 ) (RiderOrTeam, error) {
-	// Make the query
-	rows, err := q.conn.Query(ctx, verifyGuessQuery, pgx.NamedArgs{
+	// Get the possible rider and team names
+	rows, err := q.conn.Query(ctx, getRiderOrTeamQuery, pgx.NamedArgs{
 		"stage_id":       params.StageID,
 		"rank":           params.Rank,
 		"classification": params.Classification,
