@@ -111,6 +111,10 @@ func (c *Classification) Scan(src any) error {
 	return ScanEnum(c, src, classificationMapping)
 }
 
+func (c Classification) IsValid() bool {
+	return IsValidValue(c, classificationMapping)
+}
+
 // Duration struct
 type Duration struct {
 	Duration time.Duration
