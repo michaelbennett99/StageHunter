@@ -274,7 +274,7 @@ func GetTeamsHandler(
 	json.NewEncoder(w).Encode(teams)
 }
 
-func VerifyStageHandler(
+func VerifyResultHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
 	// Get query params

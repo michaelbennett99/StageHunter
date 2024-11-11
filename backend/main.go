@@ -105,7 +105,7 @@ func main() {
 	http.HandleFunc(
 		"/stage/results/verify/",
 		myhttp.HandlerMiddleware(
-			myhttp.MakeHandler(pool, myhttp.VerifyStageHandler),
+			myhttp.MakeHandler(pool, myhttp.VerifyResultHandler),
 			myhttp.AddRequestLogger,
 			myhttp.SetCORSHeaders,
 		),
