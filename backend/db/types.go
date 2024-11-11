@@ -58,6 +58,7 @@ type StageInfo struct {
 	StageType   StageType
 	StageStart  string
 	StageEnd    string
+	StageLength float64
 }
 
 // ElevationPoint struct

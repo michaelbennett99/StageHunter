@@ -91,7 +91,8 @@ SELECT
 	stage_number,
 	stage_type,
 	stage_start,
-	stage_end
+	stage_end,
+	stage_length
 FROM racedata.races_stages
 WHERE stage_id = $1
 LIMIT 1;
