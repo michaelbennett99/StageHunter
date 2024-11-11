@@ -7,3 +7,7 @@ services:
       target: staging
     # No volumes needed for staging
     volumes: []
+
+  db:
+    # No ports needed for staging
+    ports: []
