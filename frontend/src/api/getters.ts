@@ -55,22 +55,21 @@ export async function getResultsData(
   stage_id: string | number,
   top_n: string | number
 ): Promise<ResultsData> {
-  const info = await fetchJSON(`${BACKEND_URL}/stage/info/${stage_id}`);
   const res = await fetchJSON(
     `${BACKEND_URL}/stage/results/${stage_id}?topN=${top_n}`
   );
   return {
-    grand_tour: info.GrandTour,
-    year: info.Year,
-    stage_no: info.StageNumber,
-    stage_start: info.StageStart,
-    stage_end: info.StageEnd,
-    stage_results: parseResults(res, 'stage'),
-    gc_results: parseResults(res, 'gc'),
-    points_results: parseResults(res, 'points'),
-    mountains_results: parseResults(res, 'mountains'),
-    youth_results: parseResults(res, 'youth'),
-    teams_results: parseResults(res, 'teams'),
+    grand_tour: true,
+    year: true,
+    stage_no: true,
+    stage_start: true,
+    stage_end: true,
+    stage_results: parseResults(res, 'stage').length,
+    gc_results: parseResults(res, 'gc').length,
+    points_results: parseResults(res, 'points').length,
+    mountains_results: parseResults(res, 'mountains').length,
+    youth_results: parseResults(res, 'youth').length,
+    teams_results: parseResults(res, 'teams').length,
   };
 }
 

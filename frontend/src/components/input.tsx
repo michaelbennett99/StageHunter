@@ -5,6 +5,7 @@ import { useState, ChangeEventHandler } from 'react';
 import { ResultsData, Result } from '@/api/types';
 import { numToRank, deSnakeCase } from '@/utils/utils';
 
+
 export default function Input(
   { data }: { data?: ResultsData }
 ): JSX.Element {
@@ -15,16 +16,21 @@ export default function Input(
     .map(([name, data]) => {
       const displayName = deSnakeCase(name);
 
-      if (Array.isArray(data)) {
+      if (typeof data === 'number') {
         return (
           <li key={name}>
             <InputBoxGroup name={displayName} data={data} />
           </li>
         );
       }
+
+      if (data === false) {
+        return <></>;
+      }
+
       return (
         <li key={name} className={`flex flex-row items-center`}>
-          <InputBox name={displayName} truth={data} />
+          <InputBox name={displayName} />
         </li>
       );
     });
@@ -46,19 +52,19 @@ export default function Input(
 }
 
 function InputBoxGroup(
-  { name, data }: { name: string; data: Result[] }
+  { name, data }: { name: string; data: number }
 ): JSX.Element {
   // A group of input boxes for a single result type
   return (
     <>
       <h3 className="font-semibold mb-1 text-black">{name}</h3>
       <ul>
-        {data.map((d) => (
+        {Array.from({ length: data }, (_, i) => (
           <li
-            key={`${name}-${d.name}`}
+            key={`${name}-${i}`}
             className="flex flex-row items-center ml-4"
           >
-            <InputBox name={numToRank(d.rank) ?? ''} truth={d.name} />
+            <InputBox name={numToRank(i + 1) ?? ''} />
           </li>
         ))}
       </ul>
@@ -66,18 +72,10 @@ function InputBoxGroup(
   );
 }
 
-// Compare a string and a value, returning true if left is the string
-// representation of right
-function compare(left: string, right: any): boolean {
-  return left === String(right);
-}
-
 function InputBox(
-  { name, truth }: { name: string; truth: string }
+  { name }: { name: string }
 ): JSX.Element {
   const [val, setVal] = useState('');
-
-  const rightAnswer = compare(val, truth);
 
   return (
     <div className="flex items-center w-full">
@@ -85,7 +83,6 @@ function InputBox(
       <TextInput
         value={val}
         onChange={(e) => setVal(e.target.value)}
-        rightAnswer={rightAnswer}
       />
     </div>
   );
@@ -96,12 +93,10 @@ function InputBox(
 function TextInput( {
   value,
   onChange,
-  rightAnswer,
   className,
 }: {
   value: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
-  rightAnswer: boolean;
   className?: string;
 }): JSX.Element {
   return (
@@ -112,7 +107,6 @@ function TextInput( {
       type="text"
       value={value}
       onChange={onChange}
-      disabled={rightAnswer}
     />
   );
 }

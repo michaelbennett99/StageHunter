@@ -12,17 +12,17 @@ export interface Result {
 }
 
 export interface ResultsData {
-  grand_tour: GrandTour;
-  year: number;
-  stage_no: number;
-  stage_start: string;
-  stage_end: string;
-  stage_results: Result[];
-  gc_results: Result[];
-  points_results?: Result[];
-  mountains_results?: Result[];
-  youth_results?: Result[];
-  teams_results?: Result[];
+  grand_tour: boolean;
+  year: boolean;
+  stage_no: boolean;
+  stage_start: boolean;
+  stage_end: boolean;
+  stage_results: number;
+  gc_results: number;
+  points_results?: number;
+  mountains_results?: number;
+  youth_results?: number;
+  teams_results?: number;
 }
 
 export interface ElevationData {
