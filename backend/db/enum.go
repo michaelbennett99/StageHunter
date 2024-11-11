@@ -29,3 +29,8 @@ func ScanEnum[T EnumValue](dest *T, src any, mapping EnumMap[T]) error {
 		return fmt.Errorf("unsupported value: %v", src)
 	}
 }
+
+func IsValidValue[T EnumValue](value T, mapping EnumMap[T]) bool {
+	_, ok := mapping[string(value)]
+	return ok
+}
