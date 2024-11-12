@@ -3,6 +3,7 @@ package lib_test
 import (
 	"testing"
 
+	"github.com/michaelbennett99/stagehunter/backend/db"
 	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
 
@@ -61,5 +62,75 @@ func TestGetFieldByTag(t *testing.T) {
 	}
 	if badValue.IsValid() {
 		t.Fatalf("expected badValue to be invalid, got %s", badValue.String())
+	}
+}
+
+func TestGetFieldByTagStageInfo(t *testing.T) {
+	stageInfo := db.StageInfo{
+		GrandTour:   db.GrandTourTour,
+		Year:        2024,
+		StageNumber: 1,
+		StageType:   db.StageTypeRoad,
+		StageStart:  "Lyon",
+		StageEnd:    "Clermont-Ferrand",
+		StageLength: 100.5,
+	}
+	field, err := lib.GetFieldByTag(stageInfo, "json", "grand_tour")
+	if err != nil {
+		t.Fatalf("expected no error, got %s", err)
+	}
+	if field.String() != "Tour de France" {
+		t.Fatalf(
+			"expected grand_tour to be Tour de France, got %s",
+			field.String(),
+		)
+	}
+
+	field, err = lib.GetFieldByTag(stageInfo, "json", "year")
+	if err != nil {
+		t.Fatalf("expected no error, got %s", err)
+	}
+	if field.Int() != 2024 {
+		t.Fatalf("expected year to be 2024, got %d", field.Int())
+	}
+
+	field, err = lib.GetFieldByTag(stageInfo, "json", "stage_no")
+	if err != nil {
+		t.Fatalf("expected no error, got %s", err)
+	}
+	if field.Int() != 1 {
+		t.Fatalf("expected stage_number to be 1, got %d", field.Int())
+	}
+
+	field, err = lib.GetFieldByTag(stageInfo, "json", "stage_type")
+	if err != nil {
+		t.Fatalf("expected no error, got %s", err)
+	}
+	if field.String() != "Road" {
+		t.Fatalf("expected stage_type to be Road, got %s", field.String())
+	}
+
+	field, err = lib.GetFieldByTag(stageInfo, "json", "stage_start")
+	if err != nil {
+		t.Fatalf("expected no error, got %s", err)
+	}
+	if field.String() != "Lyon" {
+		t.Fatalf("expected stage_start to be Lyon, got %s", field.String())
+	}
+
+	field, err = lib.GetFieldByTag(stageInfo, "json", "stage_end")
+	if err != nil {
+		t.Fatalf("expected no error, got %s", err)
+	}
+	if field.String() != "Clermont-Ferrand" {
+		t.Fatalf("expected stage_end to be Clermont-Ferrand, got %s", field.String())
+	}
+
+	field, err = lib.GetFieldByTag(stageInfo, "json", "stage_length")
+	if err != nil {
+		t.Fatalf("expected no error, got %s", err)
+	}
+	if field.Float() != 100.5 {
+		t.Fatalf("expected stage_length to be 100.5, got %f", field.Float())
 	}
 }
