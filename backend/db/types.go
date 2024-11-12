@@ -29,6 +29,10 @@ func (gt *GrandTour) Scan(src any) error {
 	return ScanEnum(gt, src, grandTourMapping)
 }
 
+func (gt GrandTour) String() string {
+	return string(gt)
+}
+
 // StageType enum
 type StageType string
 
@@ -48,6 +52,10 @@ var stageTypeMapping = EnumMap[StageType]{
 
 func (st *StageType) Scan(src any) error {
 	return ScanEnum(st, src, stageTypeMapping)
+}
+
+func (st StageType) String() string {
+	return string(st)
 }
 
 // StageInfo struct

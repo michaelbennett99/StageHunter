@@ -1,6 +1,9 @@
 package lib
 
 import (
+	"fmt"
+	"reflect"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -61,4 +64,23 @@ func AreNormEqual(a, b string) bool {
 
 	// Compare the normalised strings
 	return strings.EqualFold(unAccentedA, unAccentedB)
+}
+
+func ValueToString(v any) (string, error) {
+	if v == nil {
+		return "", fmt.Errorf("value is nil")
+	}
+
+	switch v := v.(type) {
+	case fmt.Stringer:
+		return v.String(), nil
+	case string:
+		return v, nil
+	case int, int8, int16, int32, int64:
+		return strconv.FormatInt(reflect.ValueOf(v).Int(), 10), nil
+	case float32, float64:
+		return strconv.FormatFloat(reflect.ValueOf(v).Float(), 'f', -1, 64), nil
+	default:
+		return "", fmt.Errorf("unsupported type: %T", v)
+	}
 }
