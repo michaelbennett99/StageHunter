@@ -1,18 +1,21 @@
 import { Suspense } from 'react';
 
-import Input from './input';
+import Input, { Options } from './input';
 import { ResultsData } from '@/api/types';
-import { getResultsData } from '@/api/getters';
 
 async function ResultsLoader({
   stageId,
   children
 }: {
   stageId: string | number;
-  children: (results: ResultsData) => JSX.Element;
+  children: (options: Options) => JSX.Element;
 }): Promise<JSX.Element> {
-  const results = await getResultsData(stageId, 3);
-  return children(results);
+  const options = {
+    grand_tours: ['Tour de France', 'Giro d\'Italia', 'Vuelta a España'],
+    riders: ['Egan Bernal', 'Jonas Vingegaard', 'Tadej Pogacar'],
+    teams: ['Team Sky', 'Team Jumbo-Visma', 'Team Astana']
+  };
+  return children(options);
 }
 
 export default async function Results({
@@ -23,7 +26,7 @@ export default async function Results({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ResultsLoader stageId={stageId}>
-        {(results: ResultsData) => <Input data={results} />}
+        {(options: Options) => <Input options={options} />}
       </ResultsLoader>
     </Suspense>
   );

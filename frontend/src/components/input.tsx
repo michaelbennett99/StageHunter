@@ -4,6 +4,7 @@ import { useState, ChangeEventHandler } from 'react';
 import { FaCheck } from 'react-icons/fa';
 
 import { numToRank } from '@/utils/utils';
+import Autocomplete from './autocomplete';
 
 
 export interface Options {
@@ -140,17 +141,25 @@ function TextInput( {
       className="flex items-center h-full gap-1"
       onSubmit={(e) => e.preventDefault()}
     >
-      <input
-        className={
-          `h-full w-40 p-1 border-2
-          border-gray-300 text-black rounded-md
-          ${className}`
-        }
-        type={inputType}
-        value={value}
-        onChange={onChange}
-        list={listId}
-      />
+      {options ? (
+        <Autocomplete
+          value={value}
+          onChange={onChange}
+          options={options}
+        />
+      ) : (
+        <input
+          className={
+            `h-full w-40 p-1 border-2
+            border-gray-300 text-black rounded-md
+            ${className}`
+          }
+          type={inputType}
+          value={value}
+          onChange={onChange}
+          list={listId}
+        />
+      )}
       <button
         type="button"
         className="
