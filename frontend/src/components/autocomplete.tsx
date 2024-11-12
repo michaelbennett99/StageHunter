@@ -4,7 +4,9 @@ import {
   MouseEvent,
   MouseEventHandler,
   useState,
+  useEffect,
   useRef,
+  RefObject,
 } from 'react';
 
 export default function Autocomplete({
@@ -12,6 +14,7 @@ export default function Autocomplete({
   options,
   onChange,
   maxResults = options.length,
+  maxShownResults = 5,
   inputClassName =
     'h-full w-40 p-1 border-2 border-gray-300 text-black rounded-md',
   optionsClassName = 'text-white bg-black',
@@ -21,6 +24,7 @@ export default function Autocomplete({
   options: string[];
   onChange: ChangeEventHandler<HTMLInputElement>;
   maxResults?: number;
+  maxShownResults?: number;
   inputClassName?: string;
   optionsClassName?: string;
   selectedOptionClassName?: string;
@@ -28,15 +32,26 @@ export default function Autocomplete({
   // State
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [optionHeight, setOptionHeight] = useState<number>(0);
 
   // Refs
   // We get the ref of the input element so we can position the options menu
   const inputRef = useRef<HTMLInputElement>(null);
+  const firstOptionRef = useRef<HTMLLIElement>(null);
+
+  // Effects
+  useEffect(() => {
+    if (firstOptionRef.current) {
+      setOptionHeight(firstOptionRef.current.offsetHeight);
+    }
+  }, [showOptions]);
 
   // Filtered options
   const shownOptions = options.filter((option, i) =>
     option.toLowerCase().includes(value.toLowerCase()) && i < maxResults
   );
+
+  const firstOptionHeight = firstOptionRef.current?.offsetHeight;
 
   // Handlers
   // Show options only when focused
@@ -132,11 +147,17 @@ export default function Autocomplete({
       />
       {showOptions && (
         <ul
-          className={`${optionsClassName} absolute`}
+          className={`${optionsClassName} absolute overflow-y-auto`}
           style={{
             width: inputRef.current?.offsetWidth,
             top: '100%',
             left: 0,
+            height: Math.min(
+              window.innerHeight
+                - inputRef.current!.getBoundingClientRect().bottom
+                - 10,
+              maxShownResults * optionHeight
+            ),
             zIndex: 1000,
           }}
           onMouseDown={(e) => e.preventDefault()}
@@ -150,6 +171,7 @@ export default function Autocomplete({
               onHover={onHover}
               onClick={onClickOption}
               selectedOptionClassName={selectedOptionClassName}
+              ref={i === 0 ? firstOptionRef : undefined}
             />
           ))}
         </ul>
@@ -165,6 +187,7 @@ function AutocompleteOption({
   onHover,
   onClick,
   selectedOptionClassName,
+  ref,
 }: {
   index: number;
   option: string;
@@ -172,6 +195,7 @@ function AutocompleteOption({
   onHover: MouseEventHandler<HTMLLIElement>;
   onClick: MouseEventHandler<HTMLLIElement>;
   selectedOptionClassName?: string;
+  ref?: RefObject<HTMLLIElement>;
 }): JSX.Element {
   return (
     <li
@@ -179,6 +203,7 @@ function AutocompleteOption({
       className={selected ? selectedOptionClassName : ''}
       onMouseEnter={onHover}
       onClick={onClick}
+      ref={ref}
     >
       {option}
     </li>
