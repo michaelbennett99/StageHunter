@@ -37,14 +37,23 @@ export default function Autocomplete({
   // Refs
   // We get the ref of the input element so we can position the options menu
   const inputRef = useRef<HTMLInputElement>(null);
-  const firstOptionRef = useRef<HTMLLIElement>(null);
+  const firstOrSelectedOptionRef = useRef<HTMLLIElement>(null);
 
   // Effects
   useEffect(() => {
-    if (firstOptionRef.current) {
-      setOptionHeight(firstOptionRef.current.offsetHeight);
+    if (firstOrSelectedOptionRef.current) {
+      setOptionHeight(firstOrSelectedOptionRef.current.offsetHeight);
     }
   }, [showOptions]);
+
+  useEffect(() => {
+    if (selectedOption !== null) {
+      firstOrSelectedOptionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [selectedOption]);
 
   // Filtered options
   const shownOptions = options.filter((option, i) =>
@@ -154,7 +163,7 @@ export default function Autocomplete({
               window.innerHeight
                 - inputRef.current!.getBoundingClientRect().bottom
                 - 10,
-              maxShownResults * optionHeight
+              Math.min(maxShownResults, shownOptions.length) * optionHeight
             ),
             zIndex: 1000,
           }}
@@ -169,7 +178,11 @@ export default function Autocomplete({
               onHover={onHover}
               onClick={onClickOption}
               selectedOptionClassName={selectedOptionClassName}
-              ref={i === 0 ? firstOptionRef : undefined}
+              ref={
+                (selectedOption === i || (selectedOption === null && i === 0))
+                  ? firstOrSelectedOptionRef
+                  : undefined
+              }
             />
           ))}
         </ul>
@@ -186,6 +199,7 @@ function AutocompleteOption({
   onClick,
   selectedOptionClassName,
   ref,
+
 }: {
   index: number;
   option: string;
