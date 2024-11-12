@@ -6,23 +6,30 @@ import { FaCheck } from 'react-icons/fa';
 import { numToRank } from '@/utils/utils';
 
 
+export interface Options {
+  grand_tours: string[];
+  riders: string[];
+  teams: string[];
+}
+
 export default function Input(
+  { options }: { options: Options }
 ): JSX.Element {
   // Get all the entries in the data object and list them
   // If the entry is an array, it's a group of entries, so we group them
   // in an InputBoxGroup
   const list_elements = [
-    <InputBox name="Grand Tour" />,
+    <InputBox name="Grand Tour" options={options.grand_tours} />,
     <InputBox name="Year" />,
     <InputBox name="Number" />,
     <InputBox name="Start" />,
     <InputBox name="End" />,
-    <InputBoxGroup name="Stage Results" nBoxes={3} />,
-    <InputBoxGroup name="GC Results" nBoxes={3} />,
-    <InputBoxGroup name="Points Results" nBoxes={3} />,
-    <InputBoxGroup name="KOM Results" nBoxes={3} />,
-    <InputBoxGroup name="Youth Results" nBoxes={3} />,
-    <InputBoxGroup name="Teams Results" nBoxes={3} />,
+    <InputBoxGroup name="Stage Results" nBoxes={3} options={options.riders} />,
+    <InputBoxGroup name="GC Results" nBoxes={3} options={options.riders} />,
+    <InputBoxGroup name="Points Results" nBoxes={3} options={options.riders} />,
+    <InputBoxGroup name="KOM Results" nBoxes={3} options={options.riders} />,
+    <InputBoxGroup name="Youth Results" nBoxes={3} options={options.riders} />,
+    <InputBoxGroup name="Teams Results" nBoxes={3} options={options.teams} />,
   ].map((element) => (
     <li key={element.props.name}>{element}</li>
   ));
@@ -60,7 +67,11 @@ function BoxList(
 }
 
 function InputBoxGroup(
-  { name, nBoxes }: { name: string; nBoxes: number }
+  { name, nBoxes, options }: {
+    name: string;
+    nBoxes: number;
+    options?: string[];
+  }
 ): JSX.Element {
   // A group of input boxes for a single result type
   return (
@@ -72,7 +83,10 @@ function InputBoxGroup(
             key={`${name}-${i}`}
             className="flex flex-row items-center ml-4"
           >
-            <InputBox name={numToRank(i + 1) ?? ''} />
+            <InputBox
+              name={numToRank(i + 1) ?? ''}
+              options={options}
+            />
           </li>
         ))}
       </ul>
@@ -81,7 +95,11 @@ function InputBoxGroup(
 }
 
 function InputBox(
-  { name }: { name: string }
+  { name, options, inputType }: {
+    name: string;
+    options?: string[];
+    inputType?: 'text' | 'number';
+  }
 ): JSX.Element {
   const [val, setVal] = useState('');
 
@@ -92,6 +110,8 @@ function InputBox(
         name={name}
         value={val}
         onChange={(e) => setVal(e.target.value)}
+        options={options}
+        inputType={inputType}
       />
     </div>
   );
@@ -103,14 +123,16 @@ function TextInput( {
   name,
   value,
   onChange,
-  className,
   options,
+  inputType = 'text',
+  className,
 }: {
   name: string;
   value: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
-  className?: string;
   options?: string[];
+  inputType?: 'text' | 'number';
+  className?: string;
 }): JSX.Element {
   const listId = `options-${name}`;
   return (
@@ -124,7 +146,7 @@ function TextInput( {
           border-gray-300 text-black rounded-md
           ${className}`
         }
-        type="text"
+        type={inputType}
         value={value}
         onChange={onChange}
         list={listId}
