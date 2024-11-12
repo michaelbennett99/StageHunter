@@ -34,14 +34,25 @@ export async function getAllStageIDs(): Promise<number[]> {
   return fetchJSON(`${BACKEND_URL}/stages`);
 }
 
-function parseResults(res: any[], classification: string): Result[] {
-  return res.filter((r: any) => (
-    r.classification && (r.name || r.team) && r.rank
-    && r.classification === classification
-  )).map((r: any) => ({
-    name: r.rider ?? r.team,
-    rank: r.rank,
-  }));
+/**
+ * Parse the results from a list of records the backend returns.
+ * @param res - The list of records to parse.
+ * @param classification - The classification of the results to parse.
+ * @returns The parsed results.
+ */
+function parseResults(
+  res: Record<string, any>[],
+  classification: string
+): Result[] {
+  return res
+    .filter((r) => (
+      r.classification && (r.name || r.team) && r.rank
+      && r.classification === classification
+    ))
+    .map((r) => ({
+      name: r.rider ?? r.team,
+      rank: r.rank,
+    }));
 }
 
 export async function getStageLength(
