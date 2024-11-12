@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, ChangeEventHandler } from 'react';
+import { FaCheck } from 'react-icons/fa';
 
-import { ResultsData, Result } from '@/api/types';
+import { ResultsData } from '@/api/types';
 import { numToRank, deSnakeCase } from '@/utils/utils';
 
 
@@ -44,12 +45,16 @@ export default function Input(
       className="w-80 flex flex-col h-screen overflow-hidden"
       id="input-container"
     >
-      <div className={`overflow-y-auto h-full pl-6 pr-6 bg-slate-100`}>
-        <h2 className="font-semibold mt-4 mb-2 text-lg text-center text-black">
+      <div className="overflow-y-auto h-full pl-6 pr-6 bg-slate-100">
+        <h2
+          className="font-semibold mt-4 mb-2 text-lg text-center text-black"
+        >
           Guess the stage!
         </h2>
-        <ul className="flex-grow flex flex-col">{list_elements}</ul>
-        <div className="text-center mt-2 mb-4">Score: 0</div>
+        <ul className="flex-grow flex flex-col gap-1">{list_elements}</ul>
+        <div className="text-center mt-2 mb-4 text-black">
+          Score: 0
+        </div>
       </div>
     </div>
   );
@@ -82,7 +87,7 @@ function InputBox(
   const [val, setVal] = useState('');
 
   return (
-    <div className="flex items-center w-full">
+    <div className="flex items-center w-full h-full">
       <div className="flex-grow text-black text-sm">{name}</div>
       <TextInput
         value={val}
@@ -104,13 +109,23 @@ function TextInput( {
   className?: string;
 }): JSX.Element {
   return (
-    <input
-      className={
-        `w-40 m-0.5 ml-2 border-2 border-gray-300 text-black rounded-md ${className}`
-      }
-      type="text"
-      value={value}
-      onChange={onChange}
-    />
+    <form className="flex items-center h-full">
+      <input
+        className={
+          `h-full w-40 p-1 m-0.5 ml-2 border-2
+          border-gray-300 text-black rounded-md
+          ${className}`
+        }
+        type="text"
+        value={value}
+        onChange={onChange}
+      />
+      <button
+        type="button"
+        className="bg-blue-500 text-white p-1 rounded-md h-full w-full"
+      >
+        <FaCheck />
+      </button>
+    </form>
   );
 }
