@@ -1,7 +1,28 @@
 import { Suspense } from 'react';
 
 import Input, { Options } from './input';
-import { ResultsData } from '@/api/types';
+
+const riders = [
+  'Egan Bernal',
+  'Jonas Vingegaard',
+  'Tadej Pogacar',
+  'Romain Bardet',
+  'Mikel Landa',
+  'Mikel Nieve',
+  'Pello Bilbao',
+  'Ion Izagirre',
+  'Gorka Izagirre',
+  'Enric Mas',
+  'Alejandro Valverde',
+  'Nairo Quintana',
+  'Rigoberto Uran',
+  'Mikel Landa',
+  'Mikel Nieve',
+  'Pello Bilbao',
+  'Ion Izagirre',
+  'Gorka Izagirre',
+  'Enric Mas',
+];
 
 async function ResultsLoader({
   stageId,
@@ -12,7 +33,7 @@ async function ResultsLoader({
 }): Promise<JSX.Element> {
   const options = {
     grand_tours: ['Tour de France', 'Giro d\'Italia', 'Vuelta a España'],
-    riders: ['Egan Bernal', 'Jonas Vingegaard', 'Tadej Pogacar'],
+    riders: riders,
     teams: ['Team Sky', 'Team Jumbo-Visma', 'Team Astana']
   };
   return children(options);
