@@ -52,13 +52,13 @@ func (st *StageType) Scan(src any) error {
 
 // StageInfo struct
 type StageInfo struct {
-	GrandTour   GrandTour
-	Year        int
-	StageNumber int
-	StageType   StageType
-	StageStart  string
-	StageEnd    string
-	StageLength float64
+	GrandTour   GrandTour `json:"grand_tour"`
+	Year        int       `json:"year"`
+	StageNumber int       `json:"stage_no"`
+	StageType   StageType `json:"stage_type"`
+	StageStart  string    `json:"stage_start"`
+	StageEnd    string    `json:"stage_end"`
+	StageLength float64   `json:"stage_length"`
 }
 
 // ElevationPoint struct
@@ -67,8 +67,8 @@ type OrderedElevationPoint interface {
 }
 
 type ElevationPoint struct {
-	Distance  float64
-	Elevation float64
+	Distance  float64 `json:"distance"`
+	Elevation float64 `json:"elevation"`
 }
 
 func (ep ElevationPoint) Less(other ElevationPoint) bool {
@@ -77,9 +77,9 @@ func (ep ElevationPoint) Less(other ElevationPoint) bool {
 
 // GradientPoint struct
 type GradientPoint struct {
-	Distance  float64
-	Elevation float64
-	Gradient  lib.Optional[float64]
+	Distance  float64               `json:"distance"`
+	Elevation float64               `json:"elevation"`
+	Gradient  lib.Optional[float64] `json:"gradient"`
 }
 
 func (gp GradientPoint) Less(other GradientPoint) bool {

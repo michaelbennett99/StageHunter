@@ -93,25 +93,14 @@ export async function getTrack(
 export async function getElevationData(
   stage_id: string | number
 ): Promise<ElevationData[]> {
-  const data = await fetchJSON(`${BACKEND_URL}/stage/elevation/${stage_id}`);
-  return data.map((d: { Elevation: number; Distance: number }) => ({
-    elevation: d.Elevation,
-    distance: d.Distance,
-  }));
+  return fetchJSON(`${BACKEND_URL}/stage/elevation/${stage_id}`);
 }
 
 export async function getGradientData(
   stage_id: string | number,
   resolution: number
 ): Promise<GradientData[]> {
-  const data = await fetchJSON(
+  return fetchJSON(
     `${BACKEND_URL}/stage/gradient/${stage_id}?resolution=${resolution}`
-  );
-  return data.map(
-    (d: { Distance: number; Elevation: number; Gradient: number | null }) => ({
-      distance: d.Distance,
-      elevation: d.Elevation,
-      gradient: d.Gradient,
-    })
   );
 }
