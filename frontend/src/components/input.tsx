@@ -169,24 +169,7 @@ function TextInput( {
       >
         <FaCheck className="h-full w-full" />
       </button>
-      <InputBoxOptions id={listId} options={options} />
     </form>
-  );
-}
-
-function InputBoxOptions(
-  { id, options }: { id: string; options?: string[] }
-): JSX.Element {
-  if (!options) {
-    return <></>;
-  }
-
-  return (
-    <datalist id={id}>
-      {options.map((option) => (
-        <option key={option} value={option} />
-      ))}
-    </datalist>
   );
 }
 
