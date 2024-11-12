@@ -264,13 +264,14 @@ func GetTeamsHandler(
 func VerifyResultHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	// Get query params
+	// Get Stage ID
 	stage_id, err := GetStageIDFromURL(r)
 	if err != nil {
 		http.Error(w, "You must specify a stage ID", http.StatusBadRequest)
 		return
 	}
 
+	// Check query params
 	urlParams := r.URL.Query()
 	if !urlParams.Has("r") || !urlParams.Has("c") || !urlParams.Has("p") {
 		http.Error(
@@ -281,6 +282,7 @@ func VerifyResultHandler(
 		return
 	}
 
+	// Parse rank as an integer
 	rank, err := strconv.Atoi(urlParams.Get("r"))
 	if err != nil {
 		http.Error(
@@ -289,6 +291,8 @@ func VerifyResultHandler(
 		)
 		return
 	}
+
+	// Parse classification as a db.Classification
 	classification := db.Classification(urlParams.Get("c"))
 	if !classification.IsValid() {
 		http.Error(
@@ -298,8 +302,11 @@ func VerifyResultHandler(
 		)
 		return
 	}
+
+	// Parse payload as a string
 	payload := urlParams.Get("p")
 
+	// Get the correct rider/team from the database
 	params := db.GetRiderOrTeamParams{
 		StageID:        stage_id,
 		Rank:           rank,
@@ -311,8 +318,10 @@ func VerifyResultHandler(
 		return
 	}
 
+	// Verify the payload against the answer
 	verified := lib.AreNormEqual(payload, answer.Reduce())
 
+	// Return the result
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(verified)
 }
