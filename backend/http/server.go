@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -15,10 +14,6 @@ import (
 	"github.com/michaelbennett99/stagehunter/backend/db"
 	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
-
-func logRequest(r *http.Request) {
-	log.Printf("%s %s", r.Method, r.URL.Path)
-}
 
 func MakeHandler(
 	pool *pgxpool.Pool,

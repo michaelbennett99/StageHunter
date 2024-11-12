@@ -1,8 +1,21 @@
 package http
 
 import (
+	"log"
 	"net/http"
+	"time"
 )
+
+func logRequest(w *ResponseWriter, r *http.Request, duration time.Duration) {
+	method := r.Method
+	path := r.URL.EscapedPath()
+	query := r.URL.Query().Encode()
+	if query != "" {
+		query = "?" + query
+	}
+	status := w.statusCode
+	log.Printf("%s %s%s Status %d in %s", method, path, query, status, duration)
+}
 
 func HandlerMiddleware(
 	fn http.HandlerFunc, middleware ...func(http.HandlerFunc) http.HandlerFunc,
@@ -15,8 +28,11 @@ func HandlerMiddleware(
 
 func AddRequestLogger(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-		fn(w, r)
+		start := time.Now()
+		responseWriter := newResponseWriter(w)
+		fn(responseWriter, r)
+
+		logRequest(responseWriter, r, time.Since(start))
 	}
 }
 
