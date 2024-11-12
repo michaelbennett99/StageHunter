@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -14,7 +15,10 @@ func logRequest(w *ResponseWriter, r *http.Request, duration time.Duration) {
 		query = "?" + query
 	}
 	status := w.statusCode
-	log.Printf("%s %s%s Status %d in %s", method, path, query, status, duration)
+	durationStr := fmt.Sprintf("%dms", duration.Milliseconds())
+	log.Printf(
+		"%s %s%s Status %d in %s", method, path, query, status, durationStr,
+	)
 }
 
 func HandlerMiddleware(
