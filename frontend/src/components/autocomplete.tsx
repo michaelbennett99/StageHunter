@@ -51,8 +51,6 @@ export default function Autocomplete({
     option.toLowerCase().includes(value.toLowerCase()) && i < maxResults
   );
 
-  const firstOptionHeight = firstOptionRef.current?.offsetHeight;
-
   // Handlers
   // Show options only when focused
   function onFocus() {
