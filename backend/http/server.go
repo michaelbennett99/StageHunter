@@ -37,7 +37,6 @@ func MakeHandler(
 }
 
 func DefaultHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Request OK"))
 }
 
@@ -48,7 +47,6 @@ func GetDailyHandler(w http.ResponseWriter, r *http.Request, conn *db.Queries) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(stage_id)
 }
 
@@ -61,7 +59,6 @@ func GetRandomHandler(
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(stage_id)
 }
 
@@ -74,7 +71,6 @@ func GetAllStagesHandler(
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(stages)
 }
 
@@ -113,7 +109,6 @@ func GetStageInfoHandler(
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(stage_info)
 }
 
@@ -166,7 +161,6 @@ func GetStageElevationHandler(
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(elevation)
 }
 
@@ -197,7 +191,6 @@ func GetStageGradientHandler(
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(gradient)
 }
 
@@ -227,7 +220,6 @@ func GetResultsHandler(
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(results)
 }
 
@@ -247,7 +239,6 @@ func GetRidersHandler(
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(riders)
 }
 
@@ -267,7 +258,6 @@ func GetTeamsHandler(
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(teams)
 }
 
@@ -324,7 +314,6 @@ func VerifyResultHandler(
 	verified := lib.AreNormEqual(payload, answer.Reduce())
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(verified)
 }
 
@@ -391,6 +380,5 @@ func VerifyInfoHandler(
 	verified := lib.AreNormEqual(guessValue, answer)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(verified)
 }
