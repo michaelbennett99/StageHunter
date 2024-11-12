@@ -11,7 +11,7 @@ export default function Autocomplete({
   value,
   options,
   onChange,
-  maxResults = 10,
+  maxResults = options.length,
   inputClassName =
     'h-full w-40 p-1 border-2 border-gray-300 text-black rounded-md',
   optionsClassName = 'text-white bg-black',
@@ -30,11 +30,12 @@ export default function Autocomplete({
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
   // Refs
+  // We get the ref of the input element so we can position the options menu
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Filtered options
   const shownOptions = options.filter((option, i) =>
-    option.toLowerCase().includes(value.toLowerCase()) && i < maxResults,
+    option.toLowerCase().includes(value.toLowerCase()) && i < maxResults
   );
 
   // Handlers
