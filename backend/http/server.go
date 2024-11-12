@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -15,6 +14,9 @@ import (
 	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
 
+// MakeHandler creates a new HTTP handler function that acquires a database
+// connection from the provided pool and calls the provided function with the
+// Queries object.
 func MakeHandler(
 	pool *pgxpool.Pool,
 	fn func(http.ResponseWriter, *http.Request, *db.Queries),
@@ -36,10 +38,12 @@ func MakeHandler(
 	}
 }
 
+// DefaultHandler returns a simple "Request OK" response.
 func DefaultHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Request OK"))
 }
 
+// GetDailyHandler returns the ID of the daily stage from the database.
 func GetDailyHandler(w http.ResponseWriter, r *http.Request, conn *db.Queries) {
 	stage_id, err := conn.GetDailyStage(context.Background())
 	if err != nil {
@@ -50,6 +54,7 @@ func GetDailyHandler(w http.ResponseWriter, r *http.Request, conn *db.Queries) {
 	json.NewEncoder(w).Encode(stage_id)
 }
 
+// GetRandomHandler returns a random stage ID from the database.
 func GetRandomHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -62,6 +67,7 @@ func GetRandomHandler(
 	json.NewEncoder(w).Encode(stage_id)
 }
 
+// GetAllStagesHandler returns the IDs of all the stages in the database.
 func GetAllStagesHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -74,6 +80,7 @@ func GetAllStagesHandler(
 	json.NewEncoder(w).Encode(stages)
 }
 
+// GetLastURLSegment returns the last segment of the URL path.
 func GetLastURLSegment(r *http.Request) (string, error) {
 	s := strings.TrimRight(r.URL.Path, "/")
 	segments := strings.Split(s, "/")
@@ -83,6 +90,7 @@ func GetLastURLSegment(r *http.Request) (string, error) {
 	return segments[len(segments)-1], nil
 }
 
+// GetStageIDFromURL returns the stage ID from the last segment of the URL.
 func GetStageIDFromURL(r *http.Request) (int, error) {
 	segment, err := GetLastURLSegment(r)
 	if err != nil {
@@ -91,6 +99,10 @@ func GetStageIDFromURL(r *http.Request) (int, error) {
 	return strconv.Atoi(segment)
 }
 
+// GetStageInfoHandler returns the stage info for a given stage.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
 func GetStageInfoHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -112,6 +124,10 @@ func GetStageInfoHandler(
 	json.NewEncoder(w).Encode(stage_info)
 }
 
+// GetStageTrackHandler returns the track for a given stage.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
 func GetStageTrackHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -142,6 +158,10 @@ func GetStageTrackHandler(
 	w.Write([]byte(track))
 }
 
+// GetStageElevationHandler returns the raw elevation profile for a given stage.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
 func GetStageElevationHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -164,6 +184,14 @@ func GetStageElevationHandler(
 	json.NewEncoder(w).Encode(elevation)
 }
 
+// GetStageGradientHandler returns the gradient profile for a given stage.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
+//
+// Optional Query Parameters:
+// - resolution: the resolution of the gradient profile as a float in meters.
+// Defaults to 10.
 func GetStageGradientHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -194,6 +222,14 @@ func GetStageGradientHandler(
 	json.NewEncoder(w).Encode(gradient)
 }
 
+// GetResultsHandler returns the top N results for a given stage for each
+// classification.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
+//
+// Optional Query Parameters:
+// - topN: the number of results to return as an integer. Defaults to 5.
 func GetResultsHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -223,6 +259,10 @@ func GetResultsHandler(
 	json.NewEncoder(w).Encode(results)
 }
 
+// GetRidersHandler returns all the riders for a given stage.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
 func GetRidersHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -242,6 +282,10 @@ func GetRidersHandler(
 	json.NewEncoder(w).Encode(riders)
 }
 
+// GetTeamsHandler returns all the teams for a given stage.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
 func GetTeamsHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -261,6 +305,16 @@ func GetTeamsHandler(
 	json.NewEncoder(w).Encode(teams)
 }
 
+// VerifyResultHandler verifies a rider/team answer for a given stage, rank and
+// classification against the database.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
+//
+// Required Query Parameters:
+// - r: rank as an integer
+// - c: classification as a string
+// - p: payload as a string
 func VerifyResultHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -326,9 +380,19 @@ func VerifyResultHandler(
 	json.NewEncoder(w).Encode(verified)
 }
 
+// VerifyInfoHandler verifies a guess for a given stage info field against the
+// database.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
+//
+// Required Query Parameters:
+// - f: the field to guess as a string
+// - v: the guess as a string
 func VerifyInfoHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
+	// Get the stage info
 	stage_id, err := GetStageIDFromURL(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -353,36 +417,17 @@ func VerifyInfoHandler(
 	guessValue := queryParams.Get("v")
 
 	// Get the field from the stage info
-	v := reflect.ValueOf(stage_info)
-	f := v.FieldByName(guessField)
-	if !f.IsValid() {
-		possibleFields := []string{}
-		for i := 0; i < v.NumField(); i++ {
-			possibleFields = append(possibleFields, v.Type().Field(i).Name)
-		}
-		http.Error(
-			w,
-			"Invalid f parameter. Possible values are: "+
-				strings.Join(possibleFields, ", "),
-			http.StatusBadRequest,
-		)
+	v, err := lib.GetFieldByTag(stage_info, "json", guessField)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fieldValue := f.Interface()
-	var answer string
-	switch v := fieldValue.(type) {
-	case string:
-		answer = v
-	case db.StageType:
-		answer = string(v)
-	case db.GrandTour:
-		answer = string(v)
-	case int:
-		answer = strconv.Itoa(v)
-	default:
-		http.Error(
-			w, "Unsupported field type", http.StatusInternalServerError,
-		)
+	fieldValue := v.Interface()
+
+	// Convert the field value to a string for checking
+	answer, err := lib.ValueToString(fieldValue)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
