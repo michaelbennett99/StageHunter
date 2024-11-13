@@ -1,5 +1,3 @@
-export const BACKEND_URL = 'http://stagehunter-backend:8080';
-
 export enum GrandTour {
   TOUR = 'TOUR',
   GIRO = 'GIRO',

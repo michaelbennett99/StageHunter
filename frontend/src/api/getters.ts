@@ -1,12 +1,12 @@
+import { BACKEND_URL } from './constants';
 import {
-  BACKEND_URL,
   Result,
   ResultsData,
   ElevationData,
   GradientData
 } from './types';
 
-async function fetchJSON(url: string): Promise<any> {
+export async function fetchJSON(url: string): Promise<any> {
   const res = await fetch(url, {
     method: 'GET',
     headers: {
