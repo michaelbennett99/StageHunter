@@ -4,8 +4,7 @@ import { useState, ChangeEventHandler } from 'react';
 import { FaCheck } from 'react-icons/fa';
 
 import { numToRank } from '@/utils/utils';
-import Autocomplete from './autocomplete';
-
+import Autocomplete from '@/components/autocomplete';
 
 export interface Options {
   grand_tours: string[];
