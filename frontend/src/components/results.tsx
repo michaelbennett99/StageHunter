@@ -1,28 +1,8 @@
 import { Suspense } from 'react';
 
 import Input, { Options } from './input';
-
-const riders = [
-  'Egan Bernal',
-  'Jonas Vingegaard',
-  'Tadej Pogacar',
-  'Romain Bardet',
-  'Mikel Landa',
-  'Mikel Nieve',
-  'Pello Bilbao',
-  'Ion Izagirre',
-  'Gorka Izagirre',
-  'Enric Mas',
-  'Alejandro Valverde',
-  'Nairo Quintana',
-  'Rigoberto Uran',
-  'Mikel Landa',
-  'Mikel Nieve',
-  'Pello Bilbao',
-  'Ion Izagirre',
-  'Gorka Izagirre',
-  'Enric Mas',
-];
+import { BACKEND_URL } from '@/api/constants';
+import { fetchJSON } from '@/api/getters';
 
 async function ResultsLoader({
   stageId,
@@ -31,10 +11,14 @@ async function ResultsLoader({
   stageId: string | number;
   children: (options: Options) => JSX.Element;
 }): Promise<JSX.Element> {
+  const [riders, teams] = await Promise.all([
+    fetchJSON(`${BACKEND_URL}/stage/riders/${stageId}`),
+    fetchJSON(`${BACKEND_URL}/stage/teams/${stageId}`)
+  ]);
   const options = {
     grand_tours: ['Tour de France', 'Giro d\'Italia', 'Vuelta a España'],
     riders: riders,
-    teams: ['Team Sky', 'Team Jumbo-Visma', 'Team Astana']
+    teams: teams
   };
   return children(options);
 }
