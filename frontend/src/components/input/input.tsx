@@ -238,6 +238,7 @@ function TextInput({
   `;
 
   const noMoreInput = isCorrect || tries <= 0;
+  const isIncorrect = !isCorrect && tries <= 0;
 
   return (
     <form
@@ -263,10 +264,14 @@ function TextInput({
       )}
       <button
         type="submit"
-        className="
+        className={`
           bg-blue-500 text-white p-1 rounded-md h-full w-full
-          hover:bg-blue-700
-        "
+          ${!noMoreInput ? 'hover:bg-blue-700' : ''}
+          ${isCorrect ? 'bg-green-500' : ''}
+          ${isIncorrect ? 'bg-red-500' : ''}
+        `}
+        disabled={noMoreInput}
+        tabIndex={-1}
       >
         <ButtonText tries={tries} isCorrect={isCorrect} isLoading={isLoading} />
       </button>
