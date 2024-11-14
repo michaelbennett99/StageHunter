@@ -34,7 +34,7 @@ export default function Input(
     />,
     <InputBox
       name="Number"
-      validationURL={`${resultsValidationURL}?f=stage_no`}
+      validationURL={`${infoValidationURL}?f=stage_no`}
     />,
     <InputBox
       name="Start"
