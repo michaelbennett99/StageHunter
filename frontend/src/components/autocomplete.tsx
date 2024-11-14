@@ -144,7 +144,9 @@ export default function Autocomplete({
   );
 
   // Determine if the options menu should be shown
-  const optionsVisible = showOptions && shownOptions.length > 0;
+  const optionsVisible = showOptions
+    && shownOptions.length > 0
+    && !inputProps.disabled;
 
   // Define required styles
   const requiredContainerStyle = {
