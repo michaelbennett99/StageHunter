@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import Input, { Options } from './input';
+import Input, { Options } from './input/input';
 import { BACKEND_URL } from '@/api/constants';
 import { fetchJSON } from '@/api/getters';
 
@@ -31,7 +31,7 @@ export default async function Results({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ResultsLoader stageId={stageId}>
-        {(options: Options) => <Input options={options} />}
+        {(options: Options) => <Input stageId={stageId} options={options} />}
       </ResultsLoader>
     </Suspense>
   );
