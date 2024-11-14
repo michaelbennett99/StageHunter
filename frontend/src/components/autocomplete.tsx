@@ -216,7 +216,11 @@ function AutocompleteOptions({
   selectedOptionClassName?: string;
 }): JSX.Element {
   // Refs
-  const firstOrSelectedOptionRef = useRef<HTMLLIElement>(null);
+  // firstOptionRef used for sizing and selectedOptionRef used for scrolling
+  // If the first element is selected, then firstOptionRef is left undefined
+  // and selectedOptionRef is used for both sizing and scrolling
+  const firstOptionRef = useRef<HTMLLIElement>(null);
+  const selectedOptionRef = useRef<HTMLLIElement>(null);
 
   // State
   const [optionHeight, setOptionHeight] = useState<number>(0);
@@ -224,15 +228,19 @@ function AutocompleteOptions({
   // Effects
   // Set the height of an individual option
   useEffect(() => {
-    if (firstOrSelectedOptionRef.current) {
-      setOptionHeight(firstOrSelectedOptionRef.current.offsetHeight);
+    if (firstOptionRef.current) {
+      setOptionHeight(firstOptionRef.current.offsetHeight);
+      return;
+    }
+    if (selectedOptionRef.current) {
+      setOptionHeight(selectedOptionRef.current.offsetHeight);
     }
   }, [shownOptions]);
 
   // Scroll to the selected option
   useEffect(() => {
     if (selectedOption !== null) {
-      firstOrSelectedOptionRef.current?.scrollIntoView({
+      selectedOptionRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
       });
@@ -273,22 +281,27 @@ function AutocompleteOptions({
       style={requiredOptionsListStyle}
       onMouseDown={handleMouseDownOnOptions}
     >
-      {shownOptions.map((option, i) => (
-        <AutocompleteOption
-          key={i}
-          index={i}
-          option={option}
-          selected={selectedOption === i}
-          onHover={onHover}
-          onClick={onClick}
-          selectedOptionClassName={selectedOptionClassName}
-          ref={
-            (selectedOption === i || (selectedOption === null && i === 0))
-              ? firstOrSelectedOptionRef
-              : undefined
-          }
-        />
-      ))}
+      {shownOptions.map((option, i) => {
+        const isFirst = i === 0;
+        const isSelected = selectedOption === i;
+
+        let ref = undefined;
+        if (isSelected) ref = selectedOptionRef;
+        else if (isFirst) ref = firstOptionRef;
+
+        return (
+          <AutocompleteOption
+            key={i}
+            index={i}
+            option={option}
+            selected={isSelected}
+            onHover={onHover}
+            onClick={onClick}
+            selectedOptionClassName={selectedOptionClassName}
+            ref={ref}
+          />
+        );
+      })}
     </ul>
   );
 }
