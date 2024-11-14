@@ -122,6 +122,7 @@ export default function Autocomplete({
   }
 
   // Component body
+  // Extract required props from inputProps
   const value = inputProps.value as string;
   const onChange = inputProps.onChange as ChangeEventHandler<HTMLInputElement>;
 
@@ -131,8 +132,10 @@ export default function Autocomplete({
     && option !== value
   );
 
+  // Determine if the options menu should be shown
   const optionsVisible = showOptions && shownOptions.length > 0;
 
+  // Define required styles
   const requiredContainerStyle = {
     position: 'relative' as const,
   }
