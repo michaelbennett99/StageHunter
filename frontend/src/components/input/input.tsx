@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, ChangeEventHandler } from 'react';
+import { useEffect, useState, ChangeEventHandler } from 'react';
 import { FaCheck, FaTimes, FaPlus, FaSpinner } from 'react-icons/fa';
 
 import { numToRank } from '@/utils/utils';
 import Autocomplete from '@/components/autocomplete';
-import { useDecrement } from './hooks';
+import { useIncrement, useDecrement, useBomb } from './hooks';
 
 export interface Options {
   grand_tours: string[];
@@ -16,6 +16,9 @@ export interface Options {
 export default function Input(
   { stageId, options }: { stageId: string | number; options: Options }
 ): JSX.Element {
+  const [numCorrect, incrementNumCorrect] = useIncrement();
+  const [score, setScore] = useState(0);
+
   const infoValidationURL = `/api/stage/info/verify/${stageId}`;
   const resultsValidationURL = `/api/stage/results/verify/${stageId}`;
 
@@ -27,62 +30,92 @@ export default function Input(
       name="Grand Tour"
       validationURL={`${infoValidationURL}?f=grand_tour`}
       options={options.grand_tours}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBox
       name="Year"
       validationURL={`${infoValidationURL}?f=year`}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBox
       name="Number"
       validationURL={`${infoValidationURL}?f=stage_no`}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBox
       name="Start"
       validationURL={`${infoValidationURL}?f=stage_start`}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBox
       name="End"
       validationURL={`${infoValidationURL}?f=stage_end`}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBoxGroup
       name="Stage Results"
       nBoxes={3}
       validationURL={`${resultsValidationURL}?c=stage`}
       options={options.riders}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBoxGroup
       name="GC Results"
       nBoxes={3}
       validationURL={`${resultsValidationURL}?c=general`}
       options={options.riders}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBoxGroup
       name="Points Results"
       nBoxes={3}
       validationURL={`${resultsValidationURL}?c=points`}
       options={options.riders}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBoxGroup
       name="KOM Results"
       nBoxes={3}
       validationURL={`${resultsValidationURL}?c=mountains`}
       options={options.riders}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBoxGroup
       name="Youth Results"
       nBoxes={3}
       validationURL={`${resultsValidationURL}?c=youth`}
       options={options.riders}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
     <InputBoxGroup
       name="Teams Results"
       nBoxes={3}
       validationURL={`${resultsValidationURL}?c=teams`}
       options={options.teams}
+      incrementNumCorrect={incrementNumCorrect}
+      incrementScore={() => setScore(score + 10)}
     />,
   ].map((element) => (
     <li key={element.props.name}>{element}</li>
   ));
+
+  const numBoxes = list_elements.reduce(
+    (acc, curr) => {
+      const nElements = curr.props.children.props.nBoxes || 1;
+      return acc + nElements;
+    },
+    0
+  );
 
   return (
     <div
@@ -92,7 +125,11 @@ export default function Input(
       <div className="overflow-y-auto h-full pl-6 pr-6 bg-slate-100">
         <Header text="Guess the stage!" />
         <BoxList>{list_elements}</BoxList>
-        <ScoreBug score={0} />
+        <ScoreBug
+          score={score}
+          numCorrect={numCorrect}
+          total={numBoxes}
+        />
       </div>
     </div>
   );
@@ -117,11 +154,13 @@ function BoxList(
 }
 
 function InputBoxGroup(
-  { name, nBoxes, validationURL, options }: {
+  { name, nBoxes, validationURL, options, incrementNumCorrect, incrementScore }: {
     name: string;
     nBoxes: number;
     validationURL: string;
     options?: string[];
+    incrementNumCorrect: () => void;
+    incrementScore: () => void;
   }
 ): JSX.Element {
   // A group of input boxes for a single result type
@@ -138,6 +177,8 @@ function InputBoxGroup(
               name={numToRank(i + 1) ?? ''}
               validationURL={`${validationURL}&r=${i+1}`}
               options={options}
+              incrementNumCorrect={incrementNumCorrect}
+              incrementScore={incrementScore}
             />
           </li>
         ))}
@@ -147,16 +188,28 @@ function InputBoxGroup(
 }
 
 function InputBox(
-  { name, validationURL, options }: {
+  { name, validationURL, options, incrementNumCorrect, incrementScore }: {
     name: string;
     validationURL: string;
     options?: string[];
+    incrementNumCorrect: () => void;
+    incrementScore: () => void;
   }
 ): JSX.Element {
   const [val, setVal] = useState('');
-  const [isCorrect, setIsCorrect] = useState<boolean>(false);
+  const [isCorrect, setIsCorrect] = useBomb();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tries, decrementTries] = useDecrement(1);
+
+  // IsCorrect can only be set to true once, so we use a useEffect to
+  // increment the number of correct guesses and the score
+  // Relies on isCorrect using the useBomb custom hook
+  useEffect(() => {
+    if (isCorrect) {
+      incrementNumCorrect();
+      incrementScore();
+    }
+  }, [isCorrect]);
 
   const handleSubmit = async () => {
     if (isCorrect || tries <= 0 || val === '') return;
@@ -168,7 +221,7 @@ function InputBox(
         headers: { 'Content-Type': 'application/json' },
       });
       const data: boolean = await response.json();
-      setIsCorrect(data);
+      if (data) setIsCorrect();
       decrementTries();
     } catch (error) {
       console.error(error);
@@ -280,7 +333,18 @@ function TextInput({
 }
 
 function ScoreBug(
-  { score }: { score: number }
+  { score, numCorrect, total }: {
+    score: number;
+    numCorrect: number;
+    total: number;
+  }
 ): JSX.Element {
-  return <div className="text-center mt-2 mb-4 text-black">Score: {score}</div>;
+  return (
+    <div
+      className="mt-2 mb-4 text-black flex flex-row gap-2 justify-center"
+    >
+      <p>Correct: {numCorrect}/{total}</p>
+      <p>Score: {score}</p>
+    </div>
+  );
 }
