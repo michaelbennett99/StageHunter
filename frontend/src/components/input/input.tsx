@@ -4,7 +4,7 @@ import { useEffect, useState, ChangeEventHandler } from 'react';
 import { FaCheck, FaTimes, FaPlus, FaSpinner } from 'react-icons/fa';
 
 import { numToRank } from '@/utils/utils';
-import Autocomplete from '@/components/autocomplete';
+import AutoComplete from '@/components/autocomplete';
 import { useIncrement, useDecrement, useBomb } from './hooks';
 
 export interface Options {
@@ -298,23 +298,13 @@ function TextInput({
       className="flex items-center h-full gap-1"
       onSubmit={handleSubmit}
     >
-      {options ? (
-        <Autocomplete
-          value={value}
-          onChange={onChange}
-          options={options}
-          inputClassName={inputClassName}
-          disabled={noMoreInput}
-        />
-      ) : (
-        <input
-          className={inputClassName}
-          type="text"
-          value={value}
-          onChange={onChange}
-          disabled={noMoreInput}
-        />
-      )}
+      <AutoComplete
+        value={value}
+        onChange={onChange}
+        options={options}
+        inputClassName={inputClassName}
+        disabled={noMoreInput}
+      />
       <button
         type="submit"
         className={`

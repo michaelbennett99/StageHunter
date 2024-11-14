@@ -9,7 +9,7 @@ import {
   RefObject,
 } from 'react';
 
-export default function Autocomplete({
+export default function AutoComplete({
   options,
   maxShownResults = 5,
   inputClassName,
@@ -17,7 +17,7 @@ export default function Autocomplete({
   selectedOptionClassName,
   ...inputProps
 }: {
-  options: string[];
+  options?: string[];
   maxShownResults?: number;
   inputClassName?: string;
   optionsClassName?: string;
@@ -138,9 +138,10 @@ export default function Autocomplete({
   const onChange = inputProps.onChange as ChangeEventHandler<HTMLInputElement>;
 
   // Filter options to show
-  const shownOptions = options.filter(option =>
-    option.toLowerCase().includes(value.toLowerCase())
-    && option !== value
+  const shownOptions = (options ?? [])
+    .filter(option =>
+      option.toLowerCase().includes(value.toLowerCase())
+      && option !== value
   );
 
   // Determine if the options menu should be shown
