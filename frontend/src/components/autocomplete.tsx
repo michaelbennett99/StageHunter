@@ -10,23 +10,20 @@ import {
 } from 'react';
 
 export default function Autocomplete({
-  value,
   options,
-  onChange,
   maxShownResults = 5,
-  inputClassName =
-    'h-full w-40 p-1 border-2 border-gray-300 text-black rounded-md',
-  optionsClassName = 'text-white bg-black',
-  selectedOptionClassName = 'bg-blue-500',
+  inputClassName,
+  optionsClassName,
+  selectedOptionClassName,
+  ...inputProps
 }: {
-  value: string;
   options: string[];
-  onChange: ChangeEventHandler<HTMLInputElement>;
   maxShownResults?: number;
   inputClassName?: string;
   optionsClassName?: string;
   selectedOptionClassName?: string;
-}): JSX.Element {
+} & React.InputHTMLAttributes<HTMLInputElement>
+): JSX.Element {
   // Refs
   // We get the ref of the input element for horizontal sizing
   const inputRef = useRef<HTMLInputElement>(null);
@@ -34,15 +31,6 @@ export default function Autocomplete({
   // State
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-
-  // Filter options to show
-  const shownOptions = options.filter(option =>
-    option.toLowerCase().includes(value.toLowerCase())
-    && option !== value
-  );
-
-  // Options menu calculated quantities
-  const optionsVisible = showOptions && shownOptions.length > 0;
 
   // Handlers
   // Show options only when focused
@@ -80,9 +68,12 @@ export default function Autocomplete({
     setValue(newValue);
   }
 
-  // Switch between options on arrow key and choose an option on enter
-  // Suppress default behaviour for enter, including form submission, when
-  // the options menu is visible and an option is selected
+  /**
+   * Handles keyboard navigation of the options menu.
+   * Arrow keys switch between options, Enter selects the current option.
+   * When options are visible and an option is selected, Enter's default
+   * behavior (including form submission) is suppressed.
+   */
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (!optionsVisible) return;
 
@@ -130,10 +121,27 @@ export default function Autocomplete({
     }
   }
 
+  // Component body
+  const value = inputProps.value as string;
+  const onChange = inputProps.onChange as ChangeEventHandler<HTMLInputElement>;
+
+  // Filter options to show
+  const shownOptions = options.filter(option =>
+    option.toLowerCase().includes(value.toLowerCase())
+    && option !== value
+  );
+
+  const optionsVisible = showOptions && shownOptions.length > 0;
+
+  const requiredContainerStyle = {
+    position: 'relative' as const,
+  }
+  const requiredInputStyle = {}
+
   return (
     <div
       onKeyDown={onKeyDown}
-      className="relative"
+      style={requiredContainerStyle}
       onFocus={onFocus}
       onBlur={onBlur}
     >
@@ -142,7 +150,9 @@ export default function Autocomplete({
         value={value}
         onChange={onChange}
         ref={inputRef}
+        style={requiredInputStyle}
         className={inputClassName}
+        {...inputProps}
       />
       <AutocompleteOptions
         optionsVisible={optionsVisible}
@@ -223,10 +233,19 @@ function AutocompleteOptions({
     e.preventDefault();
   }
 
+  const requiredOptionsListStyle = {
+    position: 'absolute' as const,
+    top: '100%',
+    left: 0,
+    zIndex: 1000,
+    overflowY: 'auto' as const,
+    ...optionsDims,
+  }
+
   return (
     <ul
-      className={`${optionsClassName} absolute overflow-y-auto`}
-      style={{ ...optionsDims, top: '100%', left: 0, zIndex: 1000 }}
+      className={optionsClassName}
+      style={requiredOptionsListStyle}
       onMouseDown={handleMouseDownOnOptions}
     >
       {shownOptions.map((option, i) => (
@@ -266,9 +285,20 @@ function AutocompleteOption({
   selectedOptionClassName?: string;
   ref?: RefObject<HTMLLIElement>;
 }): JSX.Element {
+  const optionDefaultStyle = {
+    color: 'black',
+    backgroundColor: 'white',
+    paddingLeft: '0.2rem',
+  };
+  const selectedDefaultStyle = {
+    ...optionDefaultStyle,
+    backgroundColor: 'blue',
+  }
+
   return (
     <li
       data-key={index}
+      style={selected ? selectedDefaultStyle : optionDefaultStyle}
       className={selected ? selectedOptionClassName : ''}
       onMouseEnter={onHover}
       onClick={onClick}
