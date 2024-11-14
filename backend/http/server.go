@@ -327,7 +327,7 @@ func VerifyResultHandler(
 
 	// Check query params
 	urlParams := r.URL.Query()
-	if !urlParams.Has("r") || !urlParams.Has("c") || !urlParams.Has("p") {
+	if !urlParams.Has("r") || !urlParams.Has("c") || !urlParams.Has("v") {
 		http.Error(
 			w,
 			"Query parameters 'r', 'c' and 'p' are required",
@@ -358,7 +358,7 @@ func VerifyResultHandler(
 	}
 
 	// Parse payload as a string
-	payload := urlParams.Get("p")
+	payload := urlParams.Get("v")
 
 	// Get the correct rider/team from the database
 	params := db.GetRiderOrTeamParams{
