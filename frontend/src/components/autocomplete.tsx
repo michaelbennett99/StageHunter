@@ -13,7 +13,6 @@ export default function Autocomplete({
   value,
   options,
   onChange,
-  maxResults = options.length,
   maxShownResults = 5,
   inputClassName =
     'h-full w-40 p-1 border-2 border-gray-300 text-black rounded-md',
@@ -23,42 +22,27 @@ export default function Autocomplete({
   value: string;
   options: string[];
   onChange: ChangeEventHandler<HTMLInputElement>;
-  maxResults?: number;
   maxShownResults?: number;
   inputClassName?: string;
   optionsClassName?: string;
   selectedOptionClassName?: string;
 }): JSX.Element {
+  // Refs
+  // We get the ref of the input element for horizontal sizing
+  const inputRef = useRef<HTMLInputElement>(null);
+
   // State
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [optionHeight, setOptionHeight] = useState<number>(0);
 
-  // Refs
-  // We get the ref of the input element so we can position the options menu
-  const inputRef = useRef<HTMLInputElement>(null);
-  const firstOrSelectedOptionRef = useRef<HTMLLIElement>(null);
-
-  // Effects
-  useEffect(() => {
-    if (firstOrSelectedOptionRef.current) {
-      setOptionHeight(firstOrSelectedOptionRef.current.offsetHeight);
-    }
-  }, [showOptions]);
-
-  useEffect(() => {
-    if (selectedOption !== null) {
-      firstOrSelectedOptionRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-      });
-    }
-  }, [selectedOption]);
-
-  // Filtered options
-  const shownOptions = options.filter((option, i) =>
-    option.toLowerCase().includes(value.toLowerCase()) && i < maxResults
+  // Filter options to show
+  const shownOptions = options.filter(option =>
+    option.toLowerCase().includes(value.toLowerCase())
+    && option !== value
   );
+
+  // Options menu calculated quantities
+  const optionsVisible = showOptions && shownOptions.length > 0;
 
   // Handlers
   // Show options only when focused
@@ -66,6 +50,7 @@ export default function Autocomplete({
     setShowOptions(true);
   }
 
+  // Hide options and reset selected option when blurred
   function onBlur() {
     setShowOptions(false);
     setSelectedOption(null);
@@ -79,28 +64,34 @@ export default function Autocomplete({
     setSelectedOption(parseInt(key));
   }
 
-  function onClickOption(e: MouseEvent<HTMLLIElement>) {
-    const target = e.target as HTMLLIElement;
-    const newValue = target.innerText;
-    // Call the parent's onChange with the new value
+  function setValue(newValue: string) {
     const event = {
       target: {
         value: newValue,
       },
     } as React.ChangeEvent<HTMLInputElement>;
     onChange(event);
-    inputRef.current?.blur();
   }
 
-  // Switch between options on arrow key
+  function onClickOption(e: MouseEvent<HTMLLIElement>) {
+    const target = e.target as HTMLLIElement;
+    const newValue = target.innerText;
+    // Call the parent's onChange with the new value
+    setValue(newValue);
+  }
+
+  // Switch between options on arrow key and choose an option on enter
+  // Suppress default behaviour for enter, including form submission, when
+  // the options menu is visible and an option is selected
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (!showOptions) return;
+    if (!optionsVisible) return;
 
     const downArrow = e.key === 'ArrowDown';
     const upArrow = e.key === 'ArrowUp';
     const enter = e.key === 'Enter';
+    const escape = e.key === 'Escape';
 
-    if (!(downArrow || upArrow || enter)) return;
+    if (!(downArrow || upArrow || enter || escape)) return;
 
     const noneSelected = selectedOption === null;
     const firstSelected = selectedOption === 0;
@@ -124,17 +115,18 @@ export default function Autocomplete({
       return;
     }
 
-    if (enter) {
-      if (noneSelected) return;
+    if (escape) {
+      setSelectedOption(null);
+      return;
+    }
 
+    if (enter && !noneSelected) {
+      // Disable default enter behaviour, including form submission
+      e.preventDefault();
+      // Set the value to the selected option and reset the selected option
       const newValue = shownOptions[selectedOption];
-      const event = {
-        target: {
-          value: newValue,
-        },
-      } as React.ChangeEvent<HTMLInputElement>;
-      onChange(event);
-      inputRef.current?.blur();
+      setValue(newValue);
+      setSelectedOption(null);
     }
   }
 
@@ -152,42 +144,108 @@ export default function Autocomplete({
         ref={inputRef}
         className={inputClassName}
       />
-      {showOptions && (
-        <ul
-          className={`${optionsClassName} absolute overflow-y-auto`}
-          style={{
-            width: inputRef.current?.offsetWidth,
-            top: '100%',
-            left: 0,
-            height: Math.min(
-              window.innerHeight
-                - inputRef.current!.getBoundingClientRect().bottom
-                - 10,
-              Math.min(maxShownResults, shownOptions.length) * optionHeight
-            ),
-            zIndex: 1000,
-          }}
-          onMouseDown={(e) => e.preventDefault()}
-        >
-          {shownOptions.map((option, i) => (
-            <AutocompleteOption
-              key={i}
-              index={i}
-              option={option}
-              selected={selectedOption === i}
-              onHover={onHover}
-              onClick={onClickOption}
-              selectedOptionClassName={selectedOptionClassName}
-              ref={
-                (selectedOption === i || (selectedOption === null && i === 0))
-                  ? firstOrSelectedOptionRef
-                  : undefined
-              }
-            />
-          ))}
-        </ul>
-      )}
+      <AutocompleteOptions
+        optionsVisible={optionsVisible}
+        shownOptions={shownOptions}
+        selectedOption={selectedOption}
+        onHover={onHover}
+        onClick={onClickOption}
+        maxShownResults={maxShownResults}
+        inputRef={inputRef}
+        optionsClassName={optionsClassName}
+        selectedOptionClassName={selectedOptionClassName}
+      />
     </div>
+  );
+}
+
+function AutocompleteOptions({
+  optionsVisible,
+  shownOptions,
+  selectedOption,
+  onHover,
+  onClick,
+  maxShownResults,
+  inputRef,
+  optionsClassName,
+  selectedOptionClassName,
+}: {
+  optionsVisible: boolean;
+  shownOptions: string[];
+  selectedOption: number | null;
+  onHover: MouseEventHandler<HTMLLIElement>;
+  onClick: MouseEventHandler<HTMLLIElement>;
+  maxShownResults: number;
+  inputRef: RefObject<HTMLInputElement>;
+  optionsClassName?: string;
+  selectedOptionClassName?: string;
+}): JSX.Element {
+  // Refs
+  const firstOrSelectedOptionRef = useRef<HTMLLIElement>(null);
+
+  // State
+  const [optionHeight, setOptionHeight] = useState<number>(0);
+
+  // Effects
+  // Set the height of an individual option
+  useEffect(() => {
+    if (firstOrSelectedOptionRef.current) {
+      setOptionHeight(firstOrSelectedOptionRef.current.offsetHeight);
+    }
+  }, [shownOptions]);
+
+  // Scroll to the selected option
+  useEffect(() => {
+    if (selectedOption !== null) {
+      firstOrSelectedOptionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [selectedOption]);
+
+  // Function body
+  if (!optionsVisible) return <></>;
+
+  const optionsDims = {
+    width: inputRef.current?.offsetWidth,
+    height: Math.min(
+      window.innerHeight
+        - inputRef.current!.getBoundingClientRect().bottom
+        - 10,
+      Math.min(maxShownResults, shownOptions.length) * optionHeight
+    ),
+  };
+
+  // Suppress default behaviour for mouse down on options to prevent blurring
+  // the input
+  function handleMouseDownOnOptions(e: MouseEvent<HTMLUListElement>) {
+    e.preventDefault();
+  }
+
+  return (
+    <ul
+      className={`${optionsClassName} absolute overflow-y-auto`}
+      style={{ ...optionsDims, top: '100%', left: 0, zIndex: 1000 }}
+      onMouseDown={handleMouseDownOnOptions}
+    >
+      {shownOptions.map((option, i) => (
+        <AutocompleteOption
+          key={i}
+          index={i}
+          option={option}
+          selected={selectedOption === i}
+          onHover={onHover}
+          onClick={onClick}
+          selectedOptionClassName={selectedOptionClassName}
+          ref={
+            (selectedOption === i || (selectedOption === null && i === 0))
+              ? firstOrSelectedOptionRef
+              : undefined
+          }
+        />
+      ))}
+    </ul>
   );
 }
 
@@ -199,7 +257,6 @@ function AutocompleteOption({
   onClick,
   selectedOptionClassName,
   ref,
-
 }: {
   index: number;
   option: string;
