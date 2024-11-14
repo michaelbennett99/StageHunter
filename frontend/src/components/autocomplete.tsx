@@ -32,26 +32,11 @@ export default function Autocomplete({
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
-  // Handlers
-  // Show options only when focused
-  function onFocus() {
-    setShowOptions(true);
-  }
-
-  // Hide options and reset selected option when blurred
-  function onBlur() {
-    setShowOptions(false);
-    setSelectedOption(null);
-  }
-
-  // Highlight option on hover
-  function onHover(e: MouseEvent<HTMLLIElement>) {
-    // Get the key from the attribute
-    const key = e.currentTarget.dataset.key;
-    if (!key) return;
-    setSelectedOption(parseInt(key));
-  }
-
+  // Functions
+  /**
+   * Creates a dummy event to change the value of the input using the passed
+   * onChange function without needing the parent's setValue function.
+   */
   function setValue(newValue: string) {
     const event = {
       target: {
@@ -61,10 +46,29 @@ export default function Autocomplete({
     onChange(event);
   }
 
-  function onClickOption(e: MouseEvent<HTMLLIElement>) {
+  // Handlers
+  // Show options only when focused
+  function handleFocusOnInput() {
+    setShowOptions(true);
+  }
+
+  // Hide options and reset selected option when blurred
+  function handleBlurOnInput() {
+    setShowOptions(false);
+    setSelectedOption(null);
+  }
+
+  // Highlight option on hover
+  function handleMouseEnterOnOption(e: MouseEvent<HTMLLIElement>) {
+    // Get the key from the attribute
+    const key = e.currentTarget.dataset.key;
+    if (!key) return;
+    setSelectedOption(parseInt(key));
+  }
+
+  function handleClickOnOption(e: MouseEvent<HTMLLIElement>) {
     const target = e.target as HTMLLIElement;
     const newValue = target.innerText;
-    // Call the parent's onChange with the new value
     setValue(newValue);
   }
 
@@ -74,7 +78,7 @@ export default function Autocomplete({
    * When options are visible and an option is selected, Enter's default
    * behavior (including form submission) is suppressed.
    */
-  function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+  function handleKeyPressOnInput(e: KeyboardEvent<HTMLInputElement>) {
     if (!optionsVisible) return;
 
     const downArrow = e.key === 'ArrowDown';
@@ -89,6 +93,7 @@ export default function Autocomplete({
     const lastSelected = selectedOption === shownOptions.length - 1;
 
     if (downArrow) {
+      e.preventDefault();
       if (noneSelected || lastSelected) {
         setSelectedOption(0);
         return;
@@ -98,6 +103,7 @@ export default function Autocomplete({
     }
 
     if (upArrow) {
+      e.preventDefault();
       if (noneSelected || firstSelected) {
         setSelectedOption(shownOptions.length - 1);
         return;
@@ -107,6 +113,11 @@ export default function Autocomplete({
     }
 
     if (escape) {
+      e.preventDefault();
+      if (noneSelected) {
+        inputRef.current?.blur();
+        return;
+      }
       setSelectedOption(null);
       return;
     }
@@ -143,10 +154,10 @@ export default function Autocomplete({
 
   return (
     <div
-      onKeyDown={onKeyDown}
+      onKeyDown={handleKeyPressOnInput}
       style={requiredContainerStyle}
-      onFocus={onFocus}
-      onBlur={onBlur}
+      onFocus={handleFocusOnInput}
+      onBlur={handleBlurOnInput}
     >
       <input
         type="text"
@@ -161,8 +172,8 @@ export default function Autocomplete({
         optionsVisible={optionsVisible}
         shownOptions={shownOptions}
         selectedOption={selectedOption}
-        onHover={onHover}
-        onClick={onClickOption}
+        onHover={handleMouseEnterOnOption}
+        onClick={handleClickOnOption}
         maxShownResults={maxShownResults}
         inputRef={inputRef}
         optionsClassName={optionsClassName}
