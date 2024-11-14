@@ -147,11 +147,10 @@ function InputBoxGroup(
 }
 
 function InputBox(
-  { name, validationURL, options, inputType }: {
+  { name, validationURL, options }: {
     name: string;
     validationURL: string;
     options?: string[];
-    inputType?: 'text' | 'number';
   }
 ): JSX.Element {
   const [val, setVal] = useState('');
@@ -189,6 +188,7 @@ function InputBox(
         onChange={(e) => setVal(e.target.value)}
         onSubmit={handleSubmit}
         options={options}
+
       />
     </div>
   );
@@ -226,30 +226,39 @@ function TextInput({
   options?: string[];
   className?: string;
 }): JSX.Element {
+  // Handler functions
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSubmit();
+  }
+
+  const inputClassName = `
+    h-full w-40 p-1 border-2 border-gray-300 text-black rounded-md
+    ${className}
+  `;
+
+  const noMoreInput = isCorrect || tries <= 0;
+
   return (
     <form
       className="flex items-center h-full gap-1"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSubmit();
-      }}
+      onSubmit={handleSubmit}
     >
       {options ? (
         <Autocomplete
           value={value}
           onChange={onChange}
           options={options}
+          inputClassName={inputClassName}
+          disabled={noMoreInput}
         />
       ) : (
         <input
-          className={
-            `h-full w-40 p-1 border-2
-            border-gray-300 text-black rounded-md
-            ${className}`
-          }
+          className={inputClassName}
           type="text"
           value={value}
           onChange={onChange}
+          disabled={noMoreInput}
         />
       )}
       <button
