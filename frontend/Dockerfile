@@ -64,7 +64,9 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["pnpm", "dev"]
+RUN ["pnpm", "build"]
+
+CMD ["pnpm", "start"]
 
 #
 # Production Environment
