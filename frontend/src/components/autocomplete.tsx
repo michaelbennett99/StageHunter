@@ -7,6 +7,7 @@ import {
   useEffect,
   useRef,
   RefObject,
+  useMemo,
 } from 'react';
 
 export default function AutoComplete({
@@ -138,16 +139,23 @@ export default function AutoComplete({
   const onChange = inputProps.onChange as ChangeEventHandler<HTMLInputElement>;
 
   // Filter options to show
-  const shownOptions = (options ?? [])
+  const shownOptions = useMemo(() => (options ?? [])
     .filter(option =>
       option.toLowerCase().includes(value.toLowerCase())
       && option !== value
+    ),
+    [options, value]
   );
 
   // Determine if the options menu should be shown
   const optionsVisible = showOptions
     && shownOptions.length > 0
     && !inputProps.disabled;
+
+  // Effects that depend on shownOptions and optionsVisible
+  useEffect(() => {
+    setSelectedOption(null);
+  }, [value]);
 
   // Define required styles
   const requiredContainerStyle = {
