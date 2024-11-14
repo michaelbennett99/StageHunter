@@ -1,6 +1,14 @@
 import { useState } from 'react';
 
-export function useDecrement(n: number): [number, () => void] {
-  const [tries, setTries] = useState(n);
-  return [tries, () => setTries(tries - 1)];
+export function useIncrement(
+  start: number = 0, step: number = 1
+): [number, () => void] {
+  const [numCorrect, setNumCorrect] = useState(start);
+  return [numCorrect, () => setNumCorrect(numCorrect + step)];
+}
+
+export function useDecrement(
+  start: number = 0, step: number = 1
+): [number, () => void] {
+  return useIncrement(start, -step);
 }
