@@ -14,14 +14,15 @@ export function getInterpolatedGradientPoint(
     point2: GradientData,
     distance: number
   ): GradientData => {
-    const nGrad = point2.gradient! / 1000;
+    const nGrad = point2.gradient! / 100;
 
-    const elevation =  point1.elevation + nGrad * (point2.distance - distance);
-    return {
+    const elevation =  point1.elevation + nGrad * (distance - point1.distance);
+    const interpolatedPoint = {
       distance: distance,
       elevation: elevation,
       gradient: point2.gradient
     };
+    return interpolatedPoint;
   }
 
   return interpolateObject(data, d => d.distance, distance, interpolator);
