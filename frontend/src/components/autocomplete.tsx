@@ -235,7 +235,7 @@ function AutocompleteOptions({
     if (selectedOptionRef.current) {
       setOptionHeight(selectedOptionRef.current.offsetHeight);
     }
-  }, [shownOptions]);
+  }, [optionsVisible]);
 
   // Scroll to the selected option
   useEffect(() => {
