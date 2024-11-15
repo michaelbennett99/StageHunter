@@ -62,6 +62,10 @@ func AreNormEqual(a, b string) bool {
 	unAccentedA = strings.ReplaceAll(unAccentedA, "_", " ")
 	unAccentedB = strings.ReplaceAll(unAccentedB, "_", " ")
 
+	// Remove trailing and leading whitespace
+	unAccentedA = strings.TrimSpace(unAccentedA)
+	unAccentedB = strings.TrimSpace(unAccentedB)
+
 	// Compare the normalised strings
 	return strings.EqualFold(unAccentedA, unAccentedB)
 }
