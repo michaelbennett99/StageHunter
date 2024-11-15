@@ -36,7 +36,7 @@ function findBoundsIndex<T>(
 }
 
 // Expects data to be pre-sorted by accessor
-export function interpolateObject<T extends Record<string, any>>(
+export function interpolateObject<T>(
     data: T[],
     accessor: (object: T) => number,
     value: number | null,
