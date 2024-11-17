@@ -290,6 +290,19 @@ function TextInput({
     ${className}
   `;
 
+  const optionsListClassName = `
+    bg-slate-100 border-2 rounded-md
+  `;
+
+  const optionClassName = `
+    text-black bg-white p-1 border-0
+    outline outline-offset-0 outline-[0.5px] outline-gray-300 outline-dashed
+  `;
+
+  const selectedOptionClassName = optionClassName + `
+    text-white bg-blue-500 outline-gray-300
+  `;
+
   const noMoreInput = isCorrect || tries <= 0;
   const isIncorrect = !isCorrect && tries <= 0;
 
@@ -304,6 +317,9 @@ function TextInput({
         options={options}
         inputClassName={inputClassName}
         disabled={noMoreInput}
+        optionsListClassName={optionsListClassName}
+        optionClassName={optionClassName}
+        selectedOptionClassName={selectedOptionClassName}
       />
       <button
         type="submit"
