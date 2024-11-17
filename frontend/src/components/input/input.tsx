@@ -111,7 +111,7 @@ export default function Input(
   ].map((element) => (
     <li
       key={element.props.name ?? 'noname'}
-      className="text-slate-800 bg-slate-200 rounded-md p-2 shadow-md"
+      className="text-slate-900 bg-slate-100 rounded-md p-2 shadow-md"
     >
       {element}
     </li>
