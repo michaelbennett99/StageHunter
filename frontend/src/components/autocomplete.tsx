@@ -9,6 +9,7 @@ import {
   RefObject,
   useMemo,
 } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 export default function AutoComplete({
   options,
@@ -361,7 +362,7 @@ function AutocompleteOption({
     boxSizing: 'content-box' as const,
   };
 
-  const selectedOptionFullClassName = mergeStyles(
+  const selectedOptionFullClassName = twMerge(
     optionClassName,
     selectedOptionClassName
   );
