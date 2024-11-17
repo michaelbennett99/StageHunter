@@ -229,6 +229,7 @@ function AutocompleteOptions({
 
   // State
   const [optionHeight, setOptionHeight] = useState<number>(0);
+  const [optionsHeight, setOptionsHeight] = useState<number>(0);
 
   // Effects
   // Set the height of an individual option
@@ -249,20 +250,45 @@ function AutocompleteOptions({
     }
   }, [selectedOption]);
 
+  // Set the height of the options list
+  useEffect(() => {
+    if (!inputRef.current) return;
+
+    // Function to update options height
+    const updateOptionsHeight = () => {
+      const numOptions = Math.min(maxShownResults, shownOptions.length);
+      setOptionsHeight(Math.min(
+        window.innerHeight
+          - inputRef.current!.getBoundingClientRect().bottom
+          - 10,
+        numOptions * optionHeight
+      ));
+    };
+
+    // Initial calculation
+    updateOptionsHeight();
+
+    // Add scroll event listener
+    window.addEventListener('scroll', updateOptionsHeight, true);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('scroll', updateOptionsHeight, true);
+    };
+  }, [
+    shownOptions.length,
+    optionHeight,
+    maxShownResults,
+    inputRef,
+  ]);
+
   // Function body
   if (!optionsVisible) return <></>;
 
-  const numOptions = Math.min(maxShownResults, shownOptions.length);
-
   const optionsDims = {
     width: inputRef.current?.clientWidth,
-    height: Math.min(
-      window.innerHeight
-        - inputRef.current!.getBoundingClientRect().bottom
-        - 10,
-      numOptions * optionHeight
-    ),
-  };
+    height: optionsHeight,
+  }
 
   // Suppress default behaviour for mouse down on options to prevent blurring
   // the input
