@@ -130,7 +130,7 @@ export default function Input(
       className="w-80 flex flex-col h-screen overflow-hidden"
       id="input-container"
     >
-      <div className="overflow-y-auto h-full mx-2">
+      <div className="overflow-y-auto h-full ml-2 pr-2">
         <Header text="Guess the stage!" />
         <BoxList>{list_elements}</BoxList>
         <ScoreBug
