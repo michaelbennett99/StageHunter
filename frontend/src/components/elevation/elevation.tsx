@@ -30,7 +30,7 @@ export default function Elevation({
 }): JSX.Element {
   return (
     <div
-      className="h-1/4 max-h-64 min-h-16 bg-slate-100"
+      className="h-1/4 max-h-64 min-h-16 bg-slate-200 rounded-md shadow-md"
       id="elevation-container"
     >
       <ElevationChart

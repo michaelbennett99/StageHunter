@@ -39,7 +39,10 @@ export default async function Stage({
   ]);
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-grow flex flex-row" id="main-app-container">
+      <div
+        className="flex-grow flex flex-row bg-slate-100 text-slate-900"
+        id="main-app-container"
+      >
         <Route track={track} elevation={gradientData} />
         <Results stageId={stageId} />
       </div>

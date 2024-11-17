@@ -26,37 +26,40 @@ export default function Input(
   // If the entry is an array, it's a group of entries, so we group them
   // in an InputBoxGroup
   const list_elements = [
-    <InputBox
-      name="Grand Tour"
-      validationURL={`${infoValidationURL}?f=grand_tour`}
-      options={options.grand_tours}
-      incrementNumCorrect={incrementNumCorrect}
-      incrementScore={() => setScore(score + 10)}
-    />,
-    <InputBox
-      name="Year"
-      validationURL={`${infoValidationURL}?f=year`}
-      incrementNumCorrect={incrementNumCorrect}
-      incrementScore={() => setScore(score + 10)}
-    />,
-    <InputBox
-      name="Number"
-      validationURL={`${infoValidationURL}?f=stage_no`}
-      incrementNumCorrect={incrementNumCorrect}
-      incrementScore={() => setScore(score + 10)}
-    />,
-    <InputBox
-      name="Start"
-      validationURL={`${infoValidationURL}?f=stage_start`}
-      incrementNumCorrect={incrementNumCorrect}
-      incrementScore={() => setScore(score + 10)}
-    />,
-    <InputBox
-      name="End"
-      validationURL={`${infoValidationURL}?f=stage_end`}
-      incrementNumCorrect={incrementNumCorrect}
-      incrementScore={() => setScore(score + 10)}
-    />,
+    <div className="flex flex-col gap-1">
+      <h3 className="font-semibold mb-1">Stage Info</h3>
+      <InputBox
+        name="Grand Tour"
+        validationURL={`${infoValidationURL}?f=grand_tour`}
+        options={options.grand_tours}
+        incrementNumCorrect={incrementNumCorrect}
+        incrementScore={() => setScore(score + 10)}
+      />
+      <InputBox
+        name="Year"
+        validationURL={`${infoValidationURL}?f=year`}
+        incrementNumCorrect={incrementNumCorrect}
+        incrementScore={() => setScore(score + 10)}
+      />
+      <InputBox
+        name="Number"
+        validationURL={`${infoValidationURL}?f=stage_no`}
+        incrementNumCorrect={incrementNumCorrect}
+        incrementScore={() => setScore(score + 10)}
+      />
+      <InputBox
+        name="Start"
+        validationURL={`${infoValidationURL}?f=stage_start`}
+        incrementNumCorrect={incrementNumCorrect}
+        incrementScore={() => setScore(score + 10)}
+      />
+      <InputBox
+        name="End"
+        validationURL={`${infoValidationURL}?f=stage_end`}
+        incrementNumCorrect={incrementNumCorrect}
+        incrementScore={() => setScore(score + 10)}
+      />
+    </div>,
     <InputBoxGroup
       name="Stage Results"
       nBoxes={3}
@@ -106,7 +109,12 @@ export default function Input(
       incrementScore={() => setScore(score + 10)}
     />,
   ].map((element) => (
-    <li key={element.props.name}>{element}</li>
+    <li
+      key={element.props.name ?? 'noname'}
+      className="text-slate-800 bg-slate-200 rounded-md p-2 shadow-md"
+    >
+      {element}
+    </li>
   ));
 
   const numBoxes = list_elements.reduce(
@@ -122,7 +130,7 @@ export default function Input(
       className="w-80 flex flex-col h-screen overflow-hidden"
       id="input-container"
     >
-      <div className="overflow-y-auto h-full pl-6 pr-6 bg-slate-100">
+      <div className="overflow-y-auto h-full mx-2">
         <Header text="Guess the stage!" />
         <BoxList>{list_elements}</BoxList>
         <ScoreBug
@@ -140,7 +148,7 @@ function Header(
 ): JSX.Element {
   return (
     <h2
-      className="font-semibold mt-4 mb-2 text-lg text-center text-black"
+      className="font-semibold mt-4 mb-2 text-lg text-center"
     >
       {text}
     </h2>
@@ -150,7 +158,7 @@ function Header(
 function BoxList(
   { children }: { children: React.ReactNode }
 ): JSX.Element {
-  return <ul className="flex flex-col gap-1">{children}</ul>;
+  return <ul className="flex flex-col gap-2">{children}</ul>;
 }
 
 function InputBoxGroup(
@@ -166,7 +174,7 @@ function InputBoxGroup(
   // A group of input boxes for a single result type
   return (
     <>
-      <h3 className="font-semibold mb-1 text-black">{name}</h3>
+      <h3 className="font-semibold mb-1">{name}</h3>
       <ul className="flex flex-col gap-1">
         {Array.from({ length: nBoxes }, (_, i) => (
           <li
@@ -232,7 +240,7 @@ function InputBox(
 
   return (
     <div className="flex items-center w-full h-full gap-1">
-      <div className="flex-grow text-black text-sm">{name}</div>
+      <div className="flex-grow text-sm">{name}</div>
       <TextInput
         value={val}
         tries={tries}
@@ -286,21 +294,21 @@ function TextInput({
   }
 
   const inputClassName = `
-    h-full w-40 p-1 border-2 border-gray-300 text-black rounded-md
+    h-full w-40 p-1 border-2 border-gray-300 rounded-md text-sm
     ${className}
   `;
 
   const optionsListClassName = `
-    bg-slate-100 border-2 rounded-md
+    border-2 rounded-md bg-popover text-popover-foreground text-sm
   `;
 
   const optionClassName = `
-    text-black bg-white p-1 border-0
+    p-1 border-0
     outline outline-offset-0 outline-[0.5px] outline-gray-300 outline-dashed
   `;
 
   const selectedOptionClassName = optionClassName + `
-    text-white bg-blue-500 outline-gray-300
+    bg-accent text-accent-foreground outline-gray-300
   `;
 
   const noMoreInput = isCorrect || tries <= 0;

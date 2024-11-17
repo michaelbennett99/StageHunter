@@ -16,7 +16,10 @@ export default function Route({
   const [distance, setDistance] = useState<number | null>(null);
 
   return (
-    <div className="flex flex-col flex-grow" id="route-data-container">
+    <div
+      className="flex flex-col flex-grow gap-2 m-2"
+      id="route-data-container"
+    >
       <Map track={track} distance={distance} />
       <Elevation
         data={elevation}
