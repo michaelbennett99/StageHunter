@@ -14,14 +14,16 @@ export default function AutoComplete({
   options,
   maxShownResults = 5,
   inputClassName,
-  optionsClassName,
+  optionsListClassName,
+  optionClassName,
   selectedOptionClassName,
   ...inputProps
 }: {
   options?: string[];
   maxShownResults?: number;
   inputClassName?: string;
-  optionsClassName?: string;
+  optionsListClassName?: string;
+  optionClassName?: string;
   selectedOptionClassName?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>
 ): JSX.Element {
@@ -187,7 +189,8 @@ export default function AutoComplete({
         onClick={handleClickOnOption}
         maxShownResults={maxShownResults}
         inputRef={inputRef}
-        optionsClassName={optionsClassName}
+        optionsListClassName={optionsListClassName}
+        optionClassName={optionClassName}
         selectedOptionClassName={selectedOptionClassName}
       />
     </div>
@@ -202,7 +205,8 @@ function AutocompleteOptions({
   onClick,
   maxShownResults,
   inputRef,
-  optionsClassName,
+  optionsListClassName,
+  optionClassName,
   selectedOptionClassName,
 }: {
   optionsVisible: boolean;
@@ -212,7 +216,8 @@ function AutocompleteOptions({
   onClick: MouseEventHandler<HTMLLIElement>;
   maxShownResults: number;
   inputRef: RefObject<HTMLInputElement>;
-  optionsClassName?: string;
+  optionsListClassName?: string;
+  optionClassName?: string;
   selectedOptionClassName?: string;
 }): JSX.Element {
   // Refs
@@ -228,12 +233,9 @@ function AutocompleteOptions({
   // Effects
   // Set the height of an individual option
   useEffect(() => {
-    if (firstOptionRef.current) {
-      setOptionHeight(firstOptionRef.current.offsetHeight);
-      return;
-    }
-    if (selectedOptionRef.current) {
-      setOptionHeight(selectedOptionRef.current.offsetHeight);
+    const element = firstOptionRef.current || selectedOptionRef.current!;
+    if (element) {
+      setOptionHeight(element.getBoundingClientRect().height);
     }
   }, [optionsVisible]);
 
@@ -250,13 +252,15 @@ function AutocompleteOptions({
   // Function body
   if (!optionsVisible) return <></>;
 
+  const numOptions = Math.min(maxShownResults, shownOptions.length);
+
   const optionsDims = {
-    width: inputRef.current?.offsetWidth,
+    width: inputRef.current?.clientWidth,
     height: Math.min(
       window.innerHeight
         - inputRef.current!.getBoundingClientRect().bottom
         - 10,
-      Math.min(maxShownResults, shownOptions.length) * optionHeight
+      numOptions * optionHeight
     ),
   };
 
@@ -272,12 +276,13 @@ function AutocompleteOptions({
     left: 0,
     zIndex: 1000,
     overflowY: 'auto' as const,
+    boxSizing: 'content-box' as const,
     ...optionsDims,
   }
 
   return (
     <ul
-      className={optionsClassName}
+      className={optionsListClassName}
       style={requiredOptionsListStyle}
       onMouseDown={handleMouseDownOnOptions}
     >
@@ -297,6 +302,7 @@ function AutocompleteOptions({
             selected={isSelected}
             onHover={onHover}
             onClick={onClick}
+            optionClassName={optionClassName}
             selectedOptionClassName={selectedOptionClassName}
             ref={ref}
           />
@@ -312,6 +318,7 @@ function AutocompleteOption({
   selected,
   onHover,
   onClick,
+  optionClassName,
   selectedOptionClassName,
   ref,
 }: {
@@ -320,24 +327,24 @@ function AutocompleteOption({
   selected: boolean;
   onHover: MouseEventHandler<HTMLLIElement>;
   onClick: MouseEventHandler<HTMLLIElement>;
+  optionClassName?: string;
   selectedOptionClassName?: string;
   ref?: RefObject<HTMLLIElement>;
 }): JSX.Element {
-  const optionDefaultStyle = {
-    color: 'black',
-    backgroundColor: 'white',
-    paddingLeft: '0.2rem',
+  const defaultStyle =  {
+    boxSizing: 'content-box' as const,
   };
-  const selectedDefaultStyle = {
-    ...optionDefaultStyle,
-    backgroundColor: 'blue',
-  }
+
+  const selectedOptionFullClassName = mergeStyles(
+    optionClassName,
+    selectedOptionClassName
+  );
 
   return (
     <li
       data-key={index}
-      style={selected ? selectedDefaultStyle : optionDefaultStyle}
-      className={selected ? selectedOptionClassName : ''}
+      className={selected ? selectedOptionFullClassName : optionClassName}
+      style={defaultStyle}
       onMouseEnter={onHover}
       onClick={onClick}
       ref={ref}
@@ -345,4 +352,24 @@ function AutocompleteOption({
       {option}
     </li>
   );
+}
+
+function getImportantStyles(styles: string): string {
+  return styles
+    .trim()
+    .split(' ')
+    .map(style => {
+      if (!style.startsWith('!')) {
+        return '!' + style;
+      }
+      return style;
+    })
+    .join(' ');
+}
+
+function mergeStyles(base?: string, top?: string): string {
+  if (!base && !top) return '';
+  if (!base) return getImportantStyles(top!);
+  if (!top) return base;
+  return [base, getImportantStyles(top)].join(' ');
 }
