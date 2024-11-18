@@ -20,6 +20,13 @@ export function useDecrement(
   return useIncrement(start, -step);
 }
 
+export function useVariableIncrement(
+  start: number = 0,
+): [number, (step: number) => void] {
+  const [numCorrect, setNumCorrect] = useState(start);
+  return [numCorrect, (step: number) => setNumCorrect(numCorrect + step)];
+}
+
 /**
  * A hook that returns a boolean and a function to set it to be true. Once
  * the boolean bomb is set to true, it can never be unset.

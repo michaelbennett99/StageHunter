@@ -3,9 +3,8 @@ import {
   ResultsData,
   ElevationData,
   GradientData,
-  StageData,
   NewInfoData,
-  ClassificationEnum
+  InfoData
 } from './types';
 
 export async function fetchJSON(url: string): Promise<any> {
@@ -73,11 +72,11 @@ export async function getResultsData(
 export async function getStageData(
   stage_id: string | number,
   topN: number = 3
-): Promise<StageData> {
+): Promise<{ info: InfoData, results: ResultsData }> {
   const resultsData = await getResultsData(stage_id);
   for (const key of Object.keys(resultsData) as (keyof ResultsData)[]) {
     resultsData[key] = Math.min(resultsData[key], topN);
   }
   const infoData = NewInfoData();
-  return { ...infoData, ...resultsData };
+  return { info: infoData, results: resultsData };
 }

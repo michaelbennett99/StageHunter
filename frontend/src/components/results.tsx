@@ -3,16 +3,20 @@ import { Suspense } from 'react';
 import Input from './input/input';
 import { BACKEND_URL } from '@/api/constants';
 import { fetchJSON, getStageData } from '@/api/getters';
-import { Options, StageData } from '@/api/types';
+import { InfoData, Options, ResultsData, StageData } from '@/api/types';
 
 async function ResultsLoader({
   stageId,
   children
 }: {
   stageId: string | number;
-  children: (stageData: StageData, options: Options) => JSX.Element;
+  children: (
+    infoData: InfoData,
+    resultsData: ResultsData,
+    options: Options
+  ) => JSX.Element;
 }): Promise<JSX.Element> {
-  const [riders, teams, stageData] = await Promise.all([
+  const [riders, teams, {info, results}] = await Promise.all([
     fetchJSON(`${BACKEND_URL}/stage/riders/${stageId}`),
     fetchJSON(`${BACKEND_URL}/stage/teams/${stageId}`),
     getStageData(stageId)
@@ -22,7 +26,7 @@ async function ResultsLoader({
     riders: riders,
     teams: teams
   };
-  return children(stageData, options);
+  return children(info, results, options);
 }
 
 export default async function Results({
@@ -33,8 +37,13 @@ export default async function Results({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ResultsLoader stageId={stageId}>
-        {(stageData: StageData, options: Options) => (
-          <Input stageId={stageId} stageData={stageData} options={options} />
+        {(infoData: InfoData, resultsData: ResultsData, options: Options) => (
+          <Input
+            stageId={stageId}
+            infoData={infoData}
+            resultsData={resultsData}
+            options={options}
+          />
         )}
       </ResultsLoader>
     </Suspense>
