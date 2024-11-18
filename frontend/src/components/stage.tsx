@@ -38,9 +38,9 @@ export default async function Stage({
     getGradientData(stageId, resolution)
   ]);
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen">
       <div
-        className="flex-grow flex flex-row bg-slate-50 text-slate-950"
+        className="flex-grow flex flex-row bg-slate-50 text-slate-950 gap-4"
         id="main-app-container"
       >
         <Route track={track} elevation={gradientData} />

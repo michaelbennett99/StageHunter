@@ -34,7 +34,7 @@ export default function Elevation({
       className={twJoin(
         "h-1/4 max-h-64 min-h-16",
         'bg-slate-100 text-slate-900 rounded-md shadow-md',
-        'outline-slate-300 outline outline-1 z-10'
+        'border-slate-300 border'
       )}
       id="elevation-container"
     >

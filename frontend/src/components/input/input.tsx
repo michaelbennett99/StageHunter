@@ -128,7 +128,7 @@ export default function Input(
       key={element.props.name ?? 'noname'}
       className={twJoin(
         'text-slate-900 bg-slate-100 rounded-md p-2 shadow-md',
-        'outline-slate-300 outline outline-1',
+        'border-slate-300 border',
       )}
     >
       {element}
@@ -145,10 +145,10 @@ export default function Input(
 
   return (
     <div
-      className="w-80 flex flex-col h-screen overflow-hidden"
+      className="w-80 h-screen mr-2"
       id="input-container"
     >
-      <div className="overflow-y-auto h-full pl-2 pr-2">
+      <div className="overflow-y-auto h-full">
         <Header text="Guess the stage!" />
         <BoxList>{list_elements}</BoxList>
         <ScoreBug
@@ -166,7 +166,7 @@ function Header(
 ): JSX.Element {
   return (
     <h2
-      className="font-semibold mt-4 mb-2 text-lg text-center"
+      className="font-semibold my-2 text-lg text-center"
     >
       {text}
     </h2>
@@ -176,7 +176,11 @@ function Header(
 function BoxList(
   { children }: { children: React.ReactNode }
 ): JSX.Element {
-  return <ul className="flex flex-col gap-2">{children}</ul>;
+  return <ul
+    className="flex flex-col gap-2 z-10"
+  >
+    {children}
+  </ul>;
 }
 
 function InputBoxGroup(
@@ -427,7 +431,7 @@ function ScoreBug(
 ): JSX.Element {
   return (
     <div
-      className="mt-2 mb-4 text-black flex flex-row gap-2 justify-center"
+      className="my-2 text-black flex flex-row gap-2 justify-center"
     >
       <p>Correct: {numCorrect}/{total}</p>
       <p>Score: {score}</p>
