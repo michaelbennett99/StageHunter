@@ -372,6 +372,7 @@ function TextInput({
       <div className="relative flex-grow group">
         <AutoComplete
           value={value}
+          maxShownResults={10}
           onChange={onChange}
           options={options}
           inputClassName={inputClassName}
