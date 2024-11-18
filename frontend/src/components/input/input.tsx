@@ -126,7 +126,10 @@ export default function Input(
   ].map((element) => (
     <li
       key={element.props.name ?? 'noname'}
-      className="text-slate-900 bg-slate-100 rounded-md p-2 shadow-md"
+      className={twJoin(
+        'text-slate-900 bg-slate-100 rounded-md p-2 shadow-md',
+        'outline-slate-300 outline outline-1',
+      )}
     >
       {element}
     </li>
@@ -145,7 +148,7 @@ export default function Input(
       className="w-80 flex flex-col h-screen overflow-hidden"
       id="input-container"
     >
-      <div className="overflow-y-auto h-full ml-2 pr-2">
+      <div className="overflow-y-auto h-full pl-2 pr-2">
         <Header text="Guess the stage!" />
         <BoxList>{list_elements}</BoxList>
         <ScoreBug
