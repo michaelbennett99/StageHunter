@@ -9,19 +9,38 @@ export interface Result {
   rank: number;
 }
 
-export interface ResultsData {
-  grand_tour: boolean;
-  year: boolean;
-  stage_no: boolean;
-  stage_start: boolean;
-  stage_end: boolean;
-  stage_results: number;
-  GC_results: number;
-  points_results?: number;
-  mountains_results?: number;
-  youth_results?: number;
-  teams_results?: number;
+export type InfoType = (
+  'grand_tour' |
+  'year' |
+  'stage_no' |
+  'stage_start' |
+  'stage_end'
+);
+
+export type ClassificationEnum = (
+  'stage' |
+  'general' |
+  'points' |
+  'mountains' |
+  'youth' |
+  'teams'
+)
+
+export type InfoData = Record<InfoType, boolean>;
+
+export function NewInfoData(): InfoData {
+  return {
+    grand_tour: true,
+    year: true,
+    stage_no: true,
+    stage_start: true,
+    stage_end: true
+  };
 }
+
+export type ResultsData = Record<ClassificationEnum, number>;
+
+export type StageData = InfoData & ResultsData;
 
 export interface ElevationData {
   elevation: number;
@@ -32,4 +51,10 @@ export interface GradientData {
   distance: number;
   elevation: number;
   gradient: number | null;
+}
+
+export interface Options {
+  grand_tours: string[];
+  riders: string[];
+  teams: string[];
 }

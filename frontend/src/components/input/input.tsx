@@ -1,25 +1,29 @@
 'use client';
 
 import { useEffect, useState, ChangeEventHandler } from 'react';
-import { FaCheck, FaTimes, FaPlus, FaSpinner } from 'react-icons/fa';
 import ReactDOM from 'react-dom';
+import { FaCheck, FaTimes, FaPlus, FaSpinner } from 'react-icons/fa';
+import { twJoin, twMerge } from 'tailwind-merge';
 
 import { numToRank } from '@/utils/utils';
 import AutoComplete from '@/components/autocomplete';
 import { useIncrement, useDecrement, useBomb, useCorrectAnswer } from './hooks';
-import { twJoin, twMerge } from 'tailwind-merge';
-
-export interface Options {
-  grand_tours: string[];
-  riders: string[];
-  teams: string[];
-}
+import { Options, StageData } from '@/api/types';
 
 export default function Input(
-  { stageId, options }: { stageId: string | number; options: Options }
+  { stageId, stageData, options }: {
+    stageId: string | number;
+    stageData: StageData;
+    options: Options;
+  }
 ): JSX.Element {
+  // Hooks
   const [numCorrect, incrementNumCorrect] = useIncrement();
   const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    console.log(stageData);
+  }, []);
 
   const correctInfoURL = `/api/stage/info/correct/${stageId}`;
   const correctResultURL = `/api/stage/results/correct/${stageId}`;
