@@ -103,9 +103,27 @@ func main() {
 	)
 
 	http.HandleFunc(
+		"/stage/results/correct/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetCorrectResultHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
 		"/stage/results/verify/",
 		myhttp.HandlerMiddleware(
 			myhttp.MakeHandler(pool, myhttp.VerifyResultHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/info/correct/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetCorrectInfoHandler),
 			myhttp.AddRequestLogger,
 			myhttp.SetCORSHeaders,
 		),
