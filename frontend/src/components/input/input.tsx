@@ -2,6 +2,7 @@
 
 import { useEffect, useState, ChangeEventHandler } from 'react';
 import { FaCheck, FaTimes, FaPlus, FaSpinner } from 'react-icons/fa';
+import ReactDOM from 'react-dom';
 
 import { numToRank } from '@/utils/utils';
 import AutoComplete from '@/components/autocomplete';
@@ -19,6 +20,8 @@ export default function Input(
   const [numCorrect, incrementNumCorrect] = useIncrement();
   const [score, setScore] = useState(0);
 
+  const correctInfoURL = `/api/stage/info/correct/${stageId}`;
+  const correctResultURL = `/api/stage/results/correct/${stageId}`;
   const infoValidationURL = `/api/stage/info/verify/${stageId}`;
   const resultsValidationURL = `/api/stage/results/verify/${stageId}`;
 
@@ -30,6 +33,7 @@ export default function Input(
       <h3 className="font-semibold mb-1">Stage Info</h3>
       <InputBox
         name="Grand Tour"
+        correctURL={`${correctInfoURL}?f=grand_tour`}
         validationURL={`${infoValidationURL}?f=grand_tour`}
         options={options.grand_tours}
         incrementNumCorrect={incrementNumCorrect}
@@ -37,24 +41,28 @@ export default function Input(
       />
       <InputBox
         name="Year"
+        correctURL={`${correctInfoURL}?f=year`}
         validationURL={`${infoValidationURL}?f=year`}
         incrementNumCorrect={incrementNumCorrect}
         incrementScore={() => setScore(score + 10)}
       />
       <InputBox
         name="Number"
+        correctURL={`${correctInfoURL}?f=stage_no`}
         validationURL={`${infoValidationURL}?f=stage_no`}
         incrementNumCorrect={incrementNumCorrect}
         incrementScore={() => setScore(score + 10)}
       />
       <InputBox
         name="Start"
+        correctURL={`${correctInfoURL}?f=stage_start`}
         validationURL={`${infoValidationURL}?f=stage_start`}
         incrementNumCorrect={incrementNumCorrect}
         incrementScore={() => setScore(score + 10)}
       />
       <InputBox
         name="End"
+        correctURL={`${correctInfoURL}?f=stage_end`}
         validationURL={`${infoValidationURL}?f=stage_end`}
         incrementNumCorrect={incrementNumCorrect}
         incrementScore={() => setScore(score + 10)}
@@ -63,6 +71,7 @@ export default function Input(
     <InputBoxGroup
       name="Stage Results"
       nBoxes={3}
+      correctURL={`${correctResultURL}?c=stage`}
       validationURL={`${resultsValidationURL}?c=stage`}
       options={options.riders}
       incrementNumCorrect={incrementNumCorrect}
@@ -71,6 +80,7 @@ export default function Input(
     <InputBoxGroup
       name="GC Results"
       nBoxes={3}
+      correctURL={`${correctResultURL}?c=general`}
       validationURL={`${resultsValidationURL}?c=general`}
       options={options.riders}
       incrementNumCorrect={incrementNumCorrect}
@@ -79,6 +89,7 @@ export default function Input(
     <InputBoxGroup
       name="Points Results"
       nBoxes={3}
+      correctURL={`${correctResultURL}?c=points`}
       validationURL={`${resultsValidationURL}?c=points`}
       options={options.riders}
       incrementNumCorrect={incrementNumCorrect}
@@ -87,6 +98,7 @@ export default function Input(
     <InputBoxGroup
       name="KOM Results"
       nBoxes={3}
+      correctURL={`${correctResultURL}?c=mountains`}
       validationURL={`${resultsValidationURL}?c=mountains`}
       options={options.riders}
       incrementNumCorrect={incrementNumCorrect}
@@ -95,6 +107,7 @@ export default function Input(
     <InputBoxGroup
       name="Youth Results"
       nBoxes={3}
+      correctURL={`${correctResultURL}?c=youth`}
       validationURL={`${resultsValidationURL}?c=youth`}
       options={options.riders}
       incrementNumCorrect={incrementNumCorrect}
@@ -103,6 +116,7 @@ export default function Input(
     <InputBoxGroup
       name="Teams Results"
       nBoxes={3}
+      correctURL={`${correctResultURL}?c=teams`}
       validationURL={`${resultsValidationURL}?c=teams`}
       options={options.teams}
       incrementNumCorrect={incrementNumCorrect}
@@ -162,9 +176,17 @@ function BoxList(
 }
 
 function InputBoxGroup(
-  { name, nBoxes, validationURL, options, incrementNumCorrect, incrementScore }: {
+  { name,
+    nBoxes,
+    correctURL,
+    validationURL,
+    options,
+    incrementNumCorrect,
+    incrementScore
+  }: {
     name: string;
     nBoxes: number;
+    correctURL: string;
     validationURL: string;
     options?: string[];
     incrementNumCorrect: () => void;
@@ -183,6 +205,7 @@ function InputBoxGroup(
           >
             <InputBox
               name={numToRank(i + 1) ?? ''}
+              correctURL={`${correctURL}&r=${i+1}`}
               validationURL={`${validationURL}&r=${i+1}`}
               options={options}
               incrementNumCorrect={incrementNumCorrect}
@@ -196,8 +219,16 @@ function InputBoxGroup(
 }
 
 function InputBox(
-  { name, validationURL, options, incrementNumCorrect, incrementScore }: {
+  {
+    name,
+    correctURL,
+    validationURL,
+    options,
+    incrementNumCorrect,
+    incrementScore
+  }: {
     name: string;
+    correctURL: string;
     validationURL: string;
     options?: string[];
     incrementNumCorrect: () => void;
@@ -219,17 +250,43 @@ function InputBox(
     }
   }, [isCorrect]);
 
+  // Handle an input box submission
   const handleSubmit = async () => {
     if (isCorrect || tries <= 0 || val === '') return;
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${validationURL}&v=${val}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const data: boolean = await response.json();
-      if (data) setIsCorrect();
+      // If this is our last try, fetch both the validation and correct answer
+      if (tries === 1) {
+        const [validationResponse, correctResponse] = await Promise.all([
+          fetch(`${validationURL}&v=${val}`),
+          fetch(correctURL)
+        ]);
+
+        const isValid = await validationResponse.json();
+        const correctAnswer = await correctResponse.json();
+
+        // Batch our state updates to happen together
+        // This prevents any possibility of user input between setting value
+        // and disabling
+        const batchedUpdates = () => {
+          if (isValid) {
+            setIsCorrect();
+          } else {
+            setVal(correctAnswer);
+          }
+          decrementTries();
+        };
+
+        // In React 18+, we can use flushSync to ensure these updates happen together
+        ReactDOM.flushSync(batchedUpdates);
+      } else {
+        // Normal validation for non-final tries
+        const response = await fetch(`${validationURL}&v=${val}`);
+        const isValid = await response.json();
+        if (isValid) setIsCorrect();
+      }
+
       decrementTries();
     } catch (error) {
       console.error(error);
