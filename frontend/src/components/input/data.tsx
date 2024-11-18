@@ -24,6 +24,7 @@ function InfoInputBoxGroup(
     .filter(([_, value]) => value)
     .map(([key, _]) => (
       <InputBox
+        key={key}
         name={deSnakeCase(key)}
         correctURL={`${correctInfoURL}?f=${key}`}
         validationURL={`${infoValidationURL}?f=${key}`}
