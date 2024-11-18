@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useMemo, useState } from 'react';
+import { twJoin } from 'tailwind-merge';
 import mapboxgl from 'mapbox-gl';
 import { along } from '@turf/along';
 
@@ -121,8 +122,13 @@ export default function Map(
     >
       <MapResetButton
         onClick={handleButtonClick}
-        className="absolute top-2 right-2 z-10 bg-black text-white p-2 rounded-md shadow-md bg-opacity-50 hover:bg-opacity-100"
-        id="reset-button"
+        className={twJoin(
+          'absolute top-2 right-2 z-10',
+          'bg-black text-white p-2 rounded-md shadow-md',
+          'bg-opacity-50 hover:bg-opacity-100 group'
+        )}
+        iconClassName="group-hover:animate-[spin_1s_ease-in-out_1]"
+        id="map-reset-button"
       />
       <div
         className="h-full rounded-md shadow-md"
