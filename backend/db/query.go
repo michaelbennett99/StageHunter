@@ -323,3 +323,61 @@ func (q *Queries) GetRiderOrTeam(
 
 	return riderOrTeam, nil
 }
+
+const getValidResultsCountQuery = `
+SELECT classification, COUNT(*)
+FROM racedata.results_valid
+WHERE stage_id = @stage_id
+GROUP BY classification;
+`
+
+type ValidResultsCountRow struct {
+	Classification Classification
+	Count          int
+}
+
+type ValidResultsCount struct {
+	Stage     int `json:"stage"`
+	General   int `json:"general"`
+	Points    int `json:"points"`
+	Mountains int `json:"mountains"`
+	Youth     int `json:"youth"`
+	Teams     int `json:"teams"`
+}
+
+func (q *Queries) GetValidResultsCount(
+	ctx context.Context, stageID int,
+) (ValidResultsCount, error) {
+	rows, err := q.conn.Query(ctx, getValidResultsCountQuery, pgx.NamedArgs{
+		"stage_id": stageID,
+	})
+	if err != nil {
+		return ValidResultsCount{}, err
+	}
+	defer rows.Close()
+
+	counts, err := pgx.CollectRows(
+		rows, pgx.RowToStructByName[ValidResultsCountRow],
+	)
+	if err != nil {
+		return ValidResultsCount{}, err
+	}
+	validResultsCount := ValidResultsCount{}
+	for _, count := range counts {
+		switch count.Classification {
+		case ClassificationStage:
+			validResultsCount.Stage = count.Count
+		case ClassificationGC:
+			validResultsCount.General = count.Count
+		case ClassificationPoints:
+			validResultsCount.Points = count.Count
+		case ClassificationMountains:
+			validResultsCount.Mountains = count.Count
+		case ClassificationYouth:
+			validResultsCount.Youth = count.Count
+		case ClassificationTeams:
+			validResultsCount.Teams = count.Count
+		}
+	}
+	return validResultsCount, nil
+}

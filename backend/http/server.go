@@ -547,3 +547,24 @@ func VerifyResultHandler(
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(verified)
 }
+
+func GetValidResultsCountHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromURL(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	validResultsCount, err := conn.GetValidResultsCount(
+		context.Background(), stage_id,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(validResultsCount)
+}
