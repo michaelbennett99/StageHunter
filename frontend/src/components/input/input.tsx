@@ -6,7 +6,8 @@ import ReactDOM from 'react-dom';
 
 import { numToRank } from '@/utils/utils';
 import AutoComplete from '@/components/autocomplete';
-import { useIncrement, useDecrement, useBomb } from './hooks';
+import { useIncrement, useDecrement, useBomb, useCorrectAnswer } from './hooks';
+import { twJoin, twMerge } from 'tailwind-merge';
 
 export interface Options {
   grand_tours: string[];
@@ -236,6 +237,10 @@ function InputBox(
   }
 ): JSX.Element {
   const [val, setVal] = useState('');
+  const [
+    correctAnswer,
+    exposeCorrectAnswer
+  ] = useCorrectAnswer<string>(correctURL);
   const [isCorrect, setIsCorrect] = useBomb();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tries, decrementTries] = useDecrement(1);
@@ -256,38 +261,17 @@ function InputBox(
 
     setIsLoading(true);
     try {
-      // If this is our last try, fetch both the validation and correct answer
-      if (tries === 1) {
-        const [validationResponse, correctResponse] = await Promise.all([
-          fetch(`${validationURL}&v=${val}`),
-          fetch(correctURL)
-        ]);
+      // Normal validation for non-final tries
+      const response = await fetch(`${validationURL}&v=${val}`);
+      const isValid = await response.json();
 
-        const isValid = await validationResponse.json();
-        const correctAnswer = await correctResponse.json();
-
-        // Batch our state updates to happen together
-        // This prevents any possibility of user input between setting value
-        // and disabling
-        const batchedUpdates = () => {
-          if (isValid) {
-            setIsCorrect();
-          } else {
-            setVal(correctAnswer);
-          }
-          decrementTries();
-        };
-
-        // In React 18+, we can use flushSync to ensure these updates happen together
-        ReactDOM.flushSync(batchedUpdates);
-      } else {
-        // Normal validation for non-final tries
-        const response = await fetch(`${validationURL}&v=${val}`);
-        const isValid = await response.json();
+      const batchedUpdates = () => {
+        if (tries === 1) exposeCorrectAnswer();
         if (isValid) setIsCorrect();
-      }
+        decrementTries();
+      };
 
-      decrementTries();
+      ReactDOM.flushSync(batchedUpdates);
     } catch (error) {
       console.error(error);
     } finally {
@@ -300,13 +284,13 @@ function InputBox(
       <div className="flex-grow text-sm">{name}</div>
       <TextInput
         value={val}
+        correctAnswer={correctAnswer}
         tries={tries}
         isLoading={isLoading}
         isCorrect={isCorrect}
         onChange={(e) => setVal(e.target.value)}
         onSubmit={handleSubmit}
         options={options}
-
       />
     </div>
   );
@@ -327,6 +311,7 @@ function ButtonText({ tries, isCorrect, isLoading }: {
 // itself if it is
 function TextInput({
   value,
+  correctAnswer,
   tries,
   isLoading,
   isCorrect,
@@ -336,6 +321,7 @@ function TextInput({
   className,
 }: {
   value: string;
+  correctAnswer: string | null;
   tries: number;
   isLoading: boolean;
   isCorrect: boolean;
@@ -350,13 +336,23 @@ function TextInput({
     onSubmit();
   }
 
-  const inputClassName = `
-    h-full w-40 p-1 border-2 border-gray-300 rounded-md text-sm
-    ${className}
-  `;
+  const noMoreInput = isCorrect || tries <= 0;
+  const isIncorrect = !isCorrect && tries <= 0;
+
+  let inputClassName = twMerge(
+    'h-full w-40 p-1 border-2 border-gray-300 rounded-md disabled:bg-slate-50',
+    className
+  );
+
+  if (isCorrect) inputClassName = twMerge(
+    inputClassName, 'border-green-500'
+  );
+  if (isIncorrect) inputClassName = twMerge(
+    inputClassName, 'border-red-500'
+  );
 
   const optionsListClassName = `
-    border-2 rounded-md bg-popover text-popover-foreground text-sm
+    border-2 rounded-md bg-popover text-popover-foreground
   `;
 
   const optionClassName = `
@@ -368,28 +364,43 @@ function TextInput({
     bg-accent text-accent-foreground outline-gray-300
   `;
 
-  const noMoreInput = isCorrect || tries <= 0;
-  const isIncorrect = !isCorrect && tries <= 0;
-
   return (
     <form
-      className="flex items-center h-full gap-1"
+      className="flex items-center h-full gap-1 text-sm"
       onSubmit={handleSubmit}
     >
-      <AutoComplete
-        value={value}
-        onChange={onChange}
-        options={options}
-        inputClassName={inputClassName}
-        disabled={noMoreInput}
-        optionsListClassName={optionsListClassName}
-        optionClassName={optionClassName}
-        selectedOptionClassName={selectedOptionClassName}
-      />
+      <div className="relative flex-grow group">
+        <AutoComplete
+          value={value}
+          onChange={onChange}
+          options={options}
+          inputClassName={inputClassName}
+          disabled={noMoreInput}
+          optionsListClassName={optionsListClassName}
+          optionClassName={optionClassName}
+          selectedOptionClassName={selectedOptionClassName}
+        />
+        {
+          isIncorrect && (
+            <span
+              className={twMerge(
+                inputClassName,
+                twJoin(
+                  'absolute inset-0 invisible group-hover:visible',
+                  'text-nowrap overflow-x-auto z-50 pointer-events-none',
+                  'flex items-center bg-red-100'
+                )
+              )}
+            >
+              {correctAnswer}
+            </span>
+          )
+        }
+      </div>
       <button
         type="submit"
         className={`
-          bg-blue-500 text-white p-1 rounded-md h-full w-full
+          bg-blue-500 text-white p-1 rounded-md h-full w-full z-10
           ${!noMoreInput ? 'hover:bg-blue-700' : ''}
           ${isCorrect ? 'bg-green-500' : ''}
           ${isIncorrect ? 'bg-red-500' : ''}
