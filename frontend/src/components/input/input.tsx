@@ -24,11 +24,6 @@ export default function Input(
   const [numCorrect, incrementNumCorrect] = useIncrement();
   const [score, incrementScore] = useVariableIncrement();
 
-  useEffect(() => {
-    console.log(infoData);
-    console.log(resultsData);
-  }, []);
-
   // Get all the entries in the data object and list them
   // If the entry is an array, it's a group of entries, so we group them
   // in an InputBoxGroup
