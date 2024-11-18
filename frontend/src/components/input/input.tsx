@@ -347,7 +347,7 @@ function TextInput({
   const isIncorrect = !isCorrect && tries <= 0;
 
   let inputClassName = twMerge(
-    'h-full w-40 p-1 border-2 border-gray-300 rounded-md disabled:bg-slate-50',
+    'h-full w-40 p-1 border-2 border-slate-300 rounded-md disabled:bg-slate-50',
     className
   );
 
@@ -364,11 +364,11 @@ function TextInput({
 
   const optionClassName = `
     p-1 border-0
-    outline outline-offset-0 outline-[0.5px] outline-gray-300 outline-dashed
+    outline outline-offset-0 outline-[0.5px] outline-slate-300 outline-dashed
   `;
 
   const selectedOptionClassName = optionClassName + `
-    bg-accent text-accent-foreground outline-gray-300
+    bg-slate-300 text-slate-700 outline-slate-300
   `;
 
   return (
