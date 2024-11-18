@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 /**
  * A hook that returns a number and a function to increment it.
@@ -27,4 +28,40 @@ export function useDecrement(
 export function useBomb(): [boolean, () => void] {
   const [value, setValue] = useState(false);
   return [value, () => setValue(true)];
+}
+
+/**
+ * A hook that fetches a value from a URL secretly. When the setter is called,
+ * this value is exposed.
+ * @param url the URL to fetch the value from
+ * @returns the value (null when not exposed), a exposer, and an error
+ */
+export function useCorrectAnswer<T>(
+  url: string
+): [T | null, () => void, any] {
+  const { data, error, isLoading } = useSWR<T>(
+    url,
+    async (url: string) => {
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      return res.json();
+    }
+  );
+
+  const [value, setValue] = useState<T | null>(null);
+  const [shouldSetValue, setShouldSetValue] = useState(false);
+
+  useEffect(() => {
+    if (shouldSetValue && !isLoading && data) {
+      setValue(data);
+    }
+  }, [shouldSetValue, isLoading, data]);
+
+  const expose = () => {
+    setShouldSetValue(true);
+  };
+
+  return [value, expose, error];
 }
