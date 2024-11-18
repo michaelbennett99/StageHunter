@@ -127,7 +127,7 @@ export default function Map(
           'bg-black text-white p-2 rounded-md shadow-md',
           'bg-opacity-50 hover:bg-opacity-100 group'
         )}
-        iconClassName="group-hover:animate-[spin_1s_ease-in-out_1]"
+        iconClassName="group-hover:animate-spin-once"
         id="map-reset-button"
       />
       <div
