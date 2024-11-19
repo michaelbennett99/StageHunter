@@ -1,12 +1,14 @@
+import { BACKEND_URL } from './constants';
 import {
-  BACKEND_URL,
-  Result,
   ResultsData,
   ElevationData,
-  GradientData
+  GradientData,
+  NewInfoData,
+  Info,
+  InfoData
 } from './types';
 
-async function fetchJSON(url: string): Promise<any> {
+export async function fetchJSON<T>(url: string): Promise<T> {
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -34,45 +36,11 @@ export async function getAllStageIDs(): Promise<number[]> {
   return fetchJSON(`${BACKEND_URL}/stages`);
 }
 
-function parseResults(res: any[], classification: string): Result[] {
-  return res.filter((r: any) => (
-    r.classification && (r.name || r.team) && r.rank
-    && r.classification === classification
-  )).map((r: any) => ({
-    name: r.name ?? r.team,
-    rank: r.rank,
-  }));
-}
-
 export async function getStageLength(
   stage_id: string | number
 ): Promise<number> {
-  const info = await fetchJSON(`${BACKEND_URL}/stage/info/${stage_id}`);
-  return info.StageLength;
-}
-
-export async function getResultsData(
-  stage_id: string | number,
-  top_n: string | number
-): Promise<ResultsData> {
-  const info = await fetchJSON(`${BACKEND_URL}/stage/info/${stage_id}`);
-  const res = await fetchJSON(
-    `${BACKEND_URL}/stage/results/${stage_id}?topN=${top_n}`
-  );
-  return {
-    grand_tour: info.GrandTour,
-    year: info.Year,
-    stage_no: info.StageNumber,
-    stage_start: info.StageStart,
-    stage_end: info.StageEnd,
-    stage_length: info.StageLength,
-    stage_results: parseResults(res, 'stage'),
-    gc_results: parseResults(res, 'gc'),
-    points_results: parseResults(res, 'points'),
-    mountains_results: parseResults(res, 'mountains'),
-    youth_results: parseResults(res, 'youth'),
-    teams_results: parseResults(res, 'teams'),
-  };
+  const info = await fetchJSON<Info>(`${BACKEND_URL}/stage/info/${stage_id}`);
+  return info.stage_length;
 }
 
 export async function getTrack(
@@ -84,25 +52,32 @@ export async function getTrack(
 export async function getElevationData(
   stage_id: string | number
 ): Promise<ElevationData[]> {
-  const data = await fetchJSON(`${BACKEND_URL}/stage/elevation/${stage_id}`);
-  return data.map((d: { Elevation: number; Distance: number }) => ({
-    elevation: d.Elevation,
-    distance: d.Distance,
-  }));
+  return fetchJSON(`${BACKEND_URL}/stage/elevation/${stage_id}`);
 }
 
 export async function getGradientData(
   stage_id: string | number,
   resolution: number
 ): Promise<GradientData[]> {
-  const data = await fetchJSON(
+  return fetchJSON(
     `${BACKEND_URL}/stage/gradient/${stage_id}?resolution=${resolution}`
   );
-  return data.map(
-    (d: { Distance: number; Elevation: number; Gradient: number | null }) => ({
-      distance: d.Distance,
-      elevation: d.Elevation,
-      gradient: d.Gradient,
-    })
-  );
+}
+
+export async function getResultsData(
+  stage_id: string | number
+): Promise<ResultsData> {
+  return fetchJSON(`${BACKEND_URL}/stage/results/count/${stage_id}`);
+}
+
+export async function getStageData(
+  stage_id: string | number,
+  topN: number = 3
+): Promise<{ info: InfoData, results: ResultsData }> {
+  const resultsData = await getResultsData(stage_id);
+  for (const key of Object.keys(resultsData) as (keyof ResultsData)[]) {
+    resultsData[key] = Math.min(resultsData[key], topN);
+  }
+  const infoData = NewInfoData();
+  return { info: infoData, results: resultsData };
 }

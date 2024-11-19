@@ -84,6 +84,69 @@ func main() {
 		),
 	)
 
+	http.HandleFunc(
+		"/stage/riders/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetRidersHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/teams/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetTeamsHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/results/correct/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetCorrectResultHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/results/verify/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.VerifyResultHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/info/correct/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetCorrectInfoHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/info/verify/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.VerifyInfoHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
+	http.HandleFunc(
+		"/stage/results/count/",
+		myhttp.HandlerMiddleware(
+			myhttp.MakeHandler(pool, myhttp.GetValidResultsCountHandler),
+			myhttp.AddRequestLogger,
+			myhttp.SetCORSHeaders,
+		),
+	)
+
 	log.Println("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

@@ -1,5 +1,3 @@
-export const BACKEND_URL = 'http://stagehunter-backend:8080';
-
 export enum GrandTour {
   TOUR = 'TOUR',
   GIRO = 'GIRO',
@@ -11,20 +9,41 @@ export interface Result {
   rank: number;
 }
 
-export interface ResultsData {
-  grand_tour: GrandTour;
+export interface Info {
+  grand_tour: string;
   year: number;
   stage_no: number;
   stage_start: string;
   stage_end: string;
   stage_length: number;
-  stage_results: Result[];
-  gc_results: Result[];
-  points_results?: Result[];
-  mountains_results?: Result[];
-  youth_results?: Result[];
-  teams_results?: Result[];
 }
+
+export type InfoType = Exclude<keyof Info, 'stage_length'>;
+
+export type ClassificationEnum = (
+  'stage' |
+  'general' |
+  'points' |
+  'mountains' |
+  'youth' |
+  'teams'
+)
+
+export type InfoData = Record<InfoType, boolean>;
+
+export function NewInfoData(): InfoData {
+  return {
+    grand_tour: true,
+    year: true,
+    stage_no: true,
+    stage_start: true,
+    stage_end: true
+  };
+}
+
+export type ResultsData = Record<ClassificationEnum, number>;
+
+export type StageData = InfoData & ResultsData;
 
 export interface ElevationData {
   elevation: number;
@@ -35,4 +54,10 @@ export interface GradientData {
   distance: number;
   elevation: number;
   gradient: number | null;
+}
+
+export interface Options {
+  grand_tours: string[];
+  riders: string[];
+  teams: string[];
 }

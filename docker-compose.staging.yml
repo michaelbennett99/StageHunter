@@ -1,0 +1,15 @@
+# docker-compose.staging.yml
+# Staging environment docker compose file
+
+services:
+  frontend:
+    build:
+      target: staging
+    # No volumes needed for staging
+    volumes: []
+
+  backend: {}
+
+  db:
+    # No ports needed for staging
+    ports: []

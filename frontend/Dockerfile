@@ -8,6 +8,9 @@
 # - /app/.next        # Don't copy .next from base image
 # - /app/node_modules # Don't copy node_modules from base image
 #
+# Staging Mode:
+# No required volumes, source will be copied into image
+#
 # Production Mode:
 # No required volumes, source will be copied into image
 #
@@ -17,7 +20,9 @@
 # Set base image
 FROM node:20-alpine AS base
 
-# First stage: Install dependencies
+#
+# First stage: Install dependencies, used for all environments
+#
 FROM base AS deps
 # We need this for some reason
 RUN apk add --no-cache libc6-compat
@@ -30,15 +35,14 @@ COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm && \
     pnpm install --frozen-lockfile
 
-# Second stage: Development
+# Development Environment
 FROM base AS development
 WORKDIR /app
 
 RUN npm install -g pnpm
 
-# Copy all the files we need
+# Copy all the node_modules from the deps stage
 COPY --from=deps /app/node_modules ./node_modules
-# COPY . .
 
 # Expose port 3000
 EXPOSE 3000
@@ -46,6 +50,25 @@ EXPOSE 3000
 # Start the app
 CMD ["pnpm", "dev"]
 
+#
+# Staging Environment
+#
+FROM base AS staging
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+# Copy all the files we need
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+EXPOSE 3000
+
+CMD pnpm build && pnpm start
+
+#
+# Production Environment
+#
 FROM base AS production
 WORKDIR /app
 
@@ -54,6 +77,4 @@ COPY . .
 
 EXPOSE 3000
 
-RUN ["pnpm", "build"]
-
-CMD ["pnpm", "start"]
+CMD pnpm build && pnpm start

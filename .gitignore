@@ -1,6 +1,6 @@
 .envrc
 .pg_password
-*/dump.sql
+*/dump.sql*
 .pgpass
 .env
 !.env.example

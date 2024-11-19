@@ -1,0 +1,73 @@
+name: Deploy Dev Version to AWS server on Push
+
+on:
+  push:
+    branches: ['dev']
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars.AWS_HOST }}
+          username: ${{ vars.AWS_USER }}
+          key: ${{ secrets.AWS_PVT_KEY }}
+          command_timeout: 30m
+          script: |
+            # Stop any running containers and remove the existing clone
+            echo "Removing past deployment"
+            cd StageHunter && \
+              docker-compose -f docker-compose.yml -f docker-compose.staging.yml down && \
+              cd .. && \
+              rm -rf ./StageHunter
+
+            # Prune unused docker images and volumes
+            docker system prune --volumes -af
+            docker volume prune -af
+
+            echo "Cloning from github"
+            # Clone fresh
+            git clone -b dev git@github.com:michaelbennett99/StageHunter.git && \
+            cd ./StageHunter
+
+            echo "Downloading SQL dump from S3"
+            # Download SQL dump directly on EC2, unzip and put it where it's
+            # expected to be by the db container
+            aws s3 cp ${{ vars.S3_SQL_DUMP_PATH }} ./db/dump.sql.gz && \
+              gunzip ./db/dump.sql.gz
+
+            echo "Setting up environment"
+            # Marshal environment variables and create secret files
+            # For frontend
+            touch ./frontend/.env
+            echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.MAPBOX_ACCESS_TOKEN }}" >> ./frontend/.env
+            export NODE_OPTIONS=${{ vars.NODE_OPTIONS }}
+            export TARGET=staging
+
+            # For backend
+            touch ./backend/.env
+            echo "DATABASE_URL=${{ vars.DATABASE_URL }}" >> ./backend/.env
+            touch ./backend/.pgpass
+            echo "${{ secrets.PGPASS }}" >> ./backend/.pgpass
+
+            # For db
+            echo "${{ secrets.PG_PASSWORD }}" > ./db/.pg_password
+
+            echo "Building images"
+            # # Build
+            docker-compose \
+              -f docker-compose.yml \
+              -f docker-compose.staging.yml \
+              build
+
+            echo "Deploying images"
+            # Deploy
+            docker-compose \
+              -f docker-compose.yml \
+              -f docker-compose.staging.yml \
+              up -d

@@ -15,15 +15,17 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     restart: unless-stopped
     depends_on:
-      - backend
-      - frontend
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
 
   frontend:
     container_name: stagehunter-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: ${TARGET}
+      target: development
     volumes:
       - ./frontend:/app
       - /app/.next
@@ -31,11 +33,18 @@ services:
     networks:
       - frontend-network
     environment:
-      - NODE_OPTIONS=--max-old-space-size=768
+      - NODE_OPTIONS=${NODE_OPTIONS}
     restart: unless-stopped
     depends_on:
-      - backend
-      - db
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3000/status"]
+      interval: 1m
+      timeout: 15s
+      retries: 4
+      start_period: 10m
+      start_interval: 5s
 
   backend:
     container_name: stagehunter-backend
@@ -51,13 +60,23 @@ services:
       - ./backend/.pgpass:/root/.pgpass
     restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/daily"]
+      interval: 1m
+      timeout: 15s
+      retries: 4
+      start_period: 10m
+      start_interval: 5s
 
   db:
     container_name: stagehunter-db
     build:
       context: ./db
       dockerfile: Dockerfile
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
@@ -68,6 +87,13 @@ services:
       - pgdata:/var/lib/postgresql/data
     secrets:
       - pg_password
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "go_prog_user", "-d", "stagehunter"]
+      interval: 1m
+      timeout: 15s
+      retries: 4
+      start_period: 10m
+      start_interval: 5s
 
 volumes:
   pgdata:

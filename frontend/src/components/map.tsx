@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useMemo, useState } from 'react';
+import { twJoin } from 'tailwind-merge';
 import mapboxgl from 'mapbox-gl';
 import { along } from '@turf/along';
 
@@ -90,6 +91,9 @@ export default function Map(
       setIsMapReady(false);
       map.remove();
     };
+    // Bounds and track are never updated, and if they were we would not want to
+    // re-initialize the map
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update point location
@@ -115,14 +119,22 @@ export default function Map(
   };
 
   return (
-    <div id="map-container-container" className="h-full relative">
+    <div
+      id="map-container-container"
+      className="h-full relative"
+    >
       <MapResetButton
         onClick={handleButtonClick}
-        className="absolute top-2 right-2 z-10 bg-black text-white p-2 rounded-md shadow-md bg-opacity-50 hover:bg-opacity-100"
-        id="reset-button"
+        className={twJoin(
+          'absolute top-2 right-2 z-10',
+          'bg-black text-white p-2 rounded-md shadow-md',
+          'bg-opacity-50 hover:bg-opacity-100 group'
+        )}
+        iconClassName="group-hover:animate-spin-once"
+        id="map-reset-button"
       />
       <div
-        className="h-full"
+        className="h-full rounded-md shadow-md"
         id="map-container"
         ref={mapContainerRef}
       />

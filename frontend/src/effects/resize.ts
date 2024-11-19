@@ -16,8 +16,8 @@ export function useResize(
     setHeight(parent.clientHeight);
 
     // Handle both window resize and container resize
-    const resizeObserver = new ResizeObserver((entries) => {
-      const { width, height } = entries[0].contentRect;
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
       setWidth(width);
       setHeight(height);
     });

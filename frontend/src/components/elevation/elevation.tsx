@@ -18,6 +18,7 @@ import {
 import { GradientLegend } from './legend';
 import { YAxis, XAxis } from './axes';
 import { MouseOverLine } from './mouseOver';
+import { twJoin } from 'tailwind-merge';
 
 export default function Elevation({
   data,
@@ -30,7 +31,11 @@ export default function Elevation({
 }): JSX.Element {
   return (
     <div
-      className="h-1/4 max-h-64 min-h-16 bg-slate-100"
+      className={twJoin(
+        "h-1/4 max-h-64 min-h-16",
+        'bg-slate-100 text-slate-900 rounded-md shadow-md',
+        'border-slate-300 border'
+      )}
       id="elevation-container"
     >
       <ElevationChart
