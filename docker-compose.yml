@@ -43,7 +43,8 @@ services:
       interval: 1m
       timeout: 15s
       retries: 4
-      start_period: 1s
+      start_period: 10m
+      start_interval: 5s
 
   backend:
     container_name: stagehunter-backend
@@ -66,7 +67,8 @@ services:
       interval: 1m
       timeout: 15s
       retries: 4
-      start_period: 1s
+      start_period: 10m
+      start_interval: 5s
 
   db:
     container_name: stagehunter-db
@@ -90,7 +92,8 @@ services:
       interval: 1m
       timeout: 15s
       retries: 4
-      start_period: 1s
+      start_period: 10m
+      start_interval: 5s
 
 volumes:
   pgdata:
