@@ -8,6 +8,8 @@ services:
     # No volumes needed for staging
     volumes: []
 
+  backend: {}
+
   db:
     # No ports needed for staging
     ports: []
