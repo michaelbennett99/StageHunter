@@ -17,6 +17,7 @@ jobs:
           host: ${{ vars.AWS_HOST }}
           username: ${{ vars.AWS_USER }}
           key: ${{ secrets.AWS_PVT_KEY }}
+          command_timeout: 30m
           script: |
             # Stop any running containers and remove the existing clone
             cd StageHunter && \
