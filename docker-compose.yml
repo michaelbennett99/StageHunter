@@ -25,7 +25,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: ${TARGET}
+      target: development
     volumes:
       - ./frontend:/app
       - /app/.next
