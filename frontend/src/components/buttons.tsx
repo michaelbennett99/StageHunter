@@ -1,4 +1,4 @@
-import { FaArrowsRotate } from "react-icons/fa6";
+import { FaArrowsRotate } from 'react-icons/fa6';
 
 export function MapResetButton(
   props: React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -8,7 +8,7 @@ export function MapResetButton(
   const { iconClassName, ...buttonProps } = props;
   return (
     <button {...buttonProps}>
-      <FaArrowsRotate className={props.iconClassName} />
+      <FaArrowsRotate className={iconClassName} />
     </button>
   );
 }

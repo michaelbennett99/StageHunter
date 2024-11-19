@@ -110,6 +110,9 @@ export function InputBox(
       incrementNumCorrect();
       incrementScore();
     }
+    // These hooks should not change and if they did, should not trigger
+    // this effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCorrect]);
 
   // Handle an input box submission

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import Input from './input/input';
 import { BACKEND_URL } from '@/api/constants';
 import { fetchJSON, getStageData } from '@/api/getters';
-import { InfoData, Options, ResultsData, StageData } from '@/api/types';
+import { InfoData, Options, ResultsData } from '@/api/types';
 
 async function ResultsLoader({
   stageId,
@@ -17,8 +17,8 @@ async function ResultsLoader({
   ) => JSX.Element;
 }): Promise<JSX.Element> {
   const [riders, teams, {info, results}] = await Promise.all([
-    fetchJSON(`${BACKEND_URL}/stage/riders/${stageId}`),
-    fetchJSON(`${BACKEND_URL}/stage/teams/${stageId}`),
+    fetchJSON<string[]>(`${BACKEND_URL}/stage/riders/${stageId}`),
+    fetchJSON<string[]>(`${BACKEND_URL}/stage/teams/${stageId}`),
     getStageData(stageId)
   ]);
   const options = {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 /**
@@ -11,7 +11,11 @@ export function useIncrement(
   start: number = 0, step: number = 1
 ): [number, () => void] {
   const [numCorrect, setNumCorrect] = useState(start);
-  return [numCorrect, () => setNumCorrect(numCorrect + step)];
+  const increment = useCallback(
+    () => setNumCorrect(prev => prev + step),
+    [step]
+  );
+  return [numCorrect, increment];
 }
 
 export function useDecrement(
@@ -24,7 +28,11 @@ export function useVariableIncrement(
   start: number = 0,
 ): [number, (step: number) => void] {
   const [numCorrect, setNumCorrect] = useState(start);
-  return [numCorrect, (step: number) => setNumCorrect(numCorrect + step)];
+  const increment = useCallback(
+    (step: number) => setNumCorrect(prev => prev + step),
+    []
+  );
+  return [numCorrect, increment];
 }
 
 /**
@@ -34,7 +42,8 @@ export function useVariableIncrement(
  */
 export function useBomb(): [boolean, () => void] {
   const [value, setValue] = useState(false);
-  return [value, () => setValue(true)];
+  const setTrue = useCallback(() => setValue(true), []);
+  return [value, setTrue];
 }
 
 /**
@@ -66,9 +75,9 @@ export function useCorrectAnswer<T>(
     }
   }, [shouldSetValue, isLoading, data]);
 
-  const expose = () => {
+  const expose = useCallback(() => {
     setShouldSetValue(true);
-  };
+  }, []);
 
   return [value, expose, error];
 }

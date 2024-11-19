@@ -116,17 +116,10 @@ function MouseOverLineText(
     `${gradientPoint.gradient?.toFixed(0).toString() ?? '0'}%`
   ];
 
-  const maxTextsLength = Math.max(...texts.map(text => text.length));
-
-  // Calculate the maximum text width
-  const [boxWidth, setBoxWidth] = useState(0);
-  useEffect(() => {
-    // Calculate the maximum text width
-    const maxWidth = Math.max(
-      ...texts.map(text => getTextWidth(text, fontSize))
-    );
-    setBoxWidth(maxWidth + (boxPadding * 2));
-  }, [maxTextsLength, fontSize, boxPadding]);
+  // Calculate the maximum text width directly
+  const boxWidth = Math.max(
+    ...texts.map(text => getTextWidth(text, fontSize))
+  ) + (boxPadding * 2);
 
   // Calculate the box dimensions
   const boxHeight = (fontSize * texts.length) + (boxPadding * 2);

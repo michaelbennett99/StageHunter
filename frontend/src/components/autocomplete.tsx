@@ -380,23 +380,3 @@ function AutocompleteOption({
     </li>
   );
 }
-
-function getImportantStyles(styles: string): string {
-  return styles
-    .trim()
-    .split(' ')
-    .map(style => {
-      if (!style.startsWith('!')) {
-        return '!' + style;
-      }
-      return style;
-    })
-    .join(' ');
-}
-
-function mergeStyles(base?: string, top?: string): string {
-  if (!base && !top) return '';
-  if (!base) return getImportantStyles(top!);
-  if (!top) return base;
-  return [base, getImportantStyles(top)].join(' ');
-}

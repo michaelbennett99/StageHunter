@@ -4,10 +4,11 @@ import {
   ElevationData,
   GradientData,
   NewInfoData,
+  Info,
   InfoData
 } from './types';
 
-export async function fetchJSON(url: string): Promise<any> {
+export async function fetchJSON<T>(url: string): Promise<T> {
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -38,8 +39,8 @@ export async function getAllStageIDs(): Promise<number[]> {
 export async function getStageLength(
   stage_id: string | number
 ): Promise<number> {
-  const info = await fetchJSON(`${BACKEND_URL}/stage/info/${stage_id}`);
-  return info.StageLength;
+  const info = await fetchJSON<Info>(`${BACKEND_URL}/stage/info/${stage_id}`);
+  return info.stage_length;
 }
 
 export async function getTrack(

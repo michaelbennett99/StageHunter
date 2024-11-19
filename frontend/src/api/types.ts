@@ -9,13 +9,16 @@ export interface Result {
   rank: number;
 }
 
-export type InfoType = (
-  'grand_tour' |
-  'year' |
-  'stage_no' |
-  'stage_start' |
-  'stage_end'
-);
+export interface Info {
+  grand_tour: string;
+  year: number;
+  stage_no: number;
+  stage_start: string;
+  stage_end: string;
+  stage_length: number;
+}
+
+export type InfoType = Exclude<keyof Info, 'stage_length'>;
 
 export type ClassificationEnum = (
   'stage' |

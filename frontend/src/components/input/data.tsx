@@ -21,8 +21,8 @@ function InfoInputBoxGroup(
   const infoValidationURL = `/api/stage/info/verify/${stageId}`;
 
   const inputElements: JSX.Element[] = Object.entries(infoData)
-    .filter(([_, value]) => value)
-    .map(([key, _]) => (
+    .filter(([,value]) => value)
+    .map(([key,]) => (
       <InputBox
         key={key}
         name={deSnakeCase(key)}
@@ -53,9 +53,10 @@ function getResultInputBoxGroups(
   const resultsValidationURL = `/api/stage/results/verify/${stageId}`;
 
   return Object.entries(resultsData)
-    .filter(([_, value]) => value > 0)
+    .filter(([,value]) => value > 0)
     .map(([key, value]) => (
       <InputBoxGroup
+        key={key}
         name={deSnakeCase(key) + ' Classification'}
         nBoxes={value}
         correctURL={`${correctResultURL}?c=${key}`}
