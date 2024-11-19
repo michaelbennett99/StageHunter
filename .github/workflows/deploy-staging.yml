@@ -26,6 +26,7 @@ jobs:
 
             # Prune unused docker images and volumes
             docker system prune --volumes -af
+            docker volume prune -af
 
             # Clone fresh
             git clone -b dev git@github.com:michaelbennett99/StageHunter.git && \
