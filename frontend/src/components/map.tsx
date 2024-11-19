@@ -91,6 +91,9 @@ export default function Map(
       setIsMapReady(false);
       map.remove();
     };
+    // Bounds and track are never updated, and if they were we would not want to
+    // re-initialize the map
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update point location

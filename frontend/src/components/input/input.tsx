@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { twJoin } from 'tailwind-merge';
 
 import { useIncrement, useVariableIncrement } from './hooks';

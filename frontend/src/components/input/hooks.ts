@@ -54,7 +54,7 @@ export function useBomb(): [boolean, () => void] {
  */
 export function useCorrectAnswer<T>(
   url: string
-): [T | null, () => void, any] {
+): [T | null, () => void, Error | null] {
   const { data, error, isLoading } = useSWR<T>(
     url,
     async (url: string) => {
