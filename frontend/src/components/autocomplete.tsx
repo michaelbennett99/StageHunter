@@ -11,6 +11,29 @@ import {
 } from 'react';
 import { twMerge } from 'tailwind-merge';
 
+interface AutocompleteProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  options?: string[];
+  maxShownResults?: number;
+  inputClassName?: string;
+  optionsListClassName?: string;
+  optionClassName?: string;
+  selectedOptionClassName?: string;
+};
+
+/**
+ * Autocomplete text input component. The component must be controlled.
+ * @param value - Value to display in the input.
+ * @param onChange - Function to call when the input value changes.
+ * @param options - Array of options to display in the dropdown menu.
+ * @param maxShownResults - Maximum number of results to display in the dropdown
+ * menu, scroll to overflow.
+ * Styling options.
+ * @param inputClassName - Class name for the input element.
+ * @param optionsListClassName - Class name for the options list element.
+ * @param optionClassName - Class name for the option elements.
+ * @param selectedOptionClassName - Class name for the selected option element.
+ * @returns Autocomplete component.
+ */
 export default function AutoComplete({
   options,
   maxShownResults = 5,
@@ -19,15 +42,7 @@ export default function AutoComplete({
   optionClassName,
   selectedOptionClassName,
   ...inputProps
-}: {
-  options?: string[];
-  maxShownResults?: number;
-  inputClassName?: string;
-  optionsListClassName?: string;
-  optionClassName?: string;
-  selectedOptionClassName?: string;
-} & React.InputHTMLAttributes<HTMLInputElement>
-): JSX.Element {
+}: AutocompleteProps): JSX.Element {
   // Refs
   // We get the ref of the input element for horizontal sizing
   const inputRef = useRef<HTMLInputElement>(null);
