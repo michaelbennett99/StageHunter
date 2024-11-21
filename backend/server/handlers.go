@@ -262,6 +262,53 @@ func GetResultsHandler(
 	json.NewEncoder(w).Encode(results)
 }
 
+func GetResultsForClassificationHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	classification, err := GetResultClassificationFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	topNParam := NewIntQueryParamWithDefault("topN", 1000)
+	queryParams, _, _, err := GetQueryParams(
+		r,
+		nil,
+		[]QueryParamInterface{topNParam},
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	topN, err := GetParamValue[int](queryParams["topN"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	results, err := conn.GetResultsForClassification(
+		context.Background(), db.GetResultsForClassificationParams{
+			StageID:        stage_id,
+			TopN:           topN,
+			Classification: classification,
+		},
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(results)
+}
+
 // GetRidersHandler returns all the riders for a given stage.
 //
 // Dynamic Query Segments:

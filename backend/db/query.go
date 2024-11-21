@@ -214,6 +214,50 @@ func (q *Queries) GetResults(
 	return results, nil
 }
 
+const getResultsForClassificationQuery = `
+SELECT
+	rank,
+	rider,
+	team,
+	time,
+	points,
+	classification
+FROM racedata.riders_teams_results
+WHERE
+	stage_id = @stage_id
+	AND rank <= @top_n
+	AND classification = @classification
+ORDER BY rank ASC;
+`
+
+type GetResultsForClassificationParams struct {
+	StageID        int
+	TopN           int
+	Classification Classification
+}
+
+func (q *Queries) GetResultsForClassification(
+	ctx context.Context, params GetResultsForClassificationParams,
+) ([]Result, error) {
+	rows, err := q.conn.Query(
+		ctx, getResultsForClassificationQuery, pgx.NamedArgs{
+			"stage_id":       params.StageID,
+			"top_n":          params.TopN,
+			"classification": params.Classification,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results, err := pgx.CollectRows(rows, pgx.RowToStructByName[Result])
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
 const getRidersQuery = `
 SELECT DISTINCT rider
 FROM racedata.riders_teams_results
