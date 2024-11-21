@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/michaelbennett99/stagehunter/backend/db"
 )
 
 const DefaultPort = 8080
@@ -19,143 +20,89 @@ func DefaultServerConfig() ServerConfig {
 	}
 }
 
+func addRoute(
+	mux *http.ServeMux,
+	path string,
+	pool *pgxpool.Pool,
+	handler func(http.ResponseWriter, *http.Request, *db.Queries),
+) {
+	mux.HandleFunc(
+		path,
+		HandlerMiddleware(
+			MakeHandler(pool, handler),
+			AddRequestLogger,
+			SetCORSHeaders,
+		),
+	)
+}
+
+type Route struct {
+	path    string
+	handler func(http.ResponseWriter, *http.Request, *db.Queries)
+}
+
 func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Port),
-		Handler: nil,
+		Handler: http.NewServeMux(),
 	}
 
-	http.HandleFunc(
-		"/daily",
-		HandlerMiddleware(
-			MakeHandler(pool, GetDailyHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-	http.HandleFunc(
-		"/random",
-		HandlerMiddleware(
-			MakeHandler(pool, GetRandomHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-	http.HandleFunc(
-		"/stages",
-		HandlerMiddleware(
-			MakeHandler(pool, GetAllStagesHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/info", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetStageInfoHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
+	mux := server.Handler.(*http.ServeMux)
 
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/track", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetStageTrackHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
+	routes := []Route{
+		{
+			"/daily",
+			GetDailyHandler,
+		},
+		{
+			"/random",
+			GetRandomHandler,
+		},
+		{
+			"/stages",
+			GetAllStagesHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/info", StageID),
+			GetStageInfoHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/track", StageID),
+			GetStageTrackHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/elevation", StageID),
+			GetStageElevationHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/gradient", StageID),
+			GetStageGradientHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/results", StageID),
+			GetResultsHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/riders", StageID),
+			GetRidersHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/teams", StageID),
+			GetTeamsHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/results/correct", StageID),
+			GetCorrectResultHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/results/verify", StageID),
+			VerifyResultHandler,
+		},
+	}
 
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/elevation", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetStageElevationHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/gradient", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetStageGradientHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/results", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetResultsHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/riders", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetRidersHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/teams", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetTeamsHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/results/correct", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetCorrectResultHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/results/verify", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, VerifyResultHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/info/correct", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetCorrectInfoHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/info/verify", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, VerifyInfoHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
-
-	http.HandleFunc(
-		fmt.Sprintf("/stages/{%s}/results/count", StageID),
-		HandlerMiddleware(
-			MakeHandler(pool, GetValidResultsCountHandler),
-			AddRequestLogger,
-			SetCORSHeaders,
-		),
-	)
+	for _, route := range routes {
+		addRoute(mux, route.path, pool, route.handler)
+	}
 
 	return server
 }
