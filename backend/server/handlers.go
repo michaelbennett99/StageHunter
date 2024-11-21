@@ -230,9 +230,21 @@ func GetResultsHandler(
 		return
 	}
 
-	topN, err := strconv.Atoi(r.URL.Query().Get("topN"))
+	topNParam := NewIntQueryParamWithDefault("topN", 1000)
+	queryParams, _, _, err := GetQueryParams(
+		r,
+		nil,
+		[]QueryParamInterface{topNParam},
+	)
 	if err != nil {
-		topN = 5
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	topN, err := GetParamValue[int](queryParams["topN"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	results, err := conn.GetResults(
