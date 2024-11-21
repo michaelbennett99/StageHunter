@@ -87,7 +87,7 @@ func NewQueryParamWithDefault[T any](
 		name:         name,
 		coerce:       coerce,
 		value:        *new(T),
-		hydrated:     true,
+		hydrated:     false,
 		defaultValue: defaultValue,
 	}
 }
