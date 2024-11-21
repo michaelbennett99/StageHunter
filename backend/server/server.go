@@ -102,11 +102,17 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 			GetCorrectResultHandler,
 		},
 		{
-			fmt.Sprintf("/stages/{%s}/verify/info", StageID),
+			fmt.Sprintf(
+				"/stages/{%s}/verify/info/{%s}",
+				StageID, InfoField,
+			),
 			VerifyInfoHandler,
 		},
 		{
-			fmt.Sprintf("/stages/{%s}/verify/results", StageID),
+			fmt.Sprintf(
+				"/stages/{%s}/verify/results/{%s}/{%s}",
+				StageID, ResultClassification, Rank,
+			),
 			VerifyResultHandler,
 		},
 	}

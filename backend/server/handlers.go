@@ -361,23 +361,30 @@ func VerifyInfoHandler(
 		return
 	}
 
-	// Get guess from the query params
-	queryParams := r.URL.Query()
-	if !queryParams.Has("f") || !queryParams.Has("v") {
-		http.Error(
-			w, "Query parameters 'f' and 'v' are required",
-			http.StatusBadRequest,
-		)
+	// Get the field from the route segment
+	field, err := GetInfoFieldFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	guessField := queryParams.Get("f")
-	guessValue := queryParams.Get("v")
 
-	answer, err := GetCorrectInfo(stage_id, guessField, conn)
+	// Get the correct info from the database
+	answer, err := GetCorrectInfo(stage_id, field, conn)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Get guess from the query params
+	queryParams := r.URL.Query()
+	if !queryParams.Has("v") {
+		http.Error(
+			w, "Query parameter 'v' is required",
+			http.StatusBadRequest,
+		)
+		return
+	}
+	guessValue := queryParams.Get("v")
 
 	strAnswer, err := lib.ValueToString(answer)
 	if err != nil {
@@ -462,33 +469,32 @@ func VerifyResultHandler(
 		return
 	}
 
-	// Check query params
-	urlParams := r.URL.Query()
-	if !urlParams.Has("r") || !urlParams.Has("c") || !urlParams.Has("v") {
-		http.Error(
-			w,
-			"Query parameters 'r', 'c' and 'p' are required",
-			http.StatusBadRequest,
-		)
-		return
-	}
-
-	// Parse rank as an integer
-	rank, err := strconv.Atoi(urlParams.Get("r"))
+	// Get path segments
+	classification, err := GetResultClassificationFromRequest(r)
 	if err != nil {
-		http.Error(
-			w, "Query parameter 'r' must be an integer",
-			http.StatusBadRequest,
-		)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// Parse classification as a db.Classification
-	classification := db.Classification(urlParams.Get("c"))
-	if !classification.IsValid() {
+	rank, err := GetRankFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Get the correct result from the database
+	answer, err := GetCorrectResult(stage_id, rank, classification, conn)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Get the payload from the query params
+	urlParams := r.URL.Query()
+	if !urlParams.Has("v") {
 		http.Error(
 			w,
-			"Query parameter 'c' must be a valid classification.",
+			"Query parameter 'v' is required",
 			http.StatusBadRequest,
 		)
 		return
@@ -496,18 +502,6 @@ func VerifyResultHandler(
 
 	// Parse payload as a string
 	payload := urlParams.Get("v")
-
-	// Get the correct rider/team from the database
-	params := db.GetRiderOrTeamParams{
-		StageID:        stage_id,
-		Rank:           rank,
-		Classification: classification,
-	}
-	answer, err := conn.GetRiderOrTeam(context.Background(), params)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
 	// Verify the payload against the answer
 	verified := lib.AreNormEqual(payload, answer.Reduce())
