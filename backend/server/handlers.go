@@ -1,4 +1,4 @@
-package http
+package server
 
 import (
 	"compress/gzip"
@@ -90,13 +90,9 @@ func GetLastURLSegment(r *http.Request) (string, error) {
 	return segments[len(segments)-1], nil
 }
 
-// GetStageIDFromURL returns the stage ID from the last segment of the URL.
-func GetStageIDFromURL(r *http.Request) (int, error) {
-	segment, err := GetLastURLSegment(r)
-	if err != nil {
-		return 0, err
-	}
-	return strconv.Atoi(segment)
+// GetStageIDFromRequest returns the stage ID from the last segment of the URL.
+func GetStageIDFromRequest(r *http.Request) (int, error) {
+	return strconv.Atoi(r.PathValue(StageID))
 }
 
 // GetStageInfoHandler returns the stage info for a given stage.
@@ -106,7 +102,7 @@ func GetStageIDFromURL(r *http.Request) (int, error) {
 func GetStageInfoHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -131,7 +127,7 @@ func GetStageInfoHandler(
 func GetStageTrackHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -165,7 +161,7 @@ func GetStageTrackHandler(
 func GetStageElevationHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -195,7 +191,7 @@ func GetStageElevationHandler(
 func GetStageGradientHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -233,7 +229,7 @@ func GetStageGradientHandler(
 func GetResultsHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -266,7 +262,7 @@ func GetResultsHandler(
 func GetRidersHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -289,7 +285,7 @@ func GetRidersHandler(
 func GetTeamsHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -332,7 +328,7 @@ func GetCorrectInfoHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
 	// Get the stage info
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -370,7 +366,7 @@ func VerifyInfoHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
 	// Get the stage info
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -429,7 +425,7 @@ func GetCorrectResult(
 func GetCorrectResultHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -487,7 +483,7 @@ func VerifyResultHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
 	// Get Stage ID
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, "You must specify a stage ID", http.StatusBadRequest)
 		return
@@ -551,7 +547,7 @@ func VerifyResultHandler(
 func GetValidResultsCountHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
-	stage_id, err := GetStageIDFromURL(r)
+	stage_id, err := GetStageIDFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
