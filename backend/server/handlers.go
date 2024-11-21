@@ -344,13 +344,6 @@ func GetCorrectInfoHandler(
 
 // VerifyInfoHandler verifies a guess for a given stage info field against the
 // database.
-//
-// Dynamic Query Segments:
-// - stage_id: the stage ID as an integer
-//
-// Required Query Parameters:
-// - f: the field to guess as a string
-// - v: the guess as a string
 func VerifyInfoHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -375,20 +368,27 @@ func VerifyInfoHandler(
 		return
 	}
 
-	// Get guess from the query params
-	queryParams := r.URL.Query()
-	if !queryParams.Has("v") {
-		http.Error(
-			w, "Query parameter 'v' is required",
-			http.StatusBadRequest,
-		)
-		return
-	}
-	guessValue := queryParams.Get("v")
-
 	strAnswer, err := lib.ValueToString(answer)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Get guess from the query params
+	valueParam := NewStringQueryParam("v")
+	queryParams, _, _, err := GetQueryParams(
+		r,
+		[]QueryParamInterface{valueParam},
+		nil,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	guessValue, err := GetParamValue[string](queryParams["v"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -411,13 +411,6 @@ func GetCorrectResult(
 
 // GetCorrectResultHandler returns the correct rider/team for a given stage,
 // rank and classification.
-//
-// Dynamic Query Segments:
-// - stage_id: the stage ID as an integer
-//
-// Required Query Parameters:
-// - c: classification as a string
-// - r: rank as an integer
 func GetCorrectResultHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -451,14 +444,6 @@ func GetCorrectResultHandler(
 
 // VerifyResultHandler verifies a rider/team answer for a given stage, rank and
 // classification against the database.
-//
-// Dynamic Query Segments:
-// - stage_id: the stage ID as an integer
-//
-// Required Query Parameters:
-// - r: rank as an integer
-// - c: classification as a string
-// - p: payload as a string
 func VerifyResultHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -490,20 +475,23 @@ func VerifyResultHandler(
 	}
 
 	// Get the payload from the query params
-	urlParams := r.URL.Query()
-	if !urlParams.Has("v") {
-		http.Error(
-			w,
-			"Query parameter 'v' is required",
-			http.StatusBadRequest,
-		)
+	valueParam := NewStringQueryParam("v")
+	queryParams, _, _, err := GetQueryParams(
+		r,
+		[]QueryParamInterface{valueParam},
+		nil,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// Parse payload as a string
-	payload := urlParams.Get("v")
+	payload, err := GetParamValue[string](queryParams["v"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// Verify the payload against the answer
 	verified := lib.AreNormEqual(payload, answer.Reduce())
 
 	// Return the result
