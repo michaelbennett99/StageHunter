@@ -67,6 +67,10 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 			GetStageInfoHandler,
 		},
 		{
+			fmt.Sprintf("/stages/{%s}/info/{%s}", StageID, InfoField),
+			GetCorrectInfoHandler,
+		},
+		{
 			fmt.Sprintf("/stages/{%s}/track", StageID),
 			GetStageTrackHandler,
 		},
@@ -91,11 +95,18 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 			GetTeamsHandler,
 		},
 		{
-			fmt.Sprintf("/stages/{%s}/results/correct", StageID),
+			fmt.Sprintf(
+				"/stages/{%s}/results/classification/{%s}/rank/{%s}",
+				StageID, ResultClassification, Rank,
+			),
 			GetCorrectResultHandler,
 		},
 		{
-			fmt.Sprintf("/stages/{%s}/results/verify", StageID),
+			fmt.Sprintf("/stages/{%s}/verify/info", StageID),
+			VerifyInfoHandler,
+		},
+		{
+			fmt.Sprintf("/stages/{%s}/verify/results", StageID),
 			VerifyResultHandler,
 		},
 	}

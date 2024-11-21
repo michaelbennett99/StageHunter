@@ -1,5 +1,8 @@
 package server
 
 const (
-	StageID = "stageID"
+	StageID              = "stageID"
+	InfoField            = "infoField"
+	ResultClassification = "classification"
+	Rank                 = "rank"
 )

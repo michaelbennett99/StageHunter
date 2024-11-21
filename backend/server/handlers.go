@@ -90,11 +90,6 @@ func GetLastURLSegment(r *http.Request) (string, error) {
 	return segments[len(segments)-1], nil
 }
 
-// GetStageIDFromRequest returns the stage ID from the last segment of the URL.
-func GetStageIDFromRequest(r *http.Request) (int, error) {
-	return strconv.Atoi(r.PathValue(StageID))
-}
-
 // GetStageInfoHandler returns the stage info for a given stage.
 //
 // Dynamic Query Segments:
@@ -335,13 +330,7 @@ func GetCorrectInfoHandler(
 	}
 
 	// Get the field from the query params
-	queryParams := r.URL.Query()
-	if !queryParams.Has("f") {
-		http.Error(w, "Query parameter 'f' is required", http.StatusBadRequest)
-		return
-	}
-
-	field := queryParams.Get("f")
+	field := r.PathValue(InfoField)
 
 	answer, err := GetCorrectInfo(stage_id, field, conn)
 	if err != nil {
@@ -431,31 +420,15 @@ func GetCorrectResultHandler(
 		return
 	}
 
-	urlParams := r.URL.Query()
-	if !urlParams.Has("r") || !urlParams.Has("c") {
-		http.Error(
-			w,
-			"Query parameters 'r' and 'c' are required",
-			http.StatusBadRequest,
-		)
-		return
-	}
-
-	rank, err := strconv.Atoi(urlParams.Get("r"))
+	classification, err := GetResultClassificationFromRequest(r)
 	if err != nil {
-		http.Error(
-			w, "Query parameter 'r' must be an integer",
-			http.StatusBadRequest,
-		)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	classification := db.Classification(urlParams.Get("c"))
-	if !classification.IsValid() {
-		http.Error(
-			w, "Query parameter 'c' must be a valid classification",
-			http.StatusBadRequest,
-		)
+	rank, err := GetRankFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
