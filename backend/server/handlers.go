@@ -309,6 +309,54 @@ func GetResultsForClassificationHandler(
 	json.NewEncoder(w).Encode(results)
 }
 
+func GetResultForRankAndClassification(
+	stage_id int, rank int, classification db.Classification, conn *db.Queries,
+) (db.Result, error) {
+	params := db.GetResultForRankAndClassificationParams{
+		StageID:        stage_id,
+		Rank:           rank,
+		Classification: classification,
+	}
+	return conn.GetResultForRankAndClassification(
+		context.Background(), params,
+	)
+}
+
+// GetCorrectResultHandler returns the correct rider/team for a given stage,
+// rank and classification.
+func GetResultForRankAndClassificationHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	classification, err := GetResultClassificationFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	rank, err := GetRankFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	result, err := GetResultForRankAndClassification(
+		stage_id, rank, classification, conn,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+}
+
 // GetRidersHandler returns all the riders for a given stage.
 //
 // Dynamic Query Segments:
@@ -457,50 +505,6 @@ func VerifyInfoHandler(
 	json.NewEncoder(w).Encode(verified)
 }
 
-func GetCorrectResult(
-	stage_id int, rank int, classification db.Classification, conn *db.Queries,
-) (db.Result, error) {
-	params := db.GetRiderOrTeamParams{
-		StageID:        stage_id,
-		Rank:           rank,
-		Classification: classification,
-	}
-	return conn.GetRiderOrTeam(context.Background(), params)
-}
-
-// GetCorrectResultHandler returns the correct rider/team for a given stage,
-// rank and classification.
-func GetCorrectResultHandler(
-	w http.ResponseWriter, r *http.Request, conn *db.Queries,
-) {
-	stage_id, err := GetStageIDFromRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	classification, err := GetResultClassificationFromRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	rank, err := GetRankFromRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	result, err := GetCorrectResult(stage_id, rank, classification, conn)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
-}
-
 // VerifyResultHandler verifies a rider/team answer for a given stage, rank and
 // classification against the database.
 func VerifyResultHandler(
@@ -527,7 +531,9 @@ func VerifyResultHandler(
 	}
 
 	// Get the correct result from the database
-	result, err := GetCorrectResult(stage_id, rank, classification, conn)
+	result, err := GetResultForRankAndClassification(
+		stage_id, rank, classification, conn,
+	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

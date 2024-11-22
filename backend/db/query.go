@@ -298,8 +298,14 @@ func (q *Queries) GetTeams(ctx context.Context, stageID int) ([]string, error) {
 	return teams, nil
 }
 
-const getRiderOrTeamQuery = `
-SELECT rank, rider, team, time, points, classification
+const getResultForRankAndClassificationQuery = `
+SELECT
+	rank,
+	rider,
+	team,
+	time,
+	points,
+	classification
 FROM racedata.riders_teams_results
 WHERE
 	stage_id = @stage_id
@@ -307,7 +313,7 @@ WHERE
 	AND classification = @classification
 `
 
-type GetRiderOrTeamParams struct {
+type GetResultForRankAndClassificationParams struct {
 	StageID        int
 	Rank           int
 	Classification Classification
@@ -339,15 +345,18 @@ func (r *RiderOrTeam) Reduce() string {
 	return r.value
 }
 
-func (q *Queries) GetRiderOrTeam(
-	ctx context.Context, params GetRiderOrTeamParams,
+func (q *Queries) GetResultForRankAndClassification(
+	ctx context.Context, params GetResultForRankAndClassificationParams,
 ) (Result, error) {
-	// Get the possible rider and team names
-	rows, err := q.conn.Query(ctx, getRiderOrTeamQuery, pgx.NamedArgs{
-		"stage_id":       params.StageID,
-		"rank":           params.Rank,
-		"classification": params.Classification,
-	})
+	rows, err := q.conn.Query(
+		ctx,
+		getResultForRankAndClassificationQuery,
+		pgx.NamedArgs{
+			"stage_id":       params.StageID,
+			"rank":           params.Rank,
+			"classification": params.Classification,
+		},
+	)
 	if err != nil {
 		return Result{}, err
 	}

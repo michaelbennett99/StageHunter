@@ -102,7 +102,7 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 				"/stages/{%s}/results/{%s}/{%s}",
 				StageID, ResultClassification, Rank,
 			),
-			GetCorrectResultHandler,
+			GetResultForRankAndClassificationHandler,
 		},
 		{
 			fmt.Sprintf("/stages/{%s}/teams", StageID),
