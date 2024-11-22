@@ -56,66 +56,71 @@ export class APIClient {
   }
 
   async getStageLength(
-    stage_id: string
+    stage_id: string | number
   ): Promise<number> {
     const info: Info = await this.fetchJSON(
-      path.join(APIClient.StagesSegment, stage_id, 'info')
+      path.join(APIClient.StagesSegment, stage_id.toString(), 'info')
     );
     return info.stage_length;
   }
 
   async getRiders(
-    stage_id: string
+    stage_id: string | number
   ): Promise<string[]> {
     return this.fetchJSON(
-      path.join(APIClient.StagesSegment, stage_id, 'riders')
+      path.join(APIClient.StagesSegment, stage_id.toString(), 'riders')
     );
   }
 
   async getTeams(
-    stage_id: string
+    stage_id: string | number
   ): Promise<string[]> {
     return this.fetchJSON(
-      path.join(APIClient.StagesSegment, stage_id, 'teams')
+      path.join(APIClient.StagesSegment, stage_id.toString(), 'teams')
     );
   }
 
   async getTrack(
-    stage_id: string
+    stage_id: string | number
   ): Promise<GeoJSON.LineString> {
     return this.fetchJSON(
-      path.join(APIClient.StagesSegment, stage_id, 'track')
+      path.join(APIClient.StagesSegment, stage_id.toString(), 'track')
     );
   }
 
   async getElevationData(
-    stage_id: string
+    stage_id: string | number
   ): Promise<ElevationData[]> {
     return this.fetchJSON(
-      path.join(APIClient.StagesSegment, stage_id, 'elevation')
+      path.join(APIClient.StagesSegment, stage_id.toString(), 'elevation')
     );
   }
 
   async getGradientData(
-    stage_id: string,
+    stage_id: string | number,
     resolution: number
   ): Promise<GradientData[]> {
     return this.fetchJSON(
-      path.join(APIClient.StagesSegment, stage_id, 'gradient') +
+      path.join(APIClient.StagesSegment, stage_id.toString(), 'gradient') +
         `?resolution=${resolution}`
     );
   }
 
   async getResultsData(
-    stage_id: string
+    stage_id: string | number
   ): Promise<ResultsData> {
     return this.fetchJSON(
-      path.join(APIClient.StagesSegment, stage_id, 'results', 'count')
+      path.join(
+        APIClient.StagesSegment,
+        stage_id.toString(),
+        'results',
+        'count'
+      )
     );
   }
 
   async getStageData(
-    stage_id: string,
+    stage_id: string | number,
     topN: number = 3
   ): Promise<{ info: InfoData, results: ResultsData }> {
     const resultsData = await this.getResultsData(stage_id);
