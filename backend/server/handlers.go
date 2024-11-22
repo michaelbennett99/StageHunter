@@ -459,7 +459,7 @@ func VerifyInfoHandler(
 
 func GetCorrectResult(
 	stage_id int, rank int, classification db.Classification, conn *db.Queries,
-) (db.RiderOrTeam, error) {
+) (db.Result, error) {
 	params := db.GetRiderOrTeamParams{
 		StageID:        stage_id,
 		Rank:           rank,
@@ -491,14 +491,14 @@ func GetCorrectResultHandler(
 		return
 	}
 
-	answer, err := GetCorrectResult(stage_id, rank, classification, conn)
+	result, err := GetCorrectResult(stage_id, rank, classification, conn)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(answer.Reduce())
+	json.NewEncoder(w).Encode(result)
 }
 
 // VerifyResultHandler verifies a rider/team answer for a given stage, rank and
@@ -527,7 +527,13 @@ func VerifyResultHandler(
 	}
 
 	// Get the correct result from the database
-	answer, err := GetCorrectResult(stage_id, rank, classification, conn)
+	result, err := GetCorrectResult(stage_id, rank, classification, conn)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	answer, err := db.NewRiderOrTeam(&result.Rider.String, &result.Team.String)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

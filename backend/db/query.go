@@ -299,7 +299,8 @@ func (q *Queries) GetTeams(ctx context.Context, stageID int) ([]string, error) {
 }
 
 const getRiderOrTeamQuery = `
-SELECT rider, team FROM racedata.riders_teams_results
+SELECT rank, rider, team, time, points, classification
+FROM racedata.riders_teams_results
 WHERE
 	stage_id = @stage_id
 	AND rank = @rank
@@ -340,7 +341,7 @@ func (r *RiderOrTeam) Reduce() string {
 
 func (q *Queries) GetRiderOrTeam(
 	ctx context.Context, params GetRiderOrTeamParams,
-) (RiderOrTeam, error) {
+) (Result, error) {
 	// Get the possible rider and team names
 	rows, err := q.conn.Query(ctx, getRiderOrTeamQuery, pgx.NamedArgs{
 		"stage_id":       params.StageID,
@@ -348,24 +349,15 @@ func (q *Queries) GetRiderOrTeam(
 		"classification": params.Classification,
 	})
 	if err != nil {
-		return RiderOrTeam{}, err
+		return Result{}, err
 	}
 	defer rows.Close()
 
-	// Get the rider or team from the result
-	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[struct {
-		Rider *string
-		Team  *string
-	}])
+	result, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Result])
 	if err != nil {
-		return RiderOrTeam{}, err
+		return Result{}, err
 	}
-	riderOrTeam, err := NewRiderOrTeam(row.Rider, row.Team)
-	if err != nil {
-		return RiderOrTeam{}, err
-	}
-
-	return riderOrTeam, nil
+	return result, nil
 }
 
 const getValidResultsCountQuery = `
