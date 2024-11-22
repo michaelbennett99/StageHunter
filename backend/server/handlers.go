@@ -544,7 +544,7 @@ func VerifyResultHandler(
 		return
 	}
 
-	answer, err := db.NewRiderOrTeam(&result.Rider.String, &result.Team.String)
+	answer, err := db.NewRiderOrTeam(result.Rider, result.Team)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

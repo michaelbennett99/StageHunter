@@ -206,9 +206,13 @@ func (q *Queries) GetResults(
 	}
 	defer rows.Close()
 
-	results, err := pgx.CollectRows(rows, pgx.RowToStructByName[Result])
+	dbResults, err := pgx.CollectRows(rows, pgx.RowToStructByName[DBResult])
 	if err != nil {
 		return nil, err
+	}
+	results := make([]Result, len(dbResults))
+	for i, dbResult := range dbResults {
+		results[i] = NewResult(dbResult)
 	}
 	return results, nil
 }
@@ -252,9 +256,13 @@ func (q *Queries) GetResultsForClassification(
 	}
 	defer rows.Close()
 
-	results, err := pgx.CollectRows(rows, pgx.RowToStructByName[Result])
+	dbResults, err := pgx.CollectRows(rows, pgx.RowToStructByName[DBResult])
 	if err != nil {
 		return nil, err
+	}
+	results := make([]Result, len(dbResults))
+	for i, dbResult := range dbResults {
+		results[i] = NewResult(dbResult)
 	}
 	return results, nil
 }
@@ -297,11 +305,11 @@ func (q *Queries) GetResultForRankAndClassification(
 	}
 	defer rows.Close()
 
-	result, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Result])
+	dbResult, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[DBResult])
 	if err != nil {
 		return Result{}, err
 	}
-	return result, nil
+	return NewResult(dbResult), nil
 }
 
 const getRidersQuery = `
@@ -310,7 +318,9 @@ FROM racedata.riders_teams_results
 WHERE stage_id = $1 AND rider IS NOT NULL;
 `
 
-func (q *Queries) GetRiders(ctx context.Context, stageID int) ([]string, error) {
+func (q *Queries) GetRiders(
+	ctx context.Context, stageID int,
+) ([]string, error) {
 	rows, err := q.conn.Query(ctx, getRidersQuery, stageID)
 	if err != nil {
 		return nil, err

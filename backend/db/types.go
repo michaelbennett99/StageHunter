@@ -1,7 +1,6 @@
 package db
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -153,7 +152,7 @@ func (d *Duration) Scan(src any) error {
 }
 
 // Result struct
-type Result struct {
+type DBResult struct {
 	Rank           int            `json:"rank"`
 	Rider          pgtype.Text    `json:"-"`
 	Team           pgtype.Text    `json:"-"`
@@ -162,32 +161,34 @@ type Result struct {
 	Classification Classification `json:"classification"`
 }
 
-func (r *Result) MarshalJSON() ([]byte, error) {
-	type Alias Result
-	aux := struct {
-		Alias
-		Rider  *string `json:"rider,omitempty"`
-		Team   *string `json:"team,omitempty"`
-		Time   *string `json:"time,omitempty"`
-		Points *int64  `json:"points,omitempty"`
-	}{}
+type Result struct {
+	Rank           int            `json:"rank"`
+	Rider          *string        `json:"rider,omitempty"`
+	Team           *string        `json:"team,omitempty"`
+	Time           *string        `json:"time,omitempty"`
+	Points         *int64         `json:"points,omitempty"`
+	Classification Classification `json:"classification"`
+}
 
-	aux.Alias = Alias(*r)
-
-	if r.Rider.Valid {
-		aux.Rider = &r.Rider.String
+func NewResult(dbResult DBResult) Result {
+	result := Result{
+		Rank:           dbResult.Rank,
+		Classification: dbResult.Classification,
 	}
-	if r.Team.Valid {
-		aux.Team = &r.Team.String
+	if dbResult.Rider.Valid {
+		result.Rider = &dbResult.Rider.String
 	}
-	if r.Time.Valid {
-		timeStr := r.Time.Duration.String()
-		aux.Time = &timeStr
+	if dbResult.Team.Valid {
+		result.Team = &dbResult.Team.String
 	}
-	if r.Points.Valid {
-		aux.Points = &r.Points.Int64
+	if dbResult.Time.Valid {
+		timeStr := dbResult.Time.Duration.String()
+		result.Time = &timeStr
 	}
-	return json.Marshal(aux)
+	if dbResult.Points.Valid {
+		result.Points = &dbResult.Points.Int64
+	}
+	return result
 }
 
 type RiderOrTeam struct {
