@@ -123,7 +123,7 @@ export const serverApiClient = new APIClient(
 );
 
 export const clientApiClient = new APIClient(
-  'localhost',
+  '',
   'api',
   'v1'
 );
