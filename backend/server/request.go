@@ -46,3 +46,11 @@ func GetRankFromRequest(r *http.Request) (int, error) {
 	}
 	return strconv.Atoi(value)
 }
+
+func GetResultFieldFromRequest(r *http.Request) (string, error) {
+	value := r.PathValue(ResultField)
+	if value == "" {
+		return "", errors.New("result field is required")
+	}
+	return value, nil
+}

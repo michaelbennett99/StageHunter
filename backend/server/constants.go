@@ -5,4 +5,5 @@ const (
 	InfoField            = "infoField"
 	ResultClassification = "classification"
 	Rank                 = "rank"
+	ResultField          = "field"
 )

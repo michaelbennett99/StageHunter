@@ -362,6 +362,51 @@ func GetResultForRankAndClassificationHandler(
 	json.NewEncoder(w).Encode(result)
 }
 
+func GetResultFieldForRankAndClassificationHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	stage_id, err := GetStageIDFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	classification, err := GetResultClassificationFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	rank, err := GetRankFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	field, err := GetResultFieldFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	result, err := GetResultForRankAndClassification(
+		stage_id, rank, classification, conn,
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fieldValue, err := lib.GetFieldByTag(result, "json", field)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(fieldValue.Interface())
+}
+
 // GetRidersHandler returns all the riders for a given stage.
 //
 // Dynamic Query Segments:
