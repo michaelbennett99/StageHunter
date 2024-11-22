@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 func GetFieldByTag(
@@ -15,12 +16,15 @@ func GetFieldByTag(
 	}
 	numFields := v.NumField()
 	for i := 0; i < numFields; i++ {
-		tag, ok := v.Type().Field(i).Tag.Lookup(tagName)
+		tagList, ok := v.Type().Field(i).Tag.Lookup(tagName)
 		if !ok {
 			continue
 		}
-		if tag == tagValue {
-			return v.Field(i), nil
+		tags := strings.Split(tagList, ",")
+		for _, tag := range tags {
+			if tag == tagValue {
+				return v.Field(i), nil
+			}
 		}
 	}
 	error := fmt.Errorf("field with tag %s=%s not found", tagName, tagValue)
