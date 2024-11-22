@@ -25,7 +25,8 @@ export class APIClient {
   }
 
   async fetchJSON<T>(url: string): Promise<T> {
-    const res = await fetch(this.getURL(url), {
+    const fullURL = this.getURL(url);
+    const res = await fetch(fullURL, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -34,7 +35,7 @@ export class APIClient {
     });
 
     if (!res.ok) {
-      throw new Error(`Could not fetch ${url}. ${res.statusText}`);
+      throw new Error(`Could not fetch ${fullURL}. ${res.statusText}`);
     }
 
     return res.json();
