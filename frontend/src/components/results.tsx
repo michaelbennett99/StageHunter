@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 
 import Input from './input/input';
 import { BACKEND_URL } from '@/api/constants';
-import { fetchJSON, getStageData } from '@/api/getters';
+import { apiClient } from '@/api/getters';
 import { InfoData, Options, ResultsData } from '@/api/types';
 
 async function ResultsLoader({
@@ -17,9 +17,9 @@ async function ResultsLoader({
   ) => JSX.Element;
 }): Promise<JSX.Element> {
   const [riders, teams, {info, results}] = await Promise.all([
-    fetchJSON<string[]>(`${BACKEND_URL}/stage/riders/${stageId}`),
-    fetchJSON<string[]>(`${BACKEND_URL}/stage/teams/${stageId}`),
-    getStageData(stageId)
+    apiClient.getRiders(stageId),
+    apiClient.getTeams(stageId),
+    apiClient.getStageData(stageId)
   ]);
   const options = {
     grand_tours: ['Tour de France', 'Giro d\'Italia', 'Vuelta a España'],
