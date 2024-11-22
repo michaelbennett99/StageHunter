@@ -18,3 +18,7 @@ const (
 const (
 	topNDefault = 1000
 )
+
+const (
+	baseRoute = "/v1"
+)

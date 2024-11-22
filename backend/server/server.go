@@ -37,8 +37,20 @@ func addRoute(
 }
 
 type Route struct {
-	path    string
-	handler func(http.ResponseWriter, *http.Request, *db.Queries)
+	baseRoute string
+	path      string
+	handler   func(http.ResponseWriter, *http.Request, *db.Queries)
+}
+
+func (r *Route) FullPath() string {
+	return fmt.Sprintf("%s%s", r.baseRoute, r.path)
+}
+
+func NewRoute(
+	path string,
+	handler func(http.ResponseWriter, *http.Request, *db.Queries),
+) Route {
+	return Route{baseRoute, path, handler}
 }
 
 func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
@@ -50,89 +62,76 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 	mux := server.Handler.(*http.ServeMux)
 
 	routes := []Route{
-		{
-			"/daily",
-			GetDailyHandler,
-		},
-		{
-			"/random",
-			GetRandomHandler,
-		},
-		{
-			"/stages",
-			GetAllStagesHandler,
-		},
-		{
+		NewRoute("/daily", GetDailyHandler),
+		NewRoute("/random", GetRandomHandler),
+		NewRoute("/stages", GetAllStagesHandler),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/info", StageID),
 			GetStageInfoHandler,
-		},
-		{
-			fmt.Sprintf("/stages/{%s}/info/{%s}", StageID, InfoField),
-			GetInfoFieldHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/track", StageID),
 			GetStageTrackHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/elevation", StageID),
 			GetStageElevationHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/gradient", StageID),
 			GetStageGradientHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/results", StageID),
 			GetResultsHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/riders", StageID),
 			GetRidersHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf(
 				"/stages/{%s}/results/{%s}",
 				StageID, ResultClassification,
 			),
 			GetResultsForClassificationHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf(
 				"/stages/{%s}/results/{%s}/{%s}",
 				StageID, ResultClassification, Rank,
 			),
 			GetResultForRankAndClassificationHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf(
 				"/stages/{%s}/results/{%s}/{%s}/{%s}",
 				StageID, ResultClassification, Rank, ResultField,
 			),
 			GetResultFieldForRankAndClassificationHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/teams", StageID),
 			GetTeamsHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf(
 				"/stages/{%s}/verify/info/{%s}",
 				StageID, InfoField,
 			),
 			VerifyInfoHandler,
-		},
-		{
+		),
+		NewRoute(
 			fmt.Sprintf(
 				"/stages/{%s}/verify/results/{%s}/{%s}",
 				StageID, ResultClassification, Rank,
 			),
 			VerifyResultHandler,
-		},
+		),
 	}
 
 	for _, route := range routes {
-		addRoute(mux, route.path, pool, route.handler)
+		addRoute(mux, route.FullPath(), pool, route.handler)
 	}
 
 	return server
