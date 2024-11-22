@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -152,67 +151,11 @@ func (d *Duration) Scan(src any) error {
 }
 
 // Result struct
-type DBResult struct {
-	Rank           int            `json:"rank"`
-	Rider          pgtype.Text    `json:"-"`
-	Team           pgtype.Text    `json:"-"`
-	Time           Duration       `json:"-"`
-	Points         pgtype.Int8    `json:"-"`
-	Classification Classification `json:"classification"`
-}
-
 type Result struct {
-	Rank           int            `json:"rank"`
-	Rider          *string        `json:"rider,omitempty"`
-	Team           *string        `json:"team,omitempty"`
-	Time           *string        `json:"time,omitempty"`
-	Points         *int64         `json:"points,omitempty"`
-	Classification Classification `json:"classification"`
-}
-
-func NewResult(dbResult DBResult) Result {
-	result := Result{
-		Rank:           dbResult.Rank,
-		Classification: dbResult.Classification,
-	}
-	if dbResult.Rider.Valid {
-		result.Rider = &dbResult.Rider.String
-	}
-	if dbResult.Team.Valid {
-		result.Team = &dbResult.Team.String
-	}
-	if dbResult.Time.Valid {
-		timeStr := dbResult.Time.Duration.String()
-		result.Time = &timeStr
-	}
-	if dbResult.Points.Valid {
-		result.Points = &dbResult.Points.Int64
-	}
-	return result
-}
-
-type RiderOrTeam struct {
-	isRider bool
-	value   string
-}
-
-func NewRiderOrTeam(rider, team *string) (RiderOrTeam, error) {
-	// Team should always be non-nil
-	if team == nil {
-		return RiderOrTeam{}, errors.New("team cannot be nil")
-	}
-	// Set the value to the rider if it is non-nil
-	if rider != nil {
-		return RiderOrTeam{isRider: true, value: *rider}, nil
-	}
-	// Otherwise, the value is the team
-	return RiderOrTeam{isRider: false, value: *team}, nil
-}
-
-func (r *RiderOrTeam) IsRider() bool {
-	return r.isRider
-}
-
-func (r *RiderOrTeam) Reduce() string {
-	return r.value
+	Rank           int
+	Rider          pgtype.Text
+	Team           pgtype.Text
+	Time           Duration
+	Points         pgtype.Int8
+	Classification Classification
 }

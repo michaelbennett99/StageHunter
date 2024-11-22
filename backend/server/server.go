@@ -68,7 +68,7 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 		},
 		{
 			fmt.Sprintf("/stages/{%s}/info/{%s}", StageID, InfoField),
-			GetCorrectInfoHandler,
+			GetInfoFieldHandler,
 		},
 		{
 			fmt.Sprintf("/stages/{%s}/track", StageID),

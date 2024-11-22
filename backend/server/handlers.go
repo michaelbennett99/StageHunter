@@ -4,7 +4,6 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -79,16 +78,6 @@ func GetAllStagesHandler(
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stages)
-}
-
-// GetLastURLSegment returns the last segment of the URL path.
-func GetLastURLSegment(r *http.Request) (string, error) {
-	s := strings.TrimRight(r.URL.Path, "/")
-	segments := strings.Split(s, "/")
-	if len(segments) == 0 {
-		return "", errors.New("no segments found")
-	}
-	return segments[len(segments)-1], nil
 }
 
 // GetStageInfoHandler returns the stage info for a given stage.
@@ -221,7 +210,7 @@ func GetStageGradientHandler(
 // - stage_id: the stage ID as an integer
 //
 // Optional Query Parameters:
-// - topN: the number of results to return as an integer. Defaults to 5.
+// - topN: the number of results to return as an integer. Defaults to 1000.
 func GetResultsHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
@@ -231,7 +220,7 @@ func GetResultsHandler(
 		return
 	}
 
-	topNParam := NewIntQueryParamWithDefault("topN", 1000)
+	topNParam := NewIntQueryParamWithDefault(topNName, topNDefault)
 	queryParams, _, _, err := GetQueryParams(
 		r,
 		nil,
@@ -242,13 +231,13 @@ func GetResultsHandler(
 		return
 	}
 
-	topN, err := GetParamValue[int](queryParams["topN"])
+	topN, err := GetParamValue[int](queryParams[topNName])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	results, err := conn.GetResults(
+	dbResults, err := conn.GetResults(
 		context.Background(), db.ResultsQueryParams{
 			StageID: stage_id,
 			TopN:    topN,
@@ -258,6 +247,8 @@ func GetResultsHandler(
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	results := NewResults(dbResults)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)
@@ -278,7 +269,7 @@ func GetResultsForClassificationHandler(
 		return
 	}
 
-	topNParam := NewIntQueryParamWithDefault("topN", 1000)
+	topNParam := NewIntQueryParamWithDefault(topNName, topNDefault)
 	queryParams, _, _, err := GetQueryParams(
 		r,
 		nil,
@@ -288,13 +279,13 @@ func GetResultsForClassificationHandler(
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	topN, err := GetParamValue[int](queryParams["topN"])
+	topN, err := GetParamValue[int](queryParams[topNName])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	results, err := conn.GetResultsForClassification(
+	dbResults, err := conn.GetResultsForClassification(
 		context.Background(), db.GetResultsForClassificationParams{
 			StageID:        stage_id,
 			TopN:           topN,
@@ -306,23 +297,12 @@ func GetResultsForClassificationHandler(
 		return
 	}
 
+	results := NewResults(dbResults)
+
 	fmt.Println(results)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)
-}
-
-func GetResultForRankAndClassification(
-	stage_id int, rank int, classification db.Classification, conn *db.Queries,
-) (db.Result, error) {
-	params := db.GetResultForRankAndClassificationParams{
-		StageID:        stage_id,
-		Rank:           rank,
-		Classification: classification,
-	}
-	return conn.GetResultForRankAndClassification(
-		context.Background(), params,
-	)
 }
 
 // GetCorrectResultHandler returns the correct rider/team for a given stage,
@@ -348,15 +328,19 @@ func GetResultForRankAndClassificationHandler(
 		return
 	}
 
-	result, err := GetResultForRankAndClassification(
-		stage_id, rank, classification, conn,
+	dbResult, err := conn.GetResultForRankAndClassification(
+		context.Background(), db.GetResultForRankAndClassificationParams{
+			StageID:        stage_id,
+			Rank:           rank,
+			Classification: classification,
+		},
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println(result)
+	result := NewResult(dbResult)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
@@ -389,13 +373,19 @@ func GetResultFieldForRankAndClassificationHandler(
 		return
 	}
 
-	result, err := GetResultForRankAndClassification(
-		stage_id, rank, classification, conn,
+	dbResult, err := conn.GetResultForRankAndClassification(
+		context.Background(), db.GetResultForRankAndClassificationParams{
+			StageID:        stage_id,
+			Rank:           rank,
+			Classification: classification,
+		},
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	result := NewResult(dbResult)
 
 	fieldValue, err := lib.GetFieldByTag(result, "json", field)
 	if err != nil {
@@ -453,22 +443,6 @@ func GetTeamsHandler(
 	json.NewEncoder(w).Encode(teams)
 }
 
-func GetCorrectInfo(
-	stage_id int, field string, conn *db.Queries,
-) (any, error) {
-	stage_info, err := conn.GetStageInfo(context.Background(), stage_id)
-	if err != nil {
-		return "", err
-	}
-
-	v, err := lib.GetFieldByTag(stage_info, "json", field)
-	if err != nil {
-		return "", err
-	}
-
-	return v.Interface(), nil
-}
-
 // GetCorrectInfoHandler returns the correct info for a given stage and field.
 //
 // Dynamic Query Segments:
@@ -476,7 +450,7 @@ func GetCorrectInfo(
 //
 // Required Query Parameters:
 // - f: the field to get as a string
-func GetCorrectInfoHandler(
+func GetInfoFieldHandler(
 	w http.ResponseWriter, r *http.Request, conn *db.Queries,
 ) {
 	// Get the stage info
@@ -489,7 +463,7 @@ func GetCorrectInfoHandler(
 	// Get the field from the query params
 	field := r.PathValue(InfoField)
 
-	answer, err := GetCorrectInfo(stage_id, field, conn)
+	answer, err := GetInfoField(conn, stage_id, field)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -519,7 +493,7 @@ func VerifyInfoHandler(
 	}
 
 	// Get the correct info from the database
-	answer, err := GetCorrectInfo(stage_id, field, conn)
+	answer, err := GetInfoField(conn, stage_id, field)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -581,15 +555,19 @@ func VerifyResultHandler(
 	}
 
 	// Get the correct result from the database
-	result, err := GetResultForRankAndClassification(
-		stage_id, rank, classification, conn,
+	dbResult, err := conn.GetResultForRankAndClassification(
+		context.Background(), db.GetResultForRankAndClassificationParams{
+			StageID:        stage_id,
+			Rank:           rank,
+			Classification: classification,
+		},
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	answer, err := db.NewRiderOrTeam(result.Rider, result.Team)
+	answer, err := NewRiderOrTeamFromDBResult(dbResult)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
