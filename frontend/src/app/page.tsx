@@ -1,5 +1,5 @@
 import Stage from '@/components/stage';
-import { apiClient } from '@/api/getters';
+import { apiClient } from '@/api/api_client';
 
 export const revalidate = 3600; // 1 hour
 

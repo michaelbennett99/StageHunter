@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
 import Input from './input/input';
-import { apiClient } from '@/api/getters';
+import { serverApiClient } from '@/api/api_client';
 import { InfoData, Options, ResultsData } from '@/api/types';
 
 async function ResultsLoader({
@@ -16,9 +16,9 @@ async function ResultsLoader({
   ) => JSX.Element;
 }): Promise<JSX.Element> {
   const [riders, teams, {info, results}] = await Promise.all([
-    apiClient.getRiders(stageId),
-    apiClient.getTeams(stageId),
-    apiClient.getStageData(stageId)
+    serverApiClient.getRiders(stageId),
+    serverApiClient.getTeams(stageId),
+    serverApiClient.getStageData(stageId)
   ]);
   const options = {
     grand_tours: ['Tour de France', 'Giro d\'Italia', 'Vuelta a España'],

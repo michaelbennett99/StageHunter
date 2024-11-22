@@ -9,16 +9,22 @@ import {
 } from './types';
 
 export class APIClient {
+  private host: string;
   private baseURL: string;
   private version: string;
 
-  constructor(baseURL: string, version: string) {
+  constructor(host: string, baseURL: string, version: string) {
+    this.host = host;
     this.baseURL = baseURL;
     this.version = version;
   }
 
+  private getURL(url: string): string {
+    return `${this.host}/${this.baseURL}/${this.version}/${url}`;
+  }
+
   async fetchJSON<T>(url: string): Promise<T> {
-    const res = await fetch(`${this.baseURL}/${this.version}/${url}`, {
+    const res = await fetch(this.getURL(url), {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -106,4 +112,5 @@ export class APIClient {
   }
 }
 
-export const apiClient = new APIClient(BACKEND_URL, 'v1');
+export const serverApiClient = new APIClient(BACKEND_URL, '', 'v1');
+export const clientApiClient = new APIClient('localhost', 'api', 'v1');

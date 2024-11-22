@@ -17,8 +17,8 @@ function InfoInputBoxGroup(
     incrementScore: (score: number) => void;
   }
 ): JSX.Element {
-  const correctInfoURL = `/api/stage/${stageId}/info`;
-  const infoValidationURL = `/api/stage/${stageId}/verify/info`;
+  const correctInfoURL = `/stage/${stageId}/info`;
+  const infoValidationURL = `/stage/${stageId}/verify/info`;
 
   const inputElements: JSX.Element[] = Object.entries(infoData)
     .filter(([,value]) => value)
@@ -49,8 +49,8 @@ function getResultInputBoxGroups(
   incrementNumCorrect: () => void,
   incrementScore: (score: number) => void
 ): JSX.Element[] {
-  const correctResultURL = `/api/stage/${stageId}/results`;
-  const resultsValidationURL = `/api/stage/${stageId}/verify/results`;
+  const correctResultURL = `/stage/${stageId}/results`;
+  const resultsValidationURL = `/stage/${stageId}/verify/results`;
 
   return Object.entries(resultsData)
     .filter(([,value]) => value > 0)

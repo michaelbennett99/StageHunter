@@ -4,6 +4,7 @@ import { FaCheck, FaPlus, FaSpinner, FaTimes } from 'react-icons/fa';
 import { twMerge, twJoin } from 'tailwind-merge';
 
 import AutoComplete from '@/components/autocomplete';
+import { clientApiClient } from '@/api/api_client';
 import {
   useCorrectAnswer,
   useBomb,
@@ -122,8 +123,9 @@ export function InputBox(
     setIsLoading(true);
     try {
       // Normal validation for non-final tries
-      const response = await fetch(`${validationURL}?v=${val}`);
-      const isValid = await response.json();
+      const isValid: boolean = await clientApiClient.fetchJSON(
+        `${validationURL}?v=${val}`
+      );
 
       const batchedUpdates = () => {
         if (tries === 1) exposeCorrectAnswer();
