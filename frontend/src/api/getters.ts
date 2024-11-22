@@ -49,7 +49,7 @@ export class APIClient {
     stage_id: string | number
   ): Promise<number> {
     const info: Info = await this.fetchJSON(
-      `${STAGES_SEGMENT}/info/${stage_id}`
+      `${STAGES_SEGMENT}/${stage_id}/info`
     );
     return info.stage_length;
   }
@@ -57,25 +57,25 @@ export class APIClient {
   async getRiders(
     stage_id: string | number
   ): Promise<string[]> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/riders/${stage_id}`);
+    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/riders`);
   }
 
   async getTeams(
     stage_id: string | number
   ): Promise<string[]> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/teams/${stage_id}`);
+    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/teams`);
   }
 
   async getTrack(
     stage_id: string | number
   ): Promise<GeoJSON.LineString> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/track/${stage_id}`);
+    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/track`);
   }
 
   async getElevationData(
     stage_id: string | number
   ): Promise<ElevationData[]> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/elevation/${stage_id}`);
+    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/elevation`);
   }
 
   async getGradientData(
@@ -83,14 +83,14 @@ export class APIClient {
     resolution: number
   ): Promise<GradientData[]> {
     return this.fetchJSON(
-      `${STAGES_SEGMENT}/gradient/${stage_id}?resolution=${resolution}`
+      `${STAGES_SEGMENT}/${stage_id}/gradient?resolution=${resolution}`
     );
   }
 
   async getResultsData(
     stage_id: string | number
   ): Promise<ResultsData> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/results/count/${stage_id}`);
+    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/results/count`);
   }
 
   async getStageData(
