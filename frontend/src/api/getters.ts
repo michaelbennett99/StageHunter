@@ -1,4 +1,4 @@
-import { BACKEND_URL } from './constants';
+import { BACKEND_STAGES_URL, BACKEND_URL } from './constants';
 import {
   ResultsData,
   ElevationData,
@@ -33,26 +33,26 @@ export async function getDailyStageId(): Promise<number> {
 }
 
 export async function getAllStageIDs(): Promise<number[]> {
-  return fetchJSON(`${BACKEND_URL}/stages`);
+  return fetchJSON(`${BACKEND_STAGES_URL}`);
 }
 
 export async function getStageLength(
   stage_id: string | number
 ): Promise<number> {
-  const info = await fetchJSON<Info>(`${BACKEND_URL}/stage/info/${stage_id}`);
+  const info = await fetchJSON<Info>(`${BACKEND_STAGES_URL}/info/${stage_id}`);
   return info.stage_length;
 }
 
 export async function getTrack(
   stage_id: string | number
 ): Promise<GeoJSON.LineString> {
-  return fetchJSON(`${BACKEND_URL}/stage/track/${stage_id}`);
+  return fetchJSON(`${BACKEND_STAGES_URL}/track/${stage_id}`);
 }
 
 export async function getElevationData(
   stage_id: string | number
 ): Promise<ElevationData[]> {
-  return fetchJSON(`${BACKEND_URL}/stage/elevation/${stage_id}`);
+  return fetchJSON(`${BACKEND_STAGES_URL}/elevation/${stage_id}`);
 }
 
 export async function getGradientData(
@@ -60,14 +60,14 @@ export async function getGradientData(
   resolution: number
 ): Promise<GradientData[]> {
   return fetchJSON(
-    `${BACKEND_URL}/stage/gradient/${stage_id}?resolution=${resolution}`
+    `${BACKEND_STAGES_URL}/gradient/${stage_id}?resolution=${resolution}`
   );
 }
 
 export async function getResultsData(
   stage_id: string | number
 ): Promise<ResultsData> {
-  return fetchJSON(`${BACKEND_URL}/stage/results/count/${stage_id}`);
+  return fetchJSON(`${BACKEND_STAGES_URL}/results/count/${stage_id}`);
 }
 
 export async function getStageData(
