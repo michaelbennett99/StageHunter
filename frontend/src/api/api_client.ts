@@ -21,7 +21,7 @@ export class APIClient {
   }
 
   private getURL(url: string): string {
-    return `${this.host}/${this.baseURL}/${this.version}/${url}`;
+    return `${this.host}/${this.baseURL}/${this.version}` + url;
   }
 
   async fetchJSON<T>(url: string): Promise<T> {
