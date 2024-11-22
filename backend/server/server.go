@@ -70,6 +70,10 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 			GetStageInfoHandler,
 		),
 		NewRoute(
+			fmt.Sprintf("/stages/{%s}/info/{%s}", StageID, InfoField),
+			GetStageInfoFieldHandler,
+		),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/track", StageID),
 			GetStageTrackHandler,
 		),

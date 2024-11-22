@@ -105,6 +105,36 @@ func GetStageInfoHandler(
 	json.NewEncoder(w).Encode(stage_info)
 }
 
+// GetCorrectInfoHandler returns the correct info for a given stage and field.
+//
+// Dynamic Query Segments:
+// - stage_id: the stage ID as an integer
+//
+// Required Query Parameters:
+// - f: the field to get as a string
+func GetStageInfoFieldHandler(
+	w http.ResponseWriter, r *http.Request, conn *db.Queries,
+) {
+	// Get the stage info
+	stage_id, err := GetStageIDFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Get the field from the query params
+	field := r.PathValue(InfoField)
+
+	answer, err := GetInfoField(conn, stage_id, field)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(answer)
+}
+
 // GetStageTrackHandler returns the track for a given stage.
 //
 // Dynamic Query Segments:
@@ -441,36 +471,6 @@ func GetTeamsHandler(
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(teams)
-}
-
-// GetCorrectInfoHandler returns the correct info for a given stage and field.
-//
-// Dynamic Query Segments:
-// - stage_id: the stage ID as an integer
-//
-// Required Query Parameters:
-// - f: the field to get as a string
-func GetInfoFieldHandler(
-	w http.ResponseWriter, r *http.Request, conn *db.Queries,
-) {
-	// Get the stage info
-	stage_id, err := GetStageIDFromRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Get the field from the query params
-	field := r.PathValue(InfoField)
-
-	answer, err := GetInfoField(conn, stage_id, field)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(answer)
 }
 
 // VerifyInfoHandler verifies a guess for a given stage info field against the
