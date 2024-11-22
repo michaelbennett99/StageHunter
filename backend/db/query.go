@@ -206,13 +206,9 @@ func (q *Queries) GetResults(
 	}
 	defer rows.Close()
 
-	dbResults, err := pgx.CollectRows(rows, pgx.RowToStructByName[DBResult])
+	results, err := pgx.CollectRows(rows, pgx.RowToStructByName[Result])
 	if err != nil {
 		return nil, err
-	}
-	results := make([]Result, len(dbResults))
-	for i, dbResult := range dbResults {
-		results[i] = NewResult(dbResult)
 	}
 	return results, nil
 }
@@ -256,13 +252,9 @@ func (q *Queries) GetResultsForClassification(
 	}
 	defer rows.Close()
 
-	dbResults, err := pgx.CollectRows(rows, pgx.RowToStructByName[DBResult])
+	results, err := pgx.CollectRows(rows, pgx.RowToStructByName[Result])
 	if err != nil {
 		return nil, err
-	}
-	results := make([]Result, len(dbResults))
-	for i, dbResult := range dbResults {
-		results[i] = NewResult(dbResult)
 	}
 	return results, nil
 }
@@ -305,11 +297,11 @@ func (q *Queries) GetResultForRankAndClassification(
 	}
 	defer rows.Close()
 
-	dbResult, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[DBResult])
+	result, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Result])
 	if err != nil {
 		return Result{}, err
 	}
-	return NewResult(dbResult), nil
+	return result, nil
 }
 
 const getRidersQuery = `
