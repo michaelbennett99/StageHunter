@@ -128,6 +128,10 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 			),
 			VerifyResultHandler,
 		),
+		NewRoute(
+			fmt.Sprintf("/stages/{%s}/results/count", StageID),
+			GetValidResultsCountHandler,
+		),
 	}
 
 	for _, route := range routes {
