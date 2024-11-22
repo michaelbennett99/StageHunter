@@ -1,4 +1,3 @@
-import { BACKEND_URL, STAGES_SEGMENT } from './constants';
 import {
   ResultsData,
   ElevationData,
@@ -12,6 +11,8 @@ export class APIClient {
   private host: string;
   private baseURL: string;
   private version: string;
+
+  private static StagesSegment = '/stages';
 
   constructor(host: string, baseURL: string, version: string) {
     this.host = host;
@@ -48,14 +49,14 @@ export class APIClient {
   }
 
   async getAllStageIDs(): Promise<number[]> {
-    return this.fetchJSON(STAGES_SEGMENT);
+    return this.fetchJSON(APIClient.StagesSegment);
   }
 
   async getStageLength(
     stage_id: string | number
   ): Promise<number> {
     const info: Info = await this.fetchJSON(
-      `${STAGES_SEGMENT}/${stage_id}/info`
+      `${APIClient.StagesSegment}/${stage_id}/info`
     );
     return info.stage_length;
   }
@@ -63,25 +64,25 @@ export class APIClient {
   async getRiders(
     stage_id: string | number
   ): Promise<string[]> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/riders`);
+    return this.fetchJSON(`${APIClient.StagesSegment}/${stage_id}/riders`);
   }
 
   async getTeams(
     stage_id: string | number
   ): Promise<string[]> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/teams`);
+    return this.fetchJSON(`${APIClient.StagesSegment}/${stage_id}/teams`);
   }
 
   async getTrack(
     stage_id: string | number
   ): Promise<GeoJSON.LineString> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/track`);
+    return this.fetchJSON(`${APIClient.StagesSegment}/${stage_id}/track`);
   }
 
   async getElevationData(
     stage_id: string | number
   ): Promise<ElevationData[]> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/elevation`);
+    return this.fetchJSON(`${APIClient.StagesSegment}/${stage_id}/elevation`);
   }
 
   async getGradientData(
@@ -89,14 +90,16 @@ export class APIClient {
     resolution: number
   ): Promise<GradientData[]> {
     return this.fetchJSON(
-      `${STAGES_SEGMENT}/${stage_id}/gradient?resolution=${resolution}`
+      `${APIClient.StagesSegment}/${stage_id}/gradient?resolution=${resolution}`
     );
   }
 
   async getResultsData(
     stage_id: string | number
   ): Promise<ResultsData> {
-    return this.fetchJSON(`${STAGES_SEGMENT}/${stage_id}/results/count`);
+    return this.fetchJSON(
+      `${APIClient.StagesSegment}/${stage_id}/results/count`
+    );
   }
 
   async getStageData(
@@ -112,5 +115,14 @@ export class APIClient {
   }
 }
 
-export const serverApiClient = new APIClient(BACKEND_URL, '', 'v1');
-export const clientApiClient = new APIClient('localhost', 'api', 'v1');
+export const serverApiClient = new APIClient(
+  'http://stagehunter-backend:8080',
+  '',
+  'v1'
+);
+
+export const clientApiClient = new APIClient(
+  'localhost',
+  'api',
+  'v1'
+);
