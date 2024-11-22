@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -187,4 +188,30 @@ func (r *Result) MarshalJSON() ([]byte, error) {
 		aux.Points = &r.Points.Int64
 	}
 	return json.Marshal(aux)
+}
+
+type RiderOrTeam struct {
+	isRider bool
+	value   string
+}
+
+func NewRiderOrTeam(rider, team *string) (RiderOrTeam, error) {
+	// Team should always be non-nil
+	if team == nil {
+		return RiderOrTeam{}, errors.New("team cannot be nil")
+	}
+	// Set the value to the rider if it is non-nil
+	if rider != nil {
+		return RiderOrTeam{isRider: true, value: *rider}, nil
+	}
+	// Otherwise, the value is the team
+	return RiderOrTeam{isRider: false, value: *team}, nil
+}
+
+func (r *RiderOrTeam) IsRider() bool {
+	return r.isRider
+}
+
+func (r *RiderOrTeam) Reduce() string {
+	return r.value
 }

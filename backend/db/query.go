@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -240,7 +240,9 @@ func (q *Queries) GetResultsForClassification(
 	ctx context.Context, params GetResultsForClassificationParams,
 ) ([]Result, error) {
 	rows, err := q.conn.Query(
-		ctx, getResultsForClassificationQuery, pgx.NamedArgs{
+		ctx,
+		getResultsForClassificationQuery,
+		pgx.NamedArgs{
 			"stage_id":       params.StageID,
 			"top_n":          params.TopN,
 			"classification": params.Classification,
@@ -255,7 +257,54 @@ func (q *Queries) GetResultsForClassification(
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(results)
 	return results, nil
+}
+
+const getResultForRankAndClassificationQuery = `
+SELECT
+	rank,
+	rider,
+	team,
+	time,
+	points,
+	classification
+FROM racedata.riders_teams_results
+WHERE
+	stage_id = @stage_id
+	AND rank = @rank
+	AND classification = @classification
+`
+
+type GetResultForRankAndClassificationParams struct {
+	StageID        int
+	Rank           int
+	Classification Classification
+}
+
+func (q *Queries) GetResultForRankAndClassification(
+	ctx context.Context, params GetResultForRankAndClassificationParams,
+) (Result, error) {
+	rows, err := q.conn.Query(
+		ctx,
+		getResultForRankAndClassificationQuery,
+		pgx.NamedArgs{
+			"stage_id":       params.StageID,
+			"rank":           params.Rank,
+			"classification": params.Classification,
+		},
+	)
+	if err != nil {
+		return Result{}, err
+	}
+	defer rows.Close()
+
+	result, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Result])
+	if err != nil {
+		return Result{}, err
+	}
+	fmt.Println(result)
+	return result, nil
 }
 
 const getRidersQuery = `
@@ -296,77 +345,6 @@ func (q *Queries) GetTeams(ctx context.Context, stageID int) ([]string, error) {
 		return nil, err
 	}
 	return teams, nil
-}
-
-const getResultForRankAndClassificationQuery = `
-SELECT
-	rank,
-	rider,
-	team,
-	time,
-	points,
-	classification
-FROM racedata.riders_teams_results
-WHERE
-	stage_id = @stage_id
-	AND rank = @rank
-	AND classification = @classification
-`
-
-type GetResultForRankAndClassificationParams struct {
-	StageID        int
-	Rank           int
-	Classification Classification
-}
-
-type RiderOrTeam struct {
-	isRider bool
-	value   string
-}
-
-func NewRiderOrTeam(rider, team *string) (RiderOrTeam, error) {
-	// Team should always be non-nil
-	if team == nil {
-		return RiderOrTeam{}, errors.New("team cannot be nil")
-	}
-	// Set the value to the rider if it is non-nil
-	if rider != nil {
-		return RiderOrTeam{isRider: true, value: *rider}, nil
-	}
-	// Otherwise, the value is the team
-	return RiderOrTeam{isRider: false, value: *team}, nil
-}
-
-func (r *RiderOrTeam) IsRider() bool {
-	return r.isRider
-}
-
-func (r *RiderOrTeam) Reduce() string {
-	return r.value
-}
-
-func (q *Queries) GetResultForRankAndClassification(
-	ctx context.Context, params GetResultForRankAndClassificationParams,
-) (Result, error) {
-	rows, err := q.conn.Query(
-		ctx,
-		getResultForRankAndClassificationQuery,
-		pgx.NamedArgs{
-			"stage_id":       params.StageID,
-			"rank":           params.Rank,
-			"classification": params.Classification,
-		},
-	)
-	if err != nil {
-		return Result{}, err
-	}
-	defer rows.Close()
-
-	result, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Result])
-	if err != nil {
-		return Result{}, err
-	}
-	return result, nil
 }
 
 const getValidResultsCountQuery = `
