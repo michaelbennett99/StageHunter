@@ -1,3 +1,5 @@
+import path from 'path';
+
 import {
   ResultsData,
   ElevationData,
@@ -21,7 +23,7 @@ export class APIClient {
   }
 
   private getURL(url: string): string {
-    return `${this.host}/${this.baseURL}/${this.version}` + url;
+    return path.join(this.host, this.baseURL, this.version, url);
   }
 
   async fetchJSON<T>(url: string): Promise<T> {
@@ -54,57 +56,66 @@ export class APIClient {
   }
 
   async getStageLength(
-    stage_id: string | number
+    stage_id: string
   ): Promise<number> {
     const info: Info = await this.fetchJSON(
-      `${APIClient.StagesSegment}/${stage_id}/info`
+      path.join(APIClient.StagesSegment, stage_id, 'info')
     );
     return info.stage_length;
   }
 
   async getRiders(
-    stage_id: string | number
+    stage_id: string
   ): Promise<string[]> {
-    return this.fetchJSON(`${APIClient.StagesSegment}/${stage_id}/riders`);
+    return this.fetchJSON(
+      path.join(APIClient.StagesSegment, stage_id, 'riders')
+    );
   }
 
   async getTeams(
-    stage_id: string | number
+    stage_id: string
   ): Promise<string[]> {
-    return this.fetchJSON(`${APIClient.StagesSegment}/${stage_id}/teams`);
+    return this.fetchJSON(
+      path.join(APIClient.StagesSegment, stage_id, 'teams')
+    );
   }
 
   async getTrack(
-    stage_id: string | number
+    stage_id: string
   ): Promise<GeoJSON.LineString> {
-    return this.fetchJSON(`${APIClient.StagesSegment}/${stage_id}/track`);
+    return this.fetchJSON(
+      path.join(APIClient.StagesSegment, stage_id, 'track')
+    );
   }
 
   async getElevationData(
-    stage_id: string | number
+    stage_id: string
   ): Promise<ElevationData[]> {
-    return this.fetchJSON(`${APIClient.StagesSegment}/${stage_id}/elevation`);
+    return this.fetchJSON(
+      path.join(APIClient.StagesSegment, stage_id, 'elevation')
+    );
   }
 
   async getGradientData(
-    stage_id: string | number,
+    stage_id: string,
     resolution: number
   ): Promise<GradientData[]> {
     return this.fetchJSON(
-      `${APIClient.StagesSegment}/${stage_id}/gradient?resolution=${resolution}`
+      path.join(APIClient.StagesSegment, stage_id, 'gradient') +
+        `?resolution=${resolution}`
     );
   }
 
   async getResultsData(
-    stage_id: string | number
+    stage_id: string
   ): Promise<ResultsData> {
     return this.fetchJSON(
-      `${APIClient.StagesSegment}/${stage_id}/results/count`
+      path.join(APIClient.StagesSegment, stage_id, 'results', 'count')
     );
   }
 
   async getStageData(
-    stage_id: string | number,
+    stage_id: string,
     topN: number = 3
   ): Promise<{ info: InfoData, results: ResultsData }> {
     const resultsData = await this.getResultsData(stage_id);
