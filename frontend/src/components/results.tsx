@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 
 import Input from './input/input';
-import { BACKEND_URL } from '@/api/constants';
 import { apiClient } from '@/api/getters';
 import { InfoData, Options, ResultsData } from '@/api/types';
 

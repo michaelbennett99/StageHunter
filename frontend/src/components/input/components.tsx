@@ -63,8 +63,8 @@ export function InputBoxGroup(
           >
             <InputBox
               name={numToRank(i + 1) ?? ''}
-              correctURL={`${correctURL}&r=${i+1}`}
-              validationURL={`${validationURL}&r=${i+1}`}
+              correctURL={`${correctURL}/${i+1}`}
+              validationURL={`${validationURL}/${i+1}`}
               options={options}
               incrementNumCorrect={incrementNumCorrect}
               incrementScore={incrementScore}
@@ -122,7 +122,7 @@ export function InputBox(
     setIsLoading(true);
     try {
       // Normal validation for non-final tries
-      const response = await fetch(`${validationURL}&v=${val}`);
+      const response = await fetch(`${validationURL}?v=${val}`);
       const isValid = await response.json();
 
       const batchedUpdates = () => {
