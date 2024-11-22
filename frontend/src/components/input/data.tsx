@@ -1,6 +1,7 @@
 import { InfoData, Options, ResultsData } from '@/api/types';
 import { deSnakeCase } from '@/utils/utils';
 import { InputBox, InputBoxGroup } from './components';
+import path from 'path';
 
 function InfoInputBoxGroup(
   {
@@ -17,8 +18,13 @@ function InfoInputBoxGroup(
     incrementScore: (score: number) => void;
   }
 ): JSX.Element {
-  const correctInfoURL = `/stage/${stageId}/info`;
-  const infoValidationURL = `/stage/${stageId}/verify/info`;
+  const correctInfoURL = path.join('stages', stageId.toString(), 'info');
+  const infoValidationURL = path.join(
+    'stages',
+    stageId.toString(),
+    'verify',
+    'info'
+  );
 
   const inputElements: JSX.Element[] = Object.entries(infoData)
     .filter(([,value]) => value)
@@ -49,8 +55,13 @@ function getResultInputBoxGroups(
   incrementNumCorrect: () => void,
   incrementScore: (score: number) => void
 ): JSX.Element[] {
-  const correctResultURL = `/stage/${stageId}/results`;
-  const resultsValidationURL = `/stage/${stageId}/verify/results`;
+  const correctResultURL = path.join('stages', stageId.toString(), 'results');
+  const resultsValidationURL = path.join(
+    'stages',
+    stageId.toString(),
+    'verify',
+    'results'
+  );
 
   return Object.entries(resultsData)
     .filter(([,value]) => value > 0)
