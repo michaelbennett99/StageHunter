@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -257,7 +256,6 @@ func (q *Queries) GetResultsForClassification(
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(results)
 	return results, nil
 }
 
@@ -303,7 +301,6 @@ func (q *Queries) GetResultForRankAndClassification(
 	if err != nil {
 		return Result{}, err
 	}
-	fmt.Println(result)
 	return result, nil
 }
 
