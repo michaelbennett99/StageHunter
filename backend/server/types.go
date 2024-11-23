@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/michaelbennett99/stagehunter/backend/db"
 )
 
@@ -62,8 +63,18 @@ func NewRiderOrTeam(rider, team *string) (RiderOrTeam, error) {
 	return RiderOrTeam{isRider: false, value: *team}, nil
 }
 
+func StringRefFromPGText(pgText pgtype.Text) *string {
+	if pgText.Valid {
+		return &pgText.String
+	}
+	return nil
+}
+
 func NewRiderOrTeamFromDBResult(dbResult db.Result) (RiderOrTeam, error) {
-	return NewRiderOrTeam(&dbResult.Rider.String, &dbResult.Team.String)
+	return NewRiderOrTeam(
+		StringRefFromPGText(dbResult.Rider),
+		StringRefFromPGText(dbResult.Team),
+	)
 }
 
 func (r *RiderOrTeam) IsRider() bool {

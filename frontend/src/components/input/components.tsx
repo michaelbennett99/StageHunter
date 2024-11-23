@@ -64,7 +64,7 @@ export function InputBoxGroup(
           >
             <InputBox
               name={numToRank(i + 1) ?? ''}
-              correctURL={`${correctURL}/${i+1}`}
+              correctURL={`${correctURL}/${i+1}/name`}
               validationURL={`${validationURL}/${i+1}`}
               options={options}
               incrementNumCorrect={incrementNumCorrect}
@@ -120,6 +120,8 @@ export function InputBox(
   const handleSubmit = async () => {
     if (isCorrect || tries <= 0 || val === '') return;
 
+    console.log('handleSubmit');
+
     setIsLoading(true);
     try {
       // Normal validation for non-final tries
@@ -127,7 +129,10 @@ export function InputBox(
         `${validationURL}?v=${val}`
       );
 
+      console.log(isValid);
+
       const batchedUpdates = () => {
+        console.log('batchedUpdates');
         if (tries === 1) exposeCorrectAnswer();
         if (isValid) setIsCorrect();
         decrementTries();
@@ -137,6 +142,7 @@ export function InputBox(
     } catch (error) {
       console.error(error);
     } finally {
+      console.log('finally');
       setIsLoading(false);
     }
   }

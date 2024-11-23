@@ -115,6 +115,13 @@ func NewServer(pool *pgxpool.Pool, config ServerConfig) *http.Server {
 			GetResultFieldForRankAndClassificationHandler,
 		),
 		NewRoute(
+			fmt.Sprintf(
+				"/stages/{%s}/results/{%s}/{%s}/name",
+				StageID, ResultClassification, Rank,
+			),
+			GetResultNameForRankAndClassificationHandler,
+		),
+		NewRoute(
 			fmt.Sprintf("/stages/{%s}/teams", StageID),
 			GetTeamsHandler,
 		),
