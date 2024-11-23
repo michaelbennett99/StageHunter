@@ -250,14 +250,15 @@ export function TextInput({
           selectedOptionClassName={selectedOptionClassName}
         />
         {
-          isIncorrect && (
+          noMoreInput && (
             <span
               className={twMerge(
                 inputClassName,
                 twJoin(
                   'absolute inset-0 invisible group-hover:visible',
                   'text-nowrap overflow-x-auto z-50 pointer-events-none',
-                  'flex items-center bg-red-100'
+                  'flex items-center',
+                  `${isCorrect ? 'bg-green-100' : 'bg-red-100'}`
                 )
               )}
             >
