@@ -59,7 +59,7 @@ export function useCorrectAnswer<T>(
 ): [T | null, () => void, Error | null] {
   const { data, error, isLoading } = useSWR<T>(
     url,
-    clientApiClient.fetchJSON
+    async (arg: string) => clientApiClient.fetchJSON<T>(arg)
   );
 
   const [value, setValue] = useState<T | null>(null);
