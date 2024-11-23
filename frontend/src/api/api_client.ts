@@ -23,6 +23,9 @@ export class APIClient {
   }
 
   private getURL(url: string): string {
+    if (this.host === '') { // Ensure the path is absolute
+      return path.join('/', this.baseURL, this.version, url);
+    }
     return path.join(this.host, this.baseURL, this.version, url);
   }
 
