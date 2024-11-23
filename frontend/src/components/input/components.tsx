@@ -256,8 +256,8 @@ export function TextInput({
                 inputClassName,
                 twJoin(
                   'absolute inset-0 invisible group-hover:visible',
-                  'text-nowrap overflow-x-auto z-50 pointer-events-none',
-                  'flex items-center',
+                  'text-nowrap z-50 flex items-center',
+                  'select-none overflow-x-auto scrollbar-hide',
                   `${isCorrect ? 'bg-green-100' : 'bg-red-100'}`
                 )
               )}
