@@ -1,10 +1,10 @@
 import Stage from '@/components/stage';
-import { getAllStageIDs } from '@/api/getters';
+import { serverApiClient } from '@/api/api_client';
 
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  const stages = await getAllStageIDs();
+  const stages = await serverApiClient.getAllStageIDs();
   return stages.map((stage) => ({ stageId: stage.toString() }));
 }
 

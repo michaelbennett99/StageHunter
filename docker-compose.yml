@@ -26,6 +26,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       target: development
+    ports:
+      - 3000:3000
     volumes:
       - ./frontend:/app
       - /app/.next
@@ -51,6 +53,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    ports:
+      - 8080:8080
     env_file:
       - ./backend/.env
     networks:
@@ -63,7 +67,7 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/daily"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/daily"]
       interval: 1m
       timeout: 15s
       retries: 4

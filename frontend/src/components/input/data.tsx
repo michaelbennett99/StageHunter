@@ -1,6 +1,7 @@
 import { InfoData, Options, ResultsData } from '@/api/types';
 import { deSnakeCase } from '@/utils/utils';
 import { InputBox, InputBoxGroup } from './components';
+import path from 'path';
 
 function InfoInputBoxGroup(
   {
@@ -17,8 +18,13 @@ function InfoInputBoxGroup(
     incrementScore: (score: number) => void;
   }
 ): JSX.Element {
-  const correctInfoURL = `/api/stage/info/correct/${stageId}`;
-  const infoValidationURL = `/api/stage/info/verify/${stageId}`;
+  const correctInfoURL = path.join('stages', stageId.toString(), 'info');
+  const infoValidationURL = path.join(
+    'stages',
+    stageId.toString(),
+    'verify',
+    'info'
+  );
 
   const inputElements: JSX.Element[] = Object.entries(infoData)
     .filter(([,value]) => value)
@@ -26,8 +32,8 @@ function InfoInputBoxGroup(
       <InputBox
         key={key}
         name={deSnakeCase(key)}
-        correctURL={`${correctInfoURL}?f=${key}`}
-        validationURL={`${infoValidationURL}?f=${key}`}
+        correctURL={`${correctInfoURL}/${key}`}
+        validationURL={`${infoValidationURL}/${key}`}
         options={key === 'grand_tour' ? options.grand_tours : undefined}
         incrementNumCorrect={incrementNumCorrect}
         incrementScore={() => incrementScore(10)}
@@ -49,8 +55,13 @@ function getResultInputBoxGroups(
   incrementNumCorrect: () => void,
   incrementScore: (score: number) => void
 ): JSX.Element[] {
-  const correctResultURL = `/api/stage/results/correct/${stageId}`;
-  const resultsValidationURL = `/api/stage/results/verify/${stageId}`;
+  const correctResultURL = path.join('stages', stageId.toString(), 'results');
+  const resultsValidationURL = path.join(
+    'stages',
+    stageId.toString(),
+    'verify',
+    'results'
+  );
 
   return Object.entries(resultsData)
     .filter(([,value]) => value > 0)
@@ -59,8 +70,8 @@ function getResultInputBoxGroups(
         key={key}
         name={deSnakeCase(key) + ' Classification'}
         nBoxes={value}
-        correctURL={`${correctResultURL}?c=${key}`}
-        validationURL={`${resultsValidationURL}?c=${key}`}
+        correctURL={`${correctResultURL}/${key}`}
+        validationURL={`${resultsValidationURL}/${key}`}
         options={key === 'teams' ? options.teams : options.riders}
         incrementNumCorrect={incrementNumCorrect}
         incrementScore={() => incrementScore(10)}

@@ -4,6 +4,7 @@ import { FaCheck, FaPlus, FaSpinner, FaTimes } from 'react-icons/fa';
 import { twMerge, twJoin } from 'tailwind-merge';
 
 import AutoComplete from '@/components/autocomplete';
+import { clientApiClient } from '@/api/api_client';
 import {
   useCorrectAnswer,
   useBomb,
@@ -63,8 +64,8 @@ export function InputBoxGroup(
           >
             <InputBox
               name={numToRank(i + 1) ?? ''}
-              correctURL={`${correctURL}&r=${i+1}`}
-              validationURL={`${validationURL}&r=${i+1}`}
+              correctURL={`${correctURL}/${i+1}/name`}
+              validationURL={`${validationURL}/${i+1}`}
               options={options}
               incrementNumCorrect={incrementNumCorrect}
               incrementScore={incrementScore}
@@ -119,13 +120,19 @@ export function InputBox(
   const handleSubmit = async () => {
     if (isCorrect || tries <= 0 || val === '') return;
 
+    console.log('handleSubmit');
+
     setIsLoading(true);
     try {
       // Normal validation for non-final tries
-      const response = await fetch(`${validationURL}&v=${val}`);
-      const isValid = await response.json();
+      const isValid: boolean = await clientApiClient.fetchJSON(
+        `${validationURL}?v=${val}`
+      );
+
+      console.log(isValid);
 
       const batchedUpdates = () => {
+        console.log('batchedUpdates');
         if (tries === 1) exposeCorrectAnswer();
         if (isValid) setIsCorrect();
         decrementTries();
@@ -135,6 +142,7 @@ export function InputBox(
     } catch (error) {
       console.error(error);
     } finally {
+      console.log('finally');
       setIsLoading(false);
     }
   }
@@ -242,14 +250,15 @@ export function TextInput({
           selectedOptionClassName={selectedOptionClassName}
         />
         {
-          isIncorrect && (
+          noMoreInput && (
             <span
               className={twMerge(
                 inputClassName,
                 twJoin(
                   'absolute inset-0 invisible group-hover:visible',
-                  'text-nowrap overflow-x-auto z-50 pointer-events-none',
-                  'flex items-center bg-red-100'
+                  'text-nowrap z-50 flex items-center',
+                  'select-none overflow-x-auto scrollbar-hide',
+                  `${isCorrect ? 'bg-green-100' : 'bg-red-100'}`
                 )
               )}
             >

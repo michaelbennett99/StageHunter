@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 
+import { clientApiClient } from '@/api/api_client';
+
 /**
  * A hook that returns a number and a function to increment it.
  * @param start the starting number
@@ -57,13 +59,7 @@ export function useCorrectAnswer<T>(
 ): [T | null, () => void, Error | null] {
   const { data, error, isLoading } = useSWR<T>(
     url,
-    async (url: string) => {
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      return res.json();
-    }
+    async (arg: string) => clientApiClient.fetchJSON<T>(arg)
   );
 
   const [value, setValue] = useState<T | null>(null);

@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -214,13 +213,106 @@ func (q *Queries) GetResults(
 	return results, nil
 }
 
+const getResultsForClassificationQuery = `
+SELECT
+	rank,
+	rider,
+	team,
+	time,
+	points,
+	classification
+FROM racedata.riders_teams_results
+WHERE
+	stage_id = @stage_id
+	AND rank <= @top_n
+	AND classification = @classification
+ORDER BY rank ASC;
+`
+
+type GetResultsForClassificationParams struct {
+	StageID        int
+	TopN           int
+	Classification Classification
+}
+
+func (q *Queries) GetResultsForClassification(
+	ctx context.Context, params GetResultsForClassificationParams,
+) ([]Result, error) {
+	rows, err := q.conn.Query(
+		ctx,
+		getResultsForClassificationQuery,
+		pgx.NamedArgs{
+			"stage_id":       params.StageID,
+			"top_n":          params.TopN,
+			"classification": params.Classification,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results, err := pgx.CollectRows(rows, pgx.RowToStructByName[Result])
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+const getResultForRankAndClassificationQuery = `
+SELECT
+	rank,
+	rider,
+	team,
+	time,
+	points,
+	classification
+FROM racedata.riders_teams_results
+WHERE
+	stage_id = @stage_id
+	AND rank = @rank
+	AND classification = @classification
+`
+
+type GetResultForRankAndClassificationParams struct {
+	StageID        int
+	Rank           int
+	Classification Classification
+}
+
+func (q *Queries) GetResultForRankAndClassification(
+	ctx context.Context, params GetResultForRankAndClassificationParams,
+) (Result, error) {
+	rows, err := q.conn.Query(
+		ctx,
+		getResultForRankAndClassificationQuery,
+		pgx.NamedArgs{
+			"stage_id":       params.StageID,
+			"rank":           params.Rank,
+			"classification": params.Classification,
+		},
+	)
+	if err != nil {
+		return Result{}, err
+	}
+	defer rows.Close()
+
+	result, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Result])
+	if err != nil {
+		return Result{}, err
+	}
+	return result, nil
+}
+
 const getRidersQuery = `
 SELECT DISTINCT rider
 FROM racedata.riders_teams_results
 WHERE stage_id = $1 AND rider IS NOT NULL;
 `
 
-func (q *Queries) GetRiders(ctx context.Context, stageID int) ([]string, error) {
+func (q *Queries) GetRiders(
+	ctx context.Context, stageID int,
+) ([]string, error) {
 	rows, err := q.conn.Query(ctx, getRidersQuery, stageID)
 	if err != nil {
 		return nil, err
@@ -252,76 +344,6 @@ func (q *Queries) GetTeams(ctx context.Context, stageID int) ([]string, error) {
 		return nil, err
 	}
 	return teams, nil
-}
-
-const getRiderOrTeamQuery = `
-SELECT rider, team FROM racedata.riders_teams_results
-WHERE
-	stage_id = @stage_id
-	AND rank = @rank
-	AND classification = @classification
-`
-
-type GetRiderOrTeamParams struct {
-	StageID        int
-	Rank           int
-	Classification Classification
-}
-
-type RiderOrTeam struct {
-	isRider bool
-	value   string
-}
-
-func NewRiderOrTeam(rider, team *string) (RiderOrTeam, error) {
-	// Team should always be non-nil
-	if team == nil {
-		return RiderOrTeam{}, errors.New("team cannot be nil")
-	}
-	// Set the value to the rider if it is non-nil
-	if rider != nil {
-		return RiderOrTeam{isRider: true, value: *rider}, nil
-	}
-	// Otherwise, the value is the team
-	return RiderOrTeam{isRider: false, value: *team}, nil
-}
-
-func (r *RiderOrTeam) IsRider() bool {
-	return r.isRider
-}
-
-func (r *RiderOrTeam) Reduce() string {
-	return r.value
-}
-
-func (q *Queries) GetRiderOrTeam(
-	ctx context.Context, params GetRiderOrTeamParams,
-) (RiderOrTeam, error) {
-	// Get the possible rider and team names
-	rows, err := q.conn.Query(ctx, getRiderOrTeamQuery, pgx.NamedArgs{
-		"stage_id":       params.StageID,
-		"rank":           params.Rank,
-		"classification": params.Classification,
-	})
-	if err != nil {
-		return RiderOrTeam{}, err
-	}
-	defer rows.Close()
-
-	// Get the rider or team from the result
-	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[struct {
-		Rider *string
-		Team  *string
-	}])
-	if err != nil {
-		return RiderOrTeam{}, err
-	}
-	riderOrTeam, err := NewRiderOrTeam(row.Rider, row.Team)
-	if err != nil {
-		return RiderOrTeam{}, err
-	}
-
-	return riderOrTeam, nil
 }
 
 const getValidResultsCountQuery = `

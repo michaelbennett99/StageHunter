@@ -1,7 +1,7 @@
 import Route from './route';
 import Results from './results';
 
-import { getTrack, getGradientData, getStageLength } from '@/api/getters';
+import { serverApiClient } from '@/api/api_client';
 // import { GradientData } from '@/types';
 
 // async function TrackLoader({
@@ -31,11 +31,11 @@ export default async function Stage({
 }: {
   stageId: string | number;
 }): Promise<JSX.Element> {
-  const stageLength = await getStageLength(stageId);
+  const stageLength = await serverApiClient.getStageLength(stageId);
   const resolution = stageLength < 50 ? 50 : 200;
   const [track, gradientData] = await Promise.all([
-    getTrack(stageId),
-    getGradientData(stageId, resolution)
+    serverApiClient.getTrack(stageId),
+    serverApiClient.getGradientData(stageId, resolution)
   ]);
   return (
     <div className="h-screen">

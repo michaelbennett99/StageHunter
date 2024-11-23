@@ -9,7 +9,7 @@ import (
 
 func TestGetFieldByTag(t *testing.T) {
 	testStruct := struct {
-		Field1 string `tag:"value1" other:"other1"`
+		Field1 string `tag:"value1,other1" other:"other1"`
 		Field2 string `tag:"value2" other:"other2"`
 	}{
 		Field1: "string1",
@@ -22,6 +22,17 @@ func TestGetFieldByTag(t *testing.T) {
 	}
 	if field1.String() != "string1" {
 		t.Fatalf("expected field1 to be string1, got %s", field1.String())
+	}
+
+	field1Other, err1Other := lib.GetFieldByTag(testStruct, "other", "other1")
+	if err1Other != nil {
+		t.Fatalf("expected no error, got %s", err1Other)
+	}
+	if field1Other.String() != "string1" {
+		t.Fatalf(
+			"expected field1Other to be string1, got %s",
+			field1Other.String(),
+		)
 	}
 
 	field2, err2 := lib.GetFieldByTag(testStruct, "tag", "value2")

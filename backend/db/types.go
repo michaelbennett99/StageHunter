@@ -1,7 +1,6 @@
 package db
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -153,38 +152,10 @@ func (d *Duration) Scan(src any) error {
 
 // Result struct
 type Result struct {
-	Rank           int            `json:"rank"`
-	Rider          pgtype.Text    `json:"-"`
-	Team           pgtype.Text    `json:"-"`
-	Time           Duration       `json:"-"`
-	Points         pgtype.Int8    `json:"-"`
-	Classification Classification `json:"classification"`
-}
-
-func (r *Result) MarshalJSON() ([]byte, error) {
-	type Alias Result
-	aux := struct {
-		Alias
-		Rider  *string `json:"rider,omitempty"`
-		Team   *string `json:"team,omitempty"`
-		Time   *string `json:"time,omitempty"`
-		Points *int64  `json:"points,omitempty"`
-	}{}
-
-	aux.Alias = Alias(*r)
-
-	if r.Rider.Valid {
-		aux.Rider = &r.Rider.String
-	}
-	if r.Team.Valid {
-		aux.Team = &r.Team.String
-	}
-	if r.Time.Valid {
-		timeStr := r.Time.Duration.String()
-		aux.Time = &timeStr
-	}
-	if r.Points.Valid {
-		aux.Points = &r.Points.Int64
-	}
-	return json.Marshal(aux)
+	Rank           int
+	Rider          pgtype.Text
+	Team           pgtype.Text
+	Time           Duration
+	Points         pgtype.Int8
+	Classification Classification
 }
