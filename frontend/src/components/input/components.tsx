@@ -220,15 +220,15 @@ export function TextInput({
   );
 
   const optionsListClassName = `
-    border-2 rounded-md bg-popover text-popover-foreground
+    border-2 rounded-md bg-popover text-popover-foreground cursor-default
   `;
 
   const optionClassName = `
-    p-1 border-0
+    p-1 border-0 select-none
     outline outline-offset-0 outline-[0.5px] outline-slate-300 outline-dashed
   `;
 
-  const selectedOptionClassName = optionClassName + `
+  const selectedOptionClassName = `
     bg-slate-300 text-slate-700 outline-slate-300
   `;
 
