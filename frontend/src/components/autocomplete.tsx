@@ -391,7 +391,7 @@ function AutocompleteOption({
       onClick={onClick}
       ref={ref}
     >
-      {option}
+      <span className="select-none">{option}</span>
     </li>
   );
 }
