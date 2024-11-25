@@ -54,10 +54,10 @@ export default function Input(
 
   return (
     <div
-      className="w-80 h-screen mr-2"
+      className="w-80 h-screen mr-2 box-content"
       id="input-container"
     >
-      <div className="overflow-y-auto h-full">
+      <div className="overflow-y-auto h-full scrollbar-hide">
         <Header text="Guess the stage!" />
         <BoxList>{list_elements}</BoxList>
         <ScoreBug
