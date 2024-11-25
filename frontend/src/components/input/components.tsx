@@ -257,7 +257,7 @@ export function TextInput({
                 twJoin(
                   'absolute inset-0 invisible group-hover:visible',
                   'text-nowrap z-50 flex items-center',
-                  'select-none overflow-x-auto scrollbar-hide',
+                  'select-none cursor-default overflow-x-auto scrollbar-hide',
                   `${isCorrect ? 'bg-green-100' : 'bg-red-100'}`
                 )
               )}
