@@ -19,6 +19,8 @@ services:
       - ./nginx/nginx-frontend-route.conf:/etc/nginx/nginx-frontend-route.conf:ro
       - ./nginx/blank.txt:/etc/letsencrypt/options-ssl-nginx.conf:ro
       - ./nginx/blank.txt:/etc/letsencrypt/ssl-dhparams.pem:ro
+      - ./nginx/blank.txt:/etc/letsencrypt/live/stagehunter.cc/fullchain.pem:ro
+      - ./nginx/blank.txt:/etc/letsencrypt/live/stagehunter.cc/privkey.pem:ro
     restart: unless-stopped
     depends_on:
       frontend:
