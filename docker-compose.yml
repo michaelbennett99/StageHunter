@@ -13,7 +13,10 @@ services:
     networks:
       - frontend-network
     volumes:
-      - ./nginx:/etc/nginx:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx-headers.conf:/etc/nginx/nginx-headers.conf:ro
+      - ./nginx/nginx-backend-route.conf:/etc/nginx/nginx-backend-route.conf:ro
+      - ./nginx/nginx-frontend-route.conf:/etc/nginx/nginx-frontend-route.conf:ro
     restart: unless-stopped
     depends_on:
       frontend:
