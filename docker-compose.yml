@@ -17,6 +17,8 @@ services:
       - ./nginx/nginx-headers.conf:/etc/nginx/nginx-headers.conf:ro
       - ./nginx/nginx-backend-route.conf:/etc/nginx/nginx-backend-route.conf:ro
       - ./nginx/nginx-frontend-route.conf:/etc/nginx/nginx-frontend-route.conf:ro
+      - ./nginx/blank.txt:/etc/letsencrypt/options-ssl-nginx.conf:ro
+      - ./nginx/blank.txt:/etc/letsencrypt/ssl-dhparams.pem:ro
     restart: unless-stopped
     depends_on:
       frontend:
