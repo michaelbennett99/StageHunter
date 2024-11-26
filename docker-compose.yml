@@ -3,8 +3,6 @@
 # TARGET - The target environment to build the frontend for
 #   (development, production)
 
-version: '0.0.1'
-
 services:
   nginx:
     container_name: stagehunter-nginx
