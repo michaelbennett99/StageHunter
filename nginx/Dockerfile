@@ -20,9 +20,4 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Start nginx and then run certbot
-CMD [ \
-    "nginx", "-g", "daemon off;", \
-    "&&", "certbot", "--nginx", \
-    "-n", "--agree-tos", "-m", "admin@stagehunter.cc", \
-    "-d", "stagehunter.cc", "-d", "www.stagehunter.cc" \
-]
+CMD [ "/etc/nginx/startup.sh" ]
