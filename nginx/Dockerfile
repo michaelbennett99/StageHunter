@@ -2,7 +2,9 @@ FROM nginx:1.27.2 AS base
 
 FROM base AS deps
 
-COPY . /etc/nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY includes /etc/nginx/includes
+COPY startup.sh /startup.sh
 
 # Don't need SSL certificates for development, just use nginx
 FROM deps AS development
@@ -13,6 +15,7 @@ COPY --from=deps /etc/nginx /etc/nginx
 FROM deps AS staging
 
 COPY --from=deps /etc/nginx /etc/nginx
+COPY --from=deps /startup.sh /startup.sh
 
 # Install certbot
 RUN apt-get update \
@@ -20,4 +23,4 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Start nginx and then run certbot
-CMD [ "/etc/nginx/startup.sh" ]
+CMD [ "/startup.sh" ]
