@@ -47,7 +47,7 @@ jobs:
             touch ./frontend/.env
             echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.MAPBOX_ACCESS_TOKEN }}" >> ./frontend/.env
             export NODE_OPTIONS=${{ vars.NODE_OPTIONS }}
-            export TARGET=staging
+            export TARGET=production
 
             # For backend
             touch ./backend/.env
@@ -62,12 +62,12 @@ jobs:
             # # Build
             docker-compose \
               -f docker-compose.yml \
-              -f docker-compose.staging.yml \
+              -f docker-compose.production.yml \
               build
 
             echo "Deploying images"
             # Deploy
             docker-compose \
               -f docker-compose.yml \
-              -f docker-compose.staging.yml \
+              -f docker-compose.production.yml \
               up -d

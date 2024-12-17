@@ -35,7 +35,9 @@ COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm && \
     pnpm install --frozen-lockfile
 
+#
 # Development Environment
+#
 FROM base AS development
 WORKDIR /app
 
@@ -62,8 +64,6 @@ RUN npm install -g pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-EXPOSE 3000
-
 CMD pnpm build && pnpm start
 
 #
@@ -72,9 +72,10 @@ CMD pnpm build && pnpm start
 FROM base AS production
 WORKDIR /app
 
+RUN npm install -g pnpm
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-EXPOSE 3000
 
 CMD pnpm build && pnpm start

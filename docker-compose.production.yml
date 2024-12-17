@@ -1,0 +1,18 @@
+# docker-compose.production.yml
+# Production environment docker compose file
+
+services:
+  nginx:
+    build:
+      target: production
+
+  frontend:
+    build:
+      target: production
+    volumes: []
+
+  backend:
+    ports: []
+
+  db:
+    ports: []

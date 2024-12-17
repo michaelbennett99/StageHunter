@@ -11,8 +11,13 @@ FROM deps AS development
 
 COPY --from=deps /etc/nginx /etc/nginx
 
-# In staging, we need SSL certificates. Install certbot and run it.
+# In staging, we need to build the frontend but we don't need SSL certificates.
 FROM deps AS staging
+
+COPY --from=deps /etc/nginx /etc/nginx
+
+# In production, we need SSL certificates. Install certbot and run it.
+FROM deps AS production
 
 COPY --from=deps /etc/nginx /etc/nginx
 COPY --from=deps /startup.sh /startup.sh

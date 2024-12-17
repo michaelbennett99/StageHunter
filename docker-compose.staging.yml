@@ -12,7 +12,9 @@ services:
     # No volumes needed for staging
     volumes: []
 
-  backend: {}
+  backend:
+    # No ports needed for staging
+    ports: []
 
   db:
     # No ports needed for staging
