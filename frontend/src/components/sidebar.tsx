@@ -27,7 +27,7 @@ export default function Sidebar({ children }: Props): JSX.Element {
       </button>
       <div
         className={cn(
-          'pr-2',
+          'px-2 bg-background/80 border-l',
           active ? 'block' : 'hidden'
         )}
       >
