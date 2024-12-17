@@ -54,7 +54,7 @@ export function InputBoxGroup(
 ): JSX.Element {
   // A group of input boxes for a single result type
   return (
-    <>
+    <div className="bg-background rounded-md p-2 shadow-md border">
       <h3 className="font-semibold mb-1">{name}</h3>
       <ul className="flex flex-col gap-1">
         {Array.from({ length: nBoxes }, (_, i) => (
@@ -73,7 +73,7 @@ export function InputBoxGroup(
           </li>
         ))}
       </ul>
-    </>
+    </div>
   );
 }
 

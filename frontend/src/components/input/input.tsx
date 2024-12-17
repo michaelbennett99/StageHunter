@@ -34,7 +34,6 @@ export default function Input(
   ).map((element) => (
     <li
       key={element.props.name ?? 'noname'}
-      className='rounded-md p-2 shadow-md border'
     >
       {element}
     </li>

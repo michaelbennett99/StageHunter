@@ -41,7 +41,9 @@ function InfoInputBoxGroup(
     ));
 
   return (
-    <div className="flex flex-col gap-1">
+    <div
+      className="flex flex-col gap-1 bg-background rounded-md p-2 shadow-md border"
+    >
       <h3 className="font-semibold mb-1">Stage Info</h3>
       {inputElements}
     </div>
