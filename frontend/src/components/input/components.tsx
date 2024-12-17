@@ -40,16 +40,16 @@ export function InputBoxGroup(
     correctURL,
     validationURL,
     options,
-    incrementNumCorrect,
-    incrementScore
+    incrementNumCorrect = () => {},
+    incrementScore = () => {}
   }: {
     name: string;
     nBoxes: number;
     correctURL: string;
     validationURL: string;
     options?: string[];
-    incrementNumCorrect: () => void;
-    incrementScore: () => void;
+    incrementNumCorrect?: () => void;
+    incrementScore?: () => void;
   }
 ): JSX.Element {
   // A group of input boxes for a single result type

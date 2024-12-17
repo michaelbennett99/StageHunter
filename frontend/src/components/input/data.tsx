@@ -8,14 +8,14 @@ function InfoInputBoxGroup(
     stageId,
     infoData,
     options,
-    incrementNumCorrect,
-    incrementScore
+    incrementNumCorrect = () => {},
+    incrementScore = (_: number) => {}
   }: {
     stageId: number | string;
     infoData: InfoData;
     options: Options;
-    incrementNumCorrect: () => void;
-    incrementScore: (score: number) => void;
+    incrementNumCorrect?: () => void;
+    incrementScore?: (score: number) => void;
   }
 ): JSX.Element {
   const correctInfoURL = path.join('stages', stageId.toString(), 'info');
@@ -36,7 +36,7 @@ function InfoInputBoxGroup(
         validationURL={`${infoValidationURL}/${key}`}
         options={key === 'grand_tour' ? options.grand_tours : undefined}
         incrementNumCorrect={incrementNumCorrect}
-        incrementScore={() => incrementScore(10)}
+        incrementScore={() => incrementScore?.(10)}
       />
     ));
 
@@ -54,8 +54,8 @@ function getResultInputBoxGroups(
   stageId: number | string,
   resultsData: ResultsData,
   options: Options,
-  incrementNumCorrect: () => void,
-  incrementScore: (score: number) => void
+  incrementNumCorrect?: () => void,
+  incrementScore?: (score: number) => void
 ): JSX.Element[] {
   const correctResultURL = path.join('stages', stageId.toString(), 'results');
   const resultsValidationURL = path.join(
@@ -76,7 +76,7 @@ function getResultInputBoxGroups(
         validationURL={`${resultsValidationURL}/${key}`}
         options={key === 'teams' ? options.teams : options.riders}
         incrementNumCorrect={incrementNumCorrect}
-        incrementScore={() => incrementScore(10)}
+        incrementScore={() => incrementScore?.(10)}
       />
     ));
 }
@@ -86,8 +86,8 @@ export function getInputElements(
   infoData: InfoData,
   resultsData: ResultsData,
   options: Options,
-  incrementNumCorrect: () => void,
-  incrementScore: (score: number) => void
+  incrementNumCorrect?: () => void,
+  incrementScore?: (score: number) => void
 ): JSX.Element[] {
   const infoInputBoxGroup = <InfoInputBoxGroup
     stageId={stageId}

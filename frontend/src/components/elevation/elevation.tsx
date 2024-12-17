@@ -19,7 +19,6 @@ import {
 import { GradientLegend } from './legend';
 import { YAxis, XAxis } from './axes';
 import { MouseOverLine } from './mouseOver';
-import { twJoin } from 'tailwind-merge';
 
 export default function Elevation({
   data,
