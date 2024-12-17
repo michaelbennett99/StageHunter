@@ -1,19 +1,8 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 
 import Header from "@/components/layout/header";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
 
 export const metadata: Metadata = {
   title: "StageHunter",
@@ -27,11 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex flex-col h-screen overflow-hidden">
-        <div>
-          <Header />
-          {children}
-        </div>
+      <body className="flex flex-col h-screen overflow-hidden antialiased">
+        <Header />
+        {children}
       </body>
     </html>
   );
