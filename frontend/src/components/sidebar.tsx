@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default function Sidebar({ children }: Props): JSX.Element {
-  const [active, setActive] = useState(true);
+  const [active, setActive] = useState(false);
 
   return (
     <div

@@ -49,7 +49,7 @@ export default async function Stage({
           <Results stageId={stageId} />
         </div>
       </div>
-      <Sidebar active={true}>
+      <Sidebar>
         <Results stageId={stageId} />
       </Sidebar>
     </div>
