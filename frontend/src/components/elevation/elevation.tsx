@@ -6,7 +6,8 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 
 // Graph Data and Functions
 import { GradientData } from '@/api/types';
-import { useResize } from '@/effects/resize';
+import { useResize } from '@/hooks/resize';
+import useBreakpoint from '@/hooks/useBreakpoint';
 import { getInterpolatedGradientPoint } from './data';
 import { handleSVGMouseMove } from './interaction';
 // JSX Graph Components
@@ -69,7 +70,7 @@ function ElevationChart({
   const [height, setHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const smallScreen = window.innerWidth < 640;
+  const smallScreen = useBreakpoint('sm');
   const effectiveMargin = {
     ...margin,
     right: smallScreen ? margin.right.sm : margin.right.default,
