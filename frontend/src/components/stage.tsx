@@ -1,5 +1,6 @@
 import Route from './route';
 import Results from './results';
+import Sidebar from './sidebar';
 
 import { serverApiClient } from '@/api/api_client';
 // import { GradientData } from '@/types';
@@ -38,7 +39,7 @@ export default async function Stage({
     serverApiClient.getGradientData(stageId, resolution)
   ]);
   return (
-    <div className="h-full flex flex-col">
+    <div className="relative h-full w-full flex flex-col">
       <div
         className="flex flex-row h-full bg-background text-foreground gap-4 p-2 overflow-hidden"
         id="main-app-container"
@@ -48,6 +49,9 @@ export default async function Stage({
           <Results stageId={stageId} />
         </div>
       </div>
+      <Sidebar active={true}>
+        <Results stageId={stageId} />
+      </Sidebar>
     </div>
   );
 }
