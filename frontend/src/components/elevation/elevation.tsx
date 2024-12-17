@@ -133,19 +133,34 @@ function ElevationChart({
 
   // Event handlers
 
-  // Handle mouse move over the chart
-  const onMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
-    handleSVGMouseMove(event, (mouseX, mouseY) => {
-      const inX = (mouseX >= graphLeft) && (mouseX <= graphRight);
-      const inY = (mouseY >= graphTop) && (mouseY <= graphBottom);
+  function handlePointerMove(mouseX: number, mouseY: number) {
+    const inX = (mouseX >= graphLeft) && (mouseX <= graphRight);
+    const inY = (mouseY >= graphTop) && (mouseY <= graphBottom);
 
-      if (inX && inY) {
-        const distance = x.invert(mouseX);
-        setDistance(distance);
-      } else {
-        setDistance(null);
-      }
-    });
+    if (inX && inY) {
+      const distance = x.invert(mouseX);
+      setDistance(distance);
+    } else {
+      setDistance(null);
+    }
+  }
+
+  // Handle mouse move over the chart
+  function onMouseMove(event: React.MouseEvent<SVGSVGElement>) {
+    handleSVGMouseMove(event, handlePointerMove);
+  }
+
+  // Handle touch move over the chart
+  function onTouchMove(event: React.TouchEvent<SVGSVGElement>) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    if (touch) {
+      const svgElement = event.currentTarget
+      const rect = svgElement.getBoundingClientRect();
+      const mouseX = touch.clientX - rect.left;
+      const mouseY = touch.clientY - rect.top;
+      handlePointerMove(mouseX, mouseY);
+    }
   }
 
   const areaGradientId = 'areaGradient';
@@ -157,6 +172,8 @@ function ElevationChart({
         height="100%"
         onMouseMove={onMouseMove}
         onMouseLeave={() => setDistance(null)}
+        onTouchMove={onTouchMove}
+        onTouchEnd={() => setDistance(null)}
       >
         <defs>
           <AreaGradientDef data={data} id={areaGradientId} />
