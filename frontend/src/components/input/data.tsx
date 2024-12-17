@@ -9,7 +9,7 @@ function InfoInputBoxGroup(
     infoData,
     options,
     incrementNumCorrect = () => {},
-    incrementScore = (_: number) => {}
+    incrementScore = () => {}
   }: {
     stageId: number | string;
     infoData: InfoData;
