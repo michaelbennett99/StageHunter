@@ -38,12 +38,16 @@ export default async function Stage({
     serverApiClient.getGradientData(stageId, resolution)
   ]);
   return (
-    <div
-      className="flex flex-row h-full bg-background text-foreground gap-4"
-      id="main-app-container"
-    >
-      <Route track={track} elevation={gradientData} />
-      <Results stageId={stageId} />
+    <div className="h-full flex flex-col">
+      <div
+        className="flex flex-row h-full bg-background text-foreground gap-4 p-2 overflow-hidden"
+        id="main-app-container"
+      >
+        <Route track={track} elevation={gradientData} />
+        <div className="hidden md:block">
+          <Results stageId={stageId} />
+        </div>
+      </div>
     </div>
   );
 }
