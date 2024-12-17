@@ -49,7 +49,10 @@ export function GradientLegend(
     </linearGradient>
   );
   return (
-    <g transform={`translate(${legendLeft},${legendTop})`}>
+    <g
+      transform={`translate(${legendLeft},${legendTop})`}
+      className="hidden sm:block"
+    >
       <defs>
         {legendGradientDef}
       </defs>

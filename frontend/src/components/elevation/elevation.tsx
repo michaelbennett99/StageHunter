@@ -2,7 +2,7 @@
 
 // Client Libraries
 import * as d3 from 'd3';
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 
 // Graph Data and Functions
 import { GradientData } from '@/api/types';
@@ -47,31 +47,58 @@ function ElevationChart({
   data,
   distance,
   setDistance,
-  margin = { top: 10, right: 70, bottom: 30, left: 50 },
+  margin = {
+    top: 10,
+    right: { default: 70, sm: 10 },
+    bottom: 30,
+    left: 50
+  },
 }: {
   data: GradientData[];
   distance: number | null;
   setDistance: (distance: number | null) => void;
-  margin?: { top: number; right: number; bottom: number; left: number };
+  margin?: {
+    top: number;
+    right: { sm: number; default: number };
+    bottom: number;
+    left: number;
+  };
 }): JSX.Element {
   // Positioning state
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const smallScreen = window.innerWidth < 640;
+  const effectiveMargin = {
+    ...margin,
+    right: smallScreen ? margin.right.sm : margin.right.default,
+  };
+
   // Positioning derived values
-  const graphTop = margin.top;
-  const graphLeft = margin.left;
-  const graphWidth = width - margin.left - margin.right;
-  const graphHeight = height - margin.top - margin.bottom;
+  const graphTop = effectiveMargin.top;
+  const graphLeft = effectiveMargin.left;
+  const graphRight = width - effectiveMargin.right;
+  const graphHeight = height - effectiveMargin.top - effectiveMargin.bottom;
   const graphBottom = graphHeight + graphTop;
-  const graphRight = graphLeft + graphWidth;
 
   // Map position line state and dependent values
   const hoverPoint = useMemo(
     () => getInterpolatedGradientPoint(data, distance),
     [data, distance]
   );
+
+  // Hook to handle resizing the SVG when the window size changes
+  useEffect(() => {
+    const handleResize = () => {
+      // force re-render when window size changes
+      setWidth(prev => prev);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // Hook to handle resizing the SVG
   useResize(containerRef, setWidth, setHeight);
@@ -134,7 +161,7 @@ function ElevationChart({
           <AreaGradientDef data={data} id={areaGradientId} />
         </defs>
         <YAxis
-          margin={margin}
+          margin={effectiveMargin}
           width={width}
           height={height}
           y={y}
@@ -145,13 +172,13 @@ function ElevationChart({
         <AreaGradientFill d={area(data) || ''} id={areaGradientId} />
         <MouseOverLine
           hoverPoint={hoverPoint}
-          margin={margin}
+          margin={effectiveMargin}
           dims={{ width, height }}
           x={x}
           y={y}
         />
         <XAxis
-          margin={margin}
+          margin={effectiveMargin}
           width={width}
           height={height}
           x={x}
@@ -164,7 +191,7 @@ function ElevationChart({
         />
         <GradientLegend
           gradientData={data}
-          margin={margin}
+          margin={effectiveMargin}
           dims={{ width, height }}
         />
       </svg>
