@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { HiMiniChevronDoubleLeft } from 'react-icons/hi2';
 
 type Props = {
   active?: boolean;
@@ -14,12 +15,19 @@ export default function Sidebar({ children }: Props): JSX.Element {
   return (
     <div
       className={cn(
-        'absolute top-0 right-0 h-full md:hidden flex flex-col bg-background', 'z-40'
+        'absolute top-0 right-0 h-full md:hidden',
+        'z-40 overflow-y-auto flex flex-row',
       )}
     >
+      <button
+        onClick={() => setActive(!active)}
+        className="self-center px-1 py-8 rounded-md bg-background rounded-r-none"
+      >
+        <HiMiniChevronDoubleLeft />
+      </button>
       <div
         className={cn(
-          'overflow-y-auto border-l px-2',
+          'pr-2',
           active ? 'block' : 'hidden'
         )}
       >
