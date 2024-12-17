@@ -2,7 +2,7 @@ name: Deploy Dev Version to AWS server on Push
 
 on:
   push:
-    branches: ['dev']
+    branches: ['main']
 
 jobs:
   deploy:
