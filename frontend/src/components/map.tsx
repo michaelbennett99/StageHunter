@@ -127,7 +127,7 @@ export default function Map(
         onClick={handleButtonClick}
         className={twJoin(
           'absolute top-2 right-2 z-10',
-          'bg-black text-white p-2 rounded-md shadow-md',
+          'invert p-2 rounded-md shadow-md',
           'bg-opacity-50 hover:bg-opacity-100 group'
         )}
         iconClassName="group-hover:animate-spin-once"

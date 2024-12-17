@@ -31,11 +31,7 @@ export default function Elevation({
 }): JSX.Element {
   return (
     <div
-      className={twJoin(
-        "h-1/4 max-h-64 min-h-16",
-        'bg-slate-100 text-slate-900 rounded-md shadow-md',
-        'border-slate-300 border'
-      )}
+      className="h-1/4 max-h-64 min-h-16 rounded-md shadow-md border"
       id="elevation-container"
     >
       <ElevationChart

@@ -1,7 +1,5 @@
 'use client';
 
-import { twJoin } from 'tailwind-merge';
-
 import { useIncrement, useVariableIncrement } from './hooks';
 import { InfoData, Options, ResultsData } from '@/api/types';
 import {
@@ -36,10 +34,7 @@ export default function Input(
   ).map((element) => (
     <li
       key={element.props.name ?? 'noname'}
-      className={twJoin(
-        'text-slate-900 bg-slate-100 rounded-md p-2 shadow-md',
-        'border-slate-300 border',
-      )}
+      className='rounded-md p-2 shadow-md border'
     >
       {element}
     </li>

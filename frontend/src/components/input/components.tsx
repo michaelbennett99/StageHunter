@@ -208,7 +208,7 @@ export function TextInput({
   const isIncorrect = !isCorrect && tries <= 0;
 
   let inputClassName = twMerge(
-    'h-full w-40 p-1 border-2 border-slate-300 rounded-md disabled:bg-slate-50',
+    'h-full w-40 p-1 border-2 rounded-md',
     className
   );
 
@@ -225,11 +225,11 @@ export function TextInput({
 
   const optionClassName = `
     p-1 border-0 select-none
-    outline outline-offset-0 outline-[0.5px] outline-slate-300 outline-dashed
+    outline outline-offset-0 outline-[0.5px] outline-dashed outline-accent
   `;
 
   const selectedOptionClassName = `
-    bg-slate-300 text-slate-700 outline-slate-300
+    bg-accent text-accent-foreground
   `;
 
   return (
@@ -293,7 +293,7 @@ export function ScoreBug(
 ): JSX.Element {
   return (
     <div
-      className="my-2 text-black flex flex-row gap-2 justify-center"
+      className="my-2 flex flex-row gap-2 justify-center"
     >
       <p>Correct: {numCorrect}/{total}</p>
       <p>Score: {score}</p>

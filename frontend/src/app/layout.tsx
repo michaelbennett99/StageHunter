@@ -28,8 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex flex-col h-screen overflow-hidden">
-        <Header />
-        {children}
+        <div>
+          <Header />
+          {children}
+        </div>
       </body>
     </html>
   );

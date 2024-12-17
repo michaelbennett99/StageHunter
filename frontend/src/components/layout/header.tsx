@@ -4,7 +4,7 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "flex-none sticky top-0 z-50 bg-white border-b border-gray-200",
+        "flex-none sticky top-0 z-50 border-b",
         "py-2 px-8"
       )}
     >
