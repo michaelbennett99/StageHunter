@@ -16,7 +16,7 @@ export default function Sidebar({ children }: Props): JSX.Element {
     <div
       className={cn(
         'absolute top-0 right-0 h-full md:hidden',
-        'z-40 overflow-y-auto flex flex-row',
+        'z-40 flex flex-row',
       )}
     >
       <button

@@ -39,9 +39,9 @@ export default async function Stage({
     serverApiClient.getGradientData(stageId, resolution)
   ]);
   return (
-    <div className="relative h-full w-full flex flex-col">
+    <div className="relative h-full w-full flex flex-col overflow-hidden">
       <div
-        className="flex flex-row h-full bg-background text-foreground gap-4 p-2 overflow-hidden"
+        className="flex flex-row h-full bg-background text-foreground gap-4 px-2"
         id="main-app-container"
       >
         <Route track={track} elevation={gradientData} />

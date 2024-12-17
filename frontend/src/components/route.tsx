@@ -17,7 +17,7 @@ export default function Route({
 
   return (
     <div
-      className="flex flex-col flex-1 min-h-0 gap-2"
+      className="flex flex-col flex-1 min-h-0 gap-2 py-2"
       id="route-data-container"
     >
       <Map track={track} distance={distance} />
