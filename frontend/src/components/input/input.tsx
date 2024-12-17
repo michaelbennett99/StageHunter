@@ -53,11 +53,8 @@ export default function Input(
   const numBoxes = numInfoBoxes + numResultBoxes;
 
   return (
-    <div
-      className="w-80 h-screen mr-2 box-content"
-      id="input-container"
-    >
-      <div className="overflow-y-auto h-full scrollbar-hide">
+    <div className="w-80 flex flex-col h-full" id="input-container">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
         <Header text="Guess the stage!" />
         <BoxList>{list_elements}</BoxList>
         <ScoreBug
