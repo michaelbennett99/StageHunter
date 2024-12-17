@@ -49,13 +49,7 @@ export default function Input(
   return (
     <div className="w-80 flex flex-col h-full" id="input-container">
       <div className="flex-1 overflow-y-auto scrollbar-hide">
-        <Header text="Guess the stage!" />
         <BoxList>{list_elements}</BoxList>
-        <ScoreBug
-          score={score}
-          numCorrect={numCorrect}
-          total={numBoxes}
-        />
       </div>
     </div>
   );
