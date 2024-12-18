@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import DarkModeToggle from "./darkModeToggle";
 
 export default function Header() {
   return (
@@ -8,7 +9,10 @@ export default function Header() {
         "py-2 px-8"
       )}
     >
-      <h1 className="text-2xl font-bold">StageHunter</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">StageHunter</h1>
+        <DarkModeToggle />
+      </div>
     </header>
   );
 }
