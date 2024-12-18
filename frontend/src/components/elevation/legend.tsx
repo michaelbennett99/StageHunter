@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { useTheme } from 'next-themes';
 
 import { GradientData } from '@/api/types';
 
@@ -20,6 +21,8 @@ export function GradientLegend(
     height?: number;
   }
 ): JSX.Element {
+  const { resolvedTheme } = useTheme();
+
   // Dimensions
   const padding = 10;
   const legendLeft = dims.width - margin.right + padding;
@@ -61,7 +64,7 @@ export function GradientLegend(
         y={0}
         width={width}
         height={legendHeight}
-        stroke="black"
+        stroke={resolvedTheme === 'dark' ? 'white' : 'black'}
         strokeWidth={1}
         fill="url(#legendGradient)"
       />
@@ -70,7 +73,7 @@ export function GradientLegend(
           key={tick}
           transform={`translate(${width},${g(tick)})`}
         >
-          <line x2={6} stroke="black" />
+          <line x2={6} stroke={resolvedTheme === 'dark' ? 'white' : 'black'} />
           <TickLabel
             tick={tick}
             labelFn={tick => tick.toFixed(0).toString() + '%'}
@@ -78,7 +81,8 @@ export function GradientLegend(
               fontSize: '10px',
               textAnchor: 'start',
               alignmentBaseline: 'middle',
-              transform: 'translateX(8px)'
+              transform: 'translateX(8px)',
+              fill: resolvedTheme === 'dark' ? 'white' : 'black'
             }}
           />
         </g>
