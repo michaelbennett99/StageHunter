@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 
+import { useTheme } from 'next-themes'
+
 export function XAxis(
   { margin, width, height, x, nTicks, labelFn }: {
     margin: { top: number; right: number; bottom: number; left: number };
@@ -10,6 +12,8 @@ export function XAxis(
     labelFn: (tick: number) => string;
   }
 ): JSX.Element {
+  const { resolvedTheme } = useTheme();
+
   return (
     <g
       transform={`translate(0,${height - margin.bottom})`}
@@ -22,7 +26,7 @@ export function XAxis(
       />
       {x.ticks(nTicks).map(tick => (
         <g key={tick} transform={`translate(${x(tick)},0)`}>
-          <line y2={6} stroke="black" />
+          <line y2={6} stroke={resolvedTheme === 'dark' ? 'white' : 'black'} />
           <TickLabel
             tick={tick}
             labelFn={labelFn}
@@ -48,6 +52,7 @@ export function YAxis(
     labelFn: (tick: number) => string;
   }
 ): JSX.Element {
+  const { resolvedTheme } = useTheme();
   return (
     <g
       transform={`translate(${margin.left},0)`}
@@ -56,7 +61,7 @@ export function YAxis(
       <line
         y1={margin.top}
         y2={height - margin.bottom}
-        stroke="black"
+        stroke={resolvedTheme === 'dark' ? 'white' : 'black'}
       />
       {y.ticks(nTicks).map(tick => (
         <g key={tick} transform={`translate(0,${y(tick)})`}>
