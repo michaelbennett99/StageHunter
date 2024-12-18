@@ -1,12 +1,18 @@
 import React from 'react';
-
+import { useTheme } from 'next-themes';
 import { GradientData } from '@/api/types';
 
 import { makeColourMap } from './data';
 
 export function ElevationLine({ d }: { d: string }): JSX.Element {
+  const { resolvedTheme } = useTheme();
   return (
-    <path fill="none" stroke="black" strokeWidth={2} d={d} />
+    <path
+      fill="none"
+      stroke={resolvedTheme === 'dark' ? 'white' : 'black'}
+      strokeWidth={2}
+      d={d}
+    />
   );
 }
 
