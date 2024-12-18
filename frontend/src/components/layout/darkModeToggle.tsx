@@ -33,10 +33,10 @@ export default function DarkModeToggle({ className }: { className?: string }) {
   }
 
   const icon = isLightMode
-    ? <LuSun />
+    ? <LuSun className="w-full h-full" />
     : isDarkMode
-      ? <LuMoon />
-      : <LuSunMoon />;
+      ? <LuMoon className="w-full h-full" />
+      : <LuSunMoon className="w-full h-full" />;
 
   return (
     <button onClick={toggle} className={className}>
