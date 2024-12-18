@@ -22,7 +22,7 @@ export function XAxis(
       <line
         x1={margin.left}
         x2={width - margin.right}
-        stroke="black"
+        stroke={resolvedTheme === 'dark' ? 'white' : 'black'}
       />
       {x.ticks(nTicks).map(tick => (
         <g key={tick} transform={`translate(${x(tick)},0)`}>
@@ -33,7 +33,8 @@ export function XAxis(
             style={{
               fontSize: '10px',
               textAnchor: 'middle',
-              transform: 'translateY(20px)'
+              transform: 'translateY(20px)',
+              fill: resolvedTheme === 'dark' ? 'white' : 'black'
             }}
           />
         </g>
@@ -73,7 +74,7 @@ export function YAxis(
             strokeOpacity={0.5}
             strokeDasharray="2,2"
           />
-          <line x2={-6} stroke="black" />
+          <line x2={-6} stroke={resolvedTheme === 'dark' ? 'white' : 'black'} />
           <TickLabel
             tick={tick}
             labelFn={labelFn}
@@ -81,7 +82,8 @@ export function YAxis(
               fontSize: '10px',
               textAnchor: 'end',
               transform: 'translateX(-8px)',
-              alignmentBaseline: 'middle'
+              alignmentBaseline: 'middle',
+              fill: resolvedTheme === 'dark' ? 'white' : 'black'
             }}
           />
         </g>
