@@ -37,9 +37,9 @@ export const MapboxStandardConfig = {
     label: 'Show Place Labels',
     value: true
   },
-  showPOILabels: {
+  showPointOfInterestLabels: {
     type: 'boolean',
-    id: 'showPOILabels',
+    id: 'showPointOfInterestLabels',
     label: 'Show POI Labels',
     value: true
   },
