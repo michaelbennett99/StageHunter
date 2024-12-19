@@ -38,7 +38,11 @@ export default function MapConfigButton(
   }
 
   return (
-    <MapButton {...buttonProps} asChild>
+    <MapButton
+      {...buttonProps}
+      className="p-2 rounded-md shadow-md bg-background"
+      asChild
+    >
       <Popover>
         <PopoverTrigger>
           <LuSettings />
