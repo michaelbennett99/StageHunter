@@ -1,7 +1,7 @@
 const MAPBOX_STYLES = {
   standard: {
     id: 'standard' as const,
-    url: 'mapbox://styles/mdabennett99/cm4vj2i8t002k01sa0x0x30o4/draft',
+    url: 'mapbox://styles/mdabennett99/cm4vj2i8t002k01sa0x0x30o4',
     name: 'Mapbox Standard'
   },
   standardSatellite: {
