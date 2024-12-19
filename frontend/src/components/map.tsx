@@ -1,14 +1,11 @@
 'use client';
 
 import { useRef, useEffect, useMemo, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { ConfigSpecification } from 'mapbox-gl';
 import { along } from '@turf/along';
 
 import { mapboxStyleMap } from '@/interfaces/mapboxStyles';
-import {
-  getConfig,
-  MapboxStandardConfig
-} from '@/interfaces/mapboxStandardConfig';
+import { defaultConfig } from '@/interfaces/mapboxStandardConfig';
 import MapButtons from './map/mapButtons';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -22,7 +19,7 @@ export default function Map(
 
   const INITIAL_ZOOM = 7;
   const DEFAULT_STYLE = 'standard';
-  const DEFAULT_CONFIG = MapboxStandardConfig;
+  const DEFAULT_CONFIG = defaultConfig;
 
   const bounds = useMemo(() => {
     const track_coords = track.coordinates as [number, number][];
@@ -46,15 +43,11 @@ export default function Map(
       zoom: INITIAL_ZOOM,
       style: mapboxStyleMap[DEFAULT_STYLE].url,
       config: {
-        basemap: getConfig(DEFAULT_CONFIG)
+        basemap: DEFAULT_CONFIG as unknown as ConfigSpecification
       }
     });
 
     mapRef.current = map;
-
-    function initialiseConfig() {
-      map.setConfig('basemap', DEFAULT_CONFIG);
-    }
 
     function initialiseLayers() {
       map.addSource('route', {

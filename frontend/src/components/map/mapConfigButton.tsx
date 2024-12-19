@@ -17,8 +17,9 @@ import { Switch } from '@/components/ui/switch';
 
 import {
   MapboxStandardConfig,
-  MapboxStandardConfigKey,
-  getConfig
+  configLabels,
+  themeOptions,
+  lightPresetOptions
 } from '@/interfaces/mapboxStandardConfig';
 
 import MapButton, { MapButtonProps } from './mapButton';
@@ -34,26 +35,23 @@ export default function MapConfigButton(
   const [config, setConfig] = useState(defaultConfig);
 
   function handleConfigChange(
-    key: MapboxStandardConfigKey,
-    value: any
+    key: keyof MapboxStandardConfig,
+    value: boolean | string
   ) {
-    setConfig(
-      prevConfig => ({
-        ...prevConfig,
-        [key]: { ...prevConfig[key], value }
-      })
-    );
+    setConfig(prevConfig => ({
+      ...prevConfig,
+      [key]: value
+    }));
   }
 
   useEffect(() => {
-    mapRef.current?.setConfig('basemap', getConfig(config));
-  }, [config]);
+    mapRef.current?.setConfig(
+      'basemap', config as unknown as mapboxgl.ConfigSpecification
+    );
+  }, [config, mapRef]);
 
   return (
-    <MapButton
-      {...buttonProps}
-      asChild
-    >
+    <MapButton {...buttonProps} asChild>
       <Popover>
         <PopoverTrigger asChild>
           <button className="p-2 rounded-md shadow-md bg-background">
@@ -62,42 +60,39 @@ export default function MapConfigButton(
         </PopoverTrigger>
         <PopoverContent>
           <div className="flex flex-col gap-2">
-            {Object.entries(config).map(([key, item]) => (
-              <div key={key} className="flex items-center justify-between gap-4">
-                <span className="text-sm">{item.label}</span>
-                {item.type === 'boolean' ? (
-                  <Switch
-                    checked={item.value}
-                    onCheckedChange={() => handleConfigChange(
-                      key as MapboxStandardConfigKey,
-                      !item.value
-                    )}
-                  />
-                ) : (
-                  <Select
-                    value={item.value}
-                    onValueChange={(value) => handleConfigChange(
-                      key as MapboxStandardConfigKey,
-                      value
-                    )}
-                  >
-                    <SelectTrigger className="w-[140px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {item.options.map((option) => (
-                        <SelectItem
-                          key={option.value}
-                          value={option.value}
-                        >
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-            ))}
+            {Object.entries(config).map(([key, value]) => {
+              const configKey = key as keyof MapboxStandardConfig;
+              return (
+                <div key={key} className="flex items-center justify-between gap-4">
+                  <span className="text-sm">{configLabels[configKey]}</span>
+                  {typeof value === 'boolean' ? (
+                    <Switch
+                      checked={value}
+                      onCheckedChange={() => handleConfigChange(configKey, !value)}
+                    />
+                  ) : (
+                    <Select
+                      value={value}
+                      onValueChange={(newValue) => handleConfigChange(configKey, newValue)}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(key === 'theme' ? themeOptions : lightPresetOptions).map((option) => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </PopoverContent>
       </Popover>
