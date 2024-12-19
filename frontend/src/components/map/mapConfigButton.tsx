@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LuSettings } from 'react-icons/lu';
 
 import {
@@ -24,10 +24,11 @@ import MapButton, { MapButtonProps } from './mapButton';
 
 export type MapConfigButtonProps = {
   defaultConfig: MapboxStandardConfig;
+  mapRef: React.RefObject<mapboxgl.Map>;
 } & MapButtonProps;
 
 export default function MapConfigButton(
-  { defaultConfig, ...buttonProps }: MapConfigButtonProps
+  { mapRef, defaultConfig, ...buttonProps }: MapConfigButtonProps
 ): JSX.Element {
   const [config, setConfig] = useState(defaultConfig);
 
@@ -42,6 +43,18 @@ export default function MapConfigButton(
       })
     );
   }
+
+  useEffect(() => {
+    const configObj = Object.fromEntries(
+      Object.entries(config).map(([key, value]) => {
+        return [key, value.value];
+      })
+    );
+
+    console.log(configObj);
+
+    mapRef.current?.setConfig('basemap', configObj);
+  }, [config]);
 
   return (
     <MapButton
