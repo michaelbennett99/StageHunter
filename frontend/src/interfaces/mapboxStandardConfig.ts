@@ -30,17 +30,6 @@ export interface MapboxStandardConfig {
   lightPreset?: MapboxLightPreset;
 }
 
-export const defaultConfig: MapboxStandardConfig = {
-  showPedestrianRoads: true,
-  showPlaceLabels: true,
-  showPointOfInterestLabels: false,
-  showRoadLabels: false,
-  showTransitLabels: false,
-  show3dObjects: true,
-  theme: 'default',
-  lightPreset: 'day'
-};
-
 // UI display configuration - separate from the actual config values
 export const configLabels: Record<keyof MapboxStandardConfig, string> = {
   showPedestrianRoads: 'Show Pedestrian Roads',
@@ -70,3 +59,19 @@ export const configOptions: Partial<
   theme: themeOptions,
   lightPreset: lightPresetOptions
 };
+
+const defaultAllConfig: MapboxStandardConfig = {
+  showPedestrianRoads: true,
+  showPlaceLabels: true,
+  showPointOfInterestLabels: false,
+  showRoadLabels: false,
+  showTransitLabels: false,
+  show3dObjects: true,
+  theme: 'default',
+  lightPreset: 'day'
+};
+
+export const defaultConfig: MapboxStandardConfig = Object.fromEntries(
+  Object.entries(defaultAllConfig)
+    .filter(([key]) => showOptions[key as keyof MapboxStandardConfig])
+) as MapboxStandardConfig;

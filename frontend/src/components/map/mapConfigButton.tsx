@@ -42,13 +42,10 @@ export default function MapConfigButton(
       ...prevConfig,
       [key]: value
     }));
-  }
-
-  useEffect(() => {
-    mapRef.current?.setConfig(
-      'basemap', config as unknown as mapboxgl.ConfigSpecification
+    mapRef.current?.setConfigProperty(
+      'basemap', key, value
     );
-  }, [config, mapRef]);
+  }
 
   return (
     <MapButton {...buttonProps} asChild>
