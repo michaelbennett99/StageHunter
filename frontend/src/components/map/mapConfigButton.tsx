@@ -60,23 +60,63 @@ export default function MapConfigButton(
         <PopoverContent>
           <div className="flex flex-col gap-2">
             {Object.entries(config).map(([key, value]) => {
-              const configKey = key as keyof MapboxStandardConfig;
               return (
-                <div key={key} className="flex items-center justify-between gap-4">
-                  <span className="text-sm">{configLabels[configKey]}</span>
-                  {typeof value === 'boolean' ? (
-                    <Switch
-                      checked={value}
-                      onCheckedChange={() => handleConfigChange(configKey, !value)}
-                    />
-                  ) : <></>
-                  }
-                </div>
+                <ConfigOption
+                  key={key}
+                  configKey={key as keyof MapboxStandardConfig}
+                  value={value}
+                  onChange={handleConfigChange}
+                />
               );
             })}
           </div>
         </PopoverContent>
       </Popover>
     </MapButton>
+  );
+}
+
+export function ConfigOption({
+  configKey, value, onChange
+}: {
+  configKey: keyof MapboxStandardConfig,
+  value: boolean | string,
+  onChange: (key: keyof MapboxStandardConfig, value: boolean | string) => void,
+}): JSX.Element {
+  return (
+    <div key={configKey} className="flex items-center justify-between gap-4">
+      <span className="text-sm">{configLabels[configKey]}</span>
+      {typeof value === 'boolean' ? (
+        <Switch
+          checked={value}
+          onCheckedChange={() => onChange(configKey, !value)}
+        />
+      ) : (
+        <Select
+          value={value}
+          onValueChange={
+            (newValue) => onChange(configKey, newValue)
+          }
+
+        >
+          <SelectTrigger className="p-1 h-6 w-32">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="p-1">
+            {
+              configOptions[configKey]?.map((option) => (
+                <SelectItem
+                  key={option.value}
+                  value={option.value}
+                  className="p-1"
+                >
+                  {option.label}
+                </SelectItem>
+              ))
+            }
+          </SelectContent>
+        </Select>
+      )}
+    </div>
   );
 }
