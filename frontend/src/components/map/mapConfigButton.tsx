@@ -80,13 +80,12 @@ export default function MapConfigButton(
                       <SelectTrigger className="p-1 h-6 w-32">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="p-1">
                         {
                           configOptions[configKey]?.map((option) => (
                             <SelectItem
                               key={option.value}
                               value={option.value}
-                              className="py-1"
                             >
                               {option.label}
                             </SelectItem>
