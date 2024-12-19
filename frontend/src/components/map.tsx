@@ -37,6 +37,7 @@ export default function Map(
   // Initialize map
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '';
+    console.log(DEFAULT_CONFIG);
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current!,
