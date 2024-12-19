@@ -15,13 +15,13 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
         'text-foreground'
       )}
     >
-      <MapStyleButton
+      {/* <MapStyleButton
         mapRef={mapRef}
         isMapReady={isMapReady}
         id="map-style-button"
         defaultStyle={defaultStyle}
         {...buttonProps}
-      />
+      /> */}
       <MapResetButton
         mapRef={mapRef}
         bounds={bounds}
