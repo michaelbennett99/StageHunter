@@ -69,31 +69,8 @@ export default function MapConfigButton(
                       checked={value}
                       onCheckedChange={() => handleConfigChange(configKey, !value)}
                     />
-                  ) : (
-                    <Select
-                      value={value}
-                      onValueChange={
-                        (newValue) => handleConfigChange(configKey, newValue)
-                      }
-
-                    >
-                      <SelectTrigger className="p-1 h-6 w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="p-1">
-                        {
-                          configOptions[configKey]?.map((option) => (
-                            <SelectItem
-                              key={option.value}
-                              value={option.value}
-                              className="p-1"
-                            >
-                              {option.label}
-                            </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  ) : <></>
+                  }
                 </div>
               );
             })}
