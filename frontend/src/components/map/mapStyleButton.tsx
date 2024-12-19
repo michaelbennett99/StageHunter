@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LuChevronDown, LuCheck } from 'react-icons/lu';
 
 import {
@@ -22,14 +22,29 @@ import {
 } from '@/interfaces/mapboxStyles';
 import MapButton, { MapButtonProps } from './mapButton';
 
-export type MapStyleButtonProps = MapButtonProps;
+export type MapStyleButtonProps = MapButtonProps & {
+  mapRef: React.RefObject<mapboxgl.Map>,
+  defaultStyle: MapboxStyleId,
+}
 
 export default function MapStyleButton(
   props: MapStyleButtonProps
 ): JSX.Element {
+  const { mapRef, defaultStyle, ...buttonProps } = props;
+
   const [open, setOpen] = useState(false);
-  const [selectedStyle, setSelectedStyle] = useState<MapboxStyleId>('standard');
+  const [selectedStyle, setSelectedStyle] = useState<MapboxStyleId>(defaultStyle);
   const fullMapboxStyle = mapboxStyleMap[selectedStyle];
+
+  const handleSelectStyle = (styleId: MapboxStyleId) => {
+    setSelectedStyle(styleId);
+    setOpen(false);
+  };
+
+  // Set map style when selected style changes
+  useEffect(() => {
+    props.mapRef.current?.setStyle(fullMapboxStyle.url);
+  }, [selectedStyle]);
 
   return (
     <MapButton {...props}>
@@ -39,6 +54,7 @@ export default function MapStyleButton(
             role="combobox"
             aria-expanded={open}
             className="justify-between flex items-center gap-1 p-2 rounded-md shadow-md group bg-background text-sm"
+            {...buttonProps}
           >
             <span>{fullMapboxStyle.name}</span>
             <LuChevronDown />
@@ -55,8 +71,7 @@ export default function MapStyleButton(
                     key={style.id}
                     value={style.id}
                     onSelect={() => {
-                      setSelectedStyle(style.id);
-                      setOpen(false);
+                      handleSelectStyle(style.id);
                     }}
                   >
                     <span>{style.name}</span>

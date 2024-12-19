@@ -4,6 +4,7 @@ import { useRef, useEffect, useMemo, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { along } from '@turf/along';
 
+import { mapboxStyleMap } from '@/interfaces/mapboxStyles';
 import MapButtons from './map/mapButtons';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -16,6 +17,7 @@ export default function Map(
   const [isMapReady, setIsMapReady] = useState(false);
 
   const INITIAL_ZOOM = 7;
+  const DEFAULT_STYLE = 'standard';
 
   const bounds = useMemo(() => {
     const track_coords = track.coordinates as [number, number][];
@@ -86,6 +88,10 @@ export default function Map(
       setIsMapReady(true);
     });
 
+    map.on('style.load', () => {
+      map.setStyle(mapboxStyleMap[DEFAULT_STYLE].url);
+    });
+
     return () => {
       setIsMapReady(false);
       map.remove();
@@ -116,7 +122,12 @@ export default function Map(
       id="map-container-container"
       className="h-full relative"
     >
-      <MapButtons mapRef={mapRef} bounds={bounds} isMapReady={isMapReady} />
+      <MapButtons
+        mapRef={mapRef}
+        bounds={bounds}
+        isMapReady={isMapReady}
+        defaultStyle={DEFAULT_STYLE}
+      />
       <div
         className="h-full rounded-md shadow-md"
         id="map-container"
