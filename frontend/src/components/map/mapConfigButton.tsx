@@ -40,12 +40,13 @@ export default function MapConfigButton(
   return (
     <MapButton
       {...buttonProps}
-      className="p-2 rounded-md shadow-md bg-background"
       asChild
     >
       <Popover>
-        <PopoverTrigger>
-          <LuSettings />
+        <PopoverTrigger asChild>
+          <button className="p-2 rounded-md shadow-md bg-background">
+            <LuSettings />
+          </button>
         </PopoverTrigger>
         <PopoverContent>
           <div className="flex flex-col gap-2">
