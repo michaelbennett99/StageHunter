@@ -29,7 +29,7 @@ export const MapboxStandardConfig = {
     type: 'boolean',
     id: 'showPedestrianRoads',
     label: 'Show Pedestrian Roads',
-    value: false
+    value: true
   },
   showPlaceLabels: {
     type: 'boolean',
@@ -41,7 +41,7 @@ export const MapboxStandardConfig = {
     type: 'boolean',
     id: 'showPointOfInterestLabels',
     label: 'Show POI Labels',
-    value: true
+    value: false
   },
   showRoadLabels: {
     type: 'boolean',
