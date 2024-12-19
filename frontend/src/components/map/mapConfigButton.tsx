@@ -54,8 +54,8 @@ export default function MapConfigButton(
     <MapButton {...buttonProps} asChild>
       <Popover>
         <PopoverTrigger asChild>
-          <button className="p-2 rounded-md shadow-md bg-background">
-            <LuSettings />
+          <button className="p-2 rounded-md shadow-md bg-background group">
+            <LuSettings className="group-hover:animate-spin-once" />
           </button>
         </PopoverTrigger>
         <PopoverContent>
@@ -100,7 +100,6 @@ export function ConfigOption({
           onValueChange={
             (newValue) => onChange(configKey, newValue)
           }
-
         >
           <SelectTrigger className="p-1 h-6 w-32">
             <SelectValue />
