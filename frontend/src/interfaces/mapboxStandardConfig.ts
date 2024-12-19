@@ -53,6 +53,17 @@ export const configLabels: Record<keyof MapboxStandardConfig, string> = {
   lightPreset: 'Light Preset'
 };
 
+export const showOptions: Record<keyof MapboxStandardConfig, boolean> = {
+  showPedestrianRoads: true,
+  showPlaceLabels: true,
+  showPointOfInterestLabels: true,
+  showRoadLabels: true,
+  showTransitLabels: true,
+  show3dObjects: true,
+  theme: false,
+  lightPreset: false
+};
+
 export const configOptions: Partial<
   Record<keyof MapboxStandardConfig, ConfigOption[]>
 > = {

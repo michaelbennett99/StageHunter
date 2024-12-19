@@ -18,7 +18,8 @@ import { Switch } from '@/components/ui/switch';
 import {
   MapboxStandardConfig,
   configLabels,
-  configOptions
+  configOptions,
+  showOptions
 } from '@/interfaces/mapboxStandardConfig';
 
 import MapButton, { MapButtonProps } from './mapButton';
@@ -61,12 +62,14 @@ export default function MapConfigButton(
           <div className="flex flex-col gap-2">
             {Object.entries(config).map(([key, value]) => {
               return (
-                <ConfigOption
-                  key={key}
-                  configKey={key as keyof MapboxStandardConfig}
-                  value={value}
-                  onChange={handleConfigChange}
-                />
+                showOptions[key as keyof MapboxStandardConfig] && (
+                  <ConfigOption
+                    key={key}
+                    configKey={key as keyof MapboxStandardConfig}
+                    value={value}
+                    onChange={handleConfigChange}
+                  />
+                )
               );
             })}
           </div>
