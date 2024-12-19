@@ -23,6 +23,8 @@ export default function MapConfigButton(
 ): JSX.Element {
   const [config, setConfig] = useState(defaultConfig);
 
+  console.log(config);
+
   function handleConfigChange(
     key: MapboxStandardConfigKey,
     value: typeof config[MapboxStandardConfigKey]
