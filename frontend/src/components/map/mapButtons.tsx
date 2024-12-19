@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
+import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
 
 export type MapButtonsProps = MapResetButtonProps
 
@@ -14,6 +15,7 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
         'text-map-button-foreground'
       )}
     >
+      <MapStyleButton isMapReady={isMapReady} />
       <MapResetButton
         mapRef={mapRef}
         bounds={bounds}

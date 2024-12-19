@@ -5,7 +5,7 @@ const MAPBOX_STYLES = {
     name: 'Mapbox Standard'
   },
   standardSatellite: {
-    id: 'standard-satellite' as const,
+    id: 'standardSatellite' as const,
     url: 'mapbox://styles/mapbox/standard-satellite',
     name: 'Mapbox Standard Satellite'
   },
@@ -35,17 +35,17 @@ const MAPBOX_STYLES = {
     name: 'Mapbox Dark'
   },
   satelliteStreets: {
-    id: 'satellite-streets' as const,
+    id: 'satelliteStreets' as const,
     url: 'mapbox://styles/mapbox/satellite-streets-v12',
     name: 'Mapbox Satellite Streets'
   },
   navigationDay: {
-    id: 'navigation-day' as const,
+    id: 'navigationDay' as const,
     url: 'mapbox://styles/mapbox/navigation-day-v1',
     name: 'Mapbox Navigation Day'
   },
   navigationNight: {
-    id: 'navigation-night' as const,
+    id: 'navigationNight' as const,
     url: 'mapbox://styles/mapbox/navigation-night-v1',
     name: 'Mapbox Navigation Night'
   }
@@ -56,3 +56,4 @@ export type MapboxStyleId = typeof MAPBOX_STYLES[
 ]['id'];
 export type MapboxStyle = typeof MAPBOX_STYLES[keyof typeof MAPBOX_STYLES];
 export const mapboxStyleMap = MAPBOX_STYLES;
+export const mapboxStyles = Object.values(MAPBOX_STYLES);
