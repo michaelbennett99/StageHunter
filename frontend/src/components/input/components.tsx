@@ -213,10 +213,10 @@ export function TextInput({
   );
 
   if (isCorrect) inputClassName = twMerge(
-    inputClassName, 'border-green-500'
+    inputClassName, 'border-correct'
   );
   if (isIncorrect) inputClassName = twMerge(
-    inputClassName, 'border-red-500'
+    inputClassName, 'border-incorrect'
   );
 
   const optionsListClassName = `
@@ -259,7 +259,7 @@ export function TextInput({
                   'text-nowrap z-50 flex items-center',
                   'select-none cursor-default overflow-x-auto scrollbar-hide',
                   'overflow-y-hidden',
-                  `${isCorrect ? 'bg-green-100' : 'bg-red-100'}`
+                  `${isCorrect ? 'bg-correct-muted' : 'bg-incorrect-muted'}`
                 )
               )}
             >
@@ -273,8 +273,8 @@ export function TextInput({
         className={`
           bg-blue-500 text-white p-1 rounded-md h-full w-full z-10
           ${!noMoreInput ? 'hover:bg-blue-700' : ''}
-          ${isCorrect ? 'bg-green-500' : ''}
-          ${isIncorrect ? 'bg-red-500' : ''}
+          ${isCorrect ? 'bg-correct' : ''}
+          ${isIncorrect ? 'bg-incorrect' : ''}
         `}
         disabled={noMoreInput}
         tabIndex={-1}

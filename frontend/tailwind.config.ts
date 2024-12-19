@@ -52,9 +52,17 @@ const config: Config = {
         },
         map: {
           button: {
-            background: 'black',
-            foreground: 'white'
+            background: 'rgb(var(--map-button-background))',
+            foreground: 'rgb(var(--map-button-foreground))'
           }
+        },
+        correct: {
+          DEFAULT: 'rgb(var(--correct))',
+          muted: 'rgb(var(--correct-muted))'
+        },
+        incorrect: {
+          DEFAULT: 'rgb(var(--incorrect))',
+          muted: 'rgb(var(--incorrect-muted))'
         }
       },
       borderRadius: {
