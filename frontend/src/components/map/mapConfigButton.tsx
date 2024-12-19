@@ -6,6 +6,14 @@ import {
   PopoverTrigger,
   PopoverContent
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 
 import {
   MapboxStandardConfig,
@@ -23,11 +31,9 @@ export default function MapConfigButton(
 ): JSX.Element {
   const [config, setConfig] = useState(defaultConfig);
 
-  console.log(config);
-
   function handleConfigChange(
     key: MapboxStandardConfigKey,
-    value: typeof config[MapboxStandardConfigKey]
+    value: any
   ) {
     setConfig(
       prevConfig => ({
@@ -50,10 +56,40 @@ export default function MapConfigButton(
         </PopoverTrigger>
         <PopoverContent>
           <div className="flex flex-col gap-2">
-            {Object.entries(config).map(([key, value]) => (
-              <div key={key}>
-                <p>{value.label}</p>
-                <p>{value.value}</p>
+            {Object.entries(config).map(([key, item]) => (
+              <div key={key} className="flex items-center justify-between gap-4">
+                <span className="text-sm">{item.label}</span>
+                {item.type === 'boolean' ? (
+                  <Switch
+                    checked={item.value}
+                    onCheckedChange={() => handleConfigChange(
+                      key as MapboxStandardConfigKey,
+                      !item.value
+                    )}
+                  />
+                ) : (
+                  <Select
+                    value={item.value}
+                    onValueChange={(value) => handleConfigChange(
+                      key as MapboxStandardConfigKey,
+                      value
+                    )}
+                  >
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {item.options.map((option) => (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                        >
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
             ))}
           </div>
