@@ -23,13 +23,13 @@ export default function MapResetButton(
     <MapButton
       {...buttonProps}
       onClick={handleClick}
-      Icon={FaArrowsRotate}
       className={cn(
         'p-2 rounded-md shadow-md',
         'bg-opacity-50 hover:bg-opacity-100 group',
         'bg-map-button-background'
       )}
-      iconClassName="group-hover:animate-spin-once"
-    />
+    >
+      <FaArrowsRotate className="group-hover:animate-spin-once" />
+    </MapButton>
   );
 }
