@@ -38,22 +38,22 @@ export default function MapConfigButton(
   }
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <MapButton {...buttonProps}>
+    <MapButton {...buttonProps} asChild>
+      <Popover>
+        <PopoverTrigger asChild>
           <LuSettings />
-        </MapButton>
-      </PopoverTrigger>
-      <PopoverContent>
-        <div className="flex flex-col gap-2">
-          {Object.entries(config).map(([key, value]) => (
-            <div key={key}>
-              <p>{value.label}</p>
-              <p>{value.value}</p>
-            </div>
-          ))}
-        </div>
-      </PopoverContent>
-    </Popover>
+        </PopoverTrigger>
+        <PopoverContent>
+          <div className="flex flex-col gap-2">
+            {Object.entries(config).map(([key, value]) => (
+              <div key={key}>
+                <p>{value.label}</p>
+                <p>{value.value}</p>
+              </div>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </MapButton>
   );
 }
