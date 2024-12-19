@@ -45,15 +45,7 @@ export default function MapConfigButton(
   }
 
   useEffect(() => {
-    const configObj = Object.fromEntries(
-      Object.entries(config).map(([key, value]) => {
-        return [key, value.value];
-      })
-    );
-
-    console.log(configObj);
-
-    mapRef.current?.setConfig('basemap', configObj);
+    mapRef.current?.setConfig('basemap', config);
   }, [config]);
 
   return (

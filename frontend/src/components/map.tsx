@@ -46,6 +46,10 @@ export default function Map(
 
     mapRef.current = map;
 
+    function initialiseConfig() {
+      map.setConfig('basemap', DEFAULT_CONFIG);
+    }
+
     function initialiseLayers() {
       map.addSource('route', {
         type: 'geojson',
@@ -111,7 +115,9 @@ export default function Map(
     if (!isMapReady || !mapRef.current) return;
 
     try {
-      const source = mapRef.current.getSource('point') as mapboxgl.GeoJSONSource;
+      const source = mapRef
+        .current
+        ?.getSource('point') as mapboxgl.GeoJSONSource;
 
       source.setData({
         type: 'FeatureCollection',
