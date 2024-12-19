@@ -34,7 +34,7 @@ export default function Input({
   ));
 
   return (
-    <div className="w-80 flex flex-col h-full" id="input-container">
+    <div className="w-72 flex flex-col h-full" id="input-container">
       <div className="flex-1 overflow-y-auto scrollbar-hide py-2">
         <BoxList>{list_elements}</BoxList>
       </div>
