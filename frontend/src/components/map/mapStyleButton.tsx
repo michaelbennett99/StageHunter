@@ -38,7 +38,7 @@ export default function MapStyleButton(
           <button
             role="combobox"
             aria-expanded={open}
-            className="w-32 justify-between flex items-center"
+            className="w-40 justify-between flex items-center p-2 rounded-md shadow-md bg-opacity-50 hover:bg-opacity-100 group bg-map-button-background"
           >
             <span>{fullMapboxStyle.name}</span>
             <LuChevronDown />
@@ -60,7 +60,7 @@ export default function MapStyleButton(
                     }}
                   >
                     <span>{style.name}</span>
-                    <LuCheck />
+                    {selectedStyle === style.id && <LuCheck />}
                   </CommandItem>
                 ))}
               </CommandGroup>
