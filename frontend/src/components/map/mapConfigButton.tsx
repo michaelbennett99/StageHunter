@@ -73,19 +73,27 @@ export default function MapConfigButton(
                   ) : (
                     <Select
                       value={value}
-                      onValueChange={(newValue) => handleConfigChange(configKey, newValue)}
+                      onValueChange={
+                        (newValue) => handleConfigChange(configKey, newValue)
+                      }
+
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="p-1 h-6 w-32">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {(key === 'theme' ? themeOptions : lightPresetOptions).map((option) => (
-                          <SelectItem
-                            key={option.value}
-                            value={option.value}
-                          >
-                            {option.label}
-                          </SelectItem>
+                        {
+                          (key === 'theme'
+                            ? themeOptions
+                            : lightPresetOptions
+                          ).map((option) => (
+                            <SelectItem
+                              key={option.value}
+                              value={option.value}
+                              className="py-1"
+                            >
+                              {option.label}
+                            </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
