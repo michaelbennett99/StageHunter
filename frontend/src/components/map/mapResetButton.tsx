@@ -7,13 +7,10 @@ import MapButton, { MapButtonProps } from "./mapButton";
 type Props = Omit<MapButtonProps, 'Icon' | 'iconClassName' | 'className'> & {
   mapRef: React.RefObject<mapboxgl.Map>,
   bounds: mapboxgl.LngLatBounds,
-  isMapReady: boolean
 }
 
 export default function MapResetButton(props: Props): JSX.Element {
-  const { mapRef, bounds, isMapReady, ...buttonProps } = props;
-
-  if (!isMapReady) return <></>;
+  const { mapRef, bounds, ...buttonProps } = props;
 
   const handleClick = () => {
     mapRef.current?.fitBounds(bounds, {
