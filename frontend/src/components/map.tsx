@@ -4,6 +4,7 @@ import { useRef, useEffect, useMemo, useState } from 'react';
 import mapboxgl, { ConfigSpecification } from 'mapbox-gl';
 import { along } from '@turf/along';
 
+import useMapDarkMode from '@/hooks/useMapDarkMode';
 import { mapboxStyleMap } from '@/interfaces/mapboxStyles';
 import { defaultConfig } from '@/interfaces/mapboxStandardConfig';
 import MapButtons from './map/mapButtons';
@@ -126,6 +127,9 @@ export default function Map(
       console.error('Error updating point:', error);
     }
   }, [point, isMapReady]);
+
+  // Set map dark mode
+  useMapDarkMode(mapRef, isMapReady);
 
   return (
     <div
