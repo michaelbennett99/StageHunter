@@ -4,10 +4,7 @@ import { cn } from "@/lib/utils";
 
 import MapButton, { MapButtonProps } from "./mapButton";
 
-export type MapResetButtonProps = Omit<
-  MapButtonProps,
-  'Icon' | 'iconClassName' | 'className'
-> & {
+export type MapResetButtonProps = MapButtonProps & {
   mapRef: React.RefObject<mapboxgl.Map>,
   bounds: mapboxgl.LngLatBounds,
 }
