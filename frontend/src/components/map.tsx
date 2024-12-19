@@ -1,11 +1,10 @@
 'use client';
 
 import { useRef, useEffect, useMemo, useState } from 'react';
-import { twJoin } from 'tailwind-merge';
 import mapboxgl from 'mapbox-gl';
 import { along } from '@turf/along';
 
-import MapResetButton from './map/mapResetButton';
+import MapButtons from './map/mapButtons';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -117,12 +116,7 @@ export default function Map(
       id="map-container-container"
       className="h-full relative"
     >
-      <MapResetButton
-        mapRef={mapRef}
-        bounds={bounds}
-        isMapReady={isMapReady}
-        id="map-reset-button"
-      />
+      <MapButtons mapRef={mapRef} bounds={bounds} isMapReady={isMapReady} />
       <div
         className="h-full rounded-md shadow-md"
         id="map-container"
