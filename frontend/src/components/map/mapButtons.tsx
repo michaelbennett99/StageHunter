@@ -24,6 +24,7 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
         {...buttonProps}
       /> */}
       <MapConfigButton
+        mapRef={mapRef}
         defaultConfig={defaultConfig}
         isMapReady={isMapReady}
         id="map-config-button"
