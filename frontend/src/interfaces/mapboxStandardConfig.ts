@@ -88,3 +88,11 @@ export const MapboxStandardConfig = {
 
 export type MapboxStandardConfigKey = keyof typeof MapboxStandardConfig;
 export type MapboxStandardConfig = typeof MapboxStandardConfig;
+
+export function getConfig(config: MapboxStandardConfig) {
+  return Object.fromEntries(
+    Object.entries(config).map(([key, value]) => {
+      return [key, value.value];
+    })
+  );
+}

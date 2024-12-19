@@ -5,7 +5,10 @@ import mapboxgl from 'mapbox-gl';
 import { along } from '@turf/along';
 
 import { mapboxStyleMap } from '@/interfaces/mapboxStyles';
-import { MapboxStandardConfig } from '@/interfaces/mapboxStandardConfig';
+import {
+  getConfig,
+  MapboxStandardConfig
+} from '@/interfaces/mapboxStandardConfig';
 import MapButtons from './map/mapButtons';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -42,6 +45,9 @@ export default function Map(
       center: bounds.getCenter(),
       zoom: INITIAL_ZOOM,
       style: mapboxStyleMap[DEFAULT_STYLE].url,
+      config: {
+        basemap: getConfig(DEFAULT_CONFIG)
+      }
     });
 
     mapRef.current = map;

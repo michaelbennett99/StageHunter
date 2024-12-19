@@ -17,7 +17,8 @@ import { Switch } from '@/components/ui/switch';
 
 import {
   MapboxStandardConfig,
-  MapboxStandardConfigKey
+  MapboxStandardConfigKey,
+  getConfig
 } from '@/interfaces/mapboxStandardConfig';
 
 import MapButton, { MapButtonProps } from './mapButton';
@@ -45,7 +46,7 @@ export default function MapConfigButton(
   }
 
   useEffect(() => {
-    mapRef.current?.setConfig('basemap', config);
+    mapRef.current?.setConfig('basemap', getConfig(config));
   }, [config]);
 
   return (
