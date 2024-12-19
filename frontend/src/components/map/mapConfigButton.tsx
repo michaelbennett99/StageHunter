@@ -40,7 +40,7 @@ export default function MapConfigButton(
   return (
     <MapButton {...buttonProps} asChild>
       <Popover>
-        <PopoverTrigger asChild>
+        <PopoverTrigger>
           <LuSettings />
         </PopoverTrigger>
         <PopoverContent>
