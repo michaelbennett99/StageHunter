@@ -120,6 +120,7 @@ export default function Map(
       <MapResetButton
         mapRef={mapRef}
         bounds={bounds}
+        isMapReady={isMapReady}
         id="map-reset-button"
       />
       <div
