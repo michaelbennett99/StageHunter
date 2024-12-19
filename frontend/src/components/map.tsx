@@ -5,6 +5,7 @@ import mapboxgl from 'mapbox-gl';
 import { along } from '@turf/along';
 
 import { mapboxStyleMap } from '@/interfaces/mapboxStyles';
+import { MapboxStandardConfig } from '@/interfaces/mapboxStandardConfig';
 import MapButtons from './map/mapButtons';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -18,6 +19,7 @@ export default function Map(
 
   const INITIAL_ZOOM = 7;
   const DEFAULT_STYLE = 'standard';
+  const DEFAULT_CONFIG = MapboxStandardConfig;
 
   const bounds = useMemo(() => {
     const track_coords = track.coordinates as [number, number][];
@@ -39,7 +41,7 @@ export default function Map(
       container: mapContainerRef.current!,
       center: bounds.getCenter(),
       zoom: INITIAL_ZOOM,
-      style: mapboxStyleMap[DEFAULT_STYLE].url
+      style: mapboxStyleMap[DEFAULT_STYLE].url,
     });
 
     mapRef.current = map;
@@ -129,7 +131,7 @@ export default function Map(
         mapRef={mapRef}
         bounds={bounds}
         isMapReady={isMapReady}
-        defaultStyle={DEFAULT_STYLE}
+        defaultConfig={DEFAULT_CONFIG}
       />
       <div
         className="h-full rounded-md shadow-md"
