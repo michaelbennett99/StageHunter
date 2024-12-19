@@ -20,14 +20,14 @@ export type MapboxTheme = typeof themeOptions[number]['value'];
 export type MapboxLightPreset = typeof lightPresetOptions[number]['value'];
 
 export interface MapboxStandardConfig {
-  showPedestrianRoads: boolean;
-  showPlaceLabels: boolean;
-  showPointOfInterestLabels: boolean;
-  showRoadLabels: boolean;
-  showTransitLabels: boolean;
-  show3dObjects: boolean;
-  theme: MapboxTheme;
-  lightPreset: MapboxLightPreset;
+  showPedestrianRoads?: boolean;
+  showPlaceLabels?: boolean;
+  showPointOfInterestLabels?: boolean;
+  showRoadLabels?: boolean;
+  showTransitLabels?: boolean;
+  show3dObjects?: boolean;
+  theme?: MapboxTheme;
+  lightPreset?: MapboxLightPreset;
 }
 
 export const defaultConfig: MapboxStandardConfig = {
