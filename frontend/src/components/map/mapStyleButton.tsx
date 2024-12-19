@@ -47,14 +47,13 @@ export default function MapStyleButton(
   }, [selectedStyle]);
 
   return (
-    <MapButton {...props}>
+    <MapButton {...buttonProps} asChild>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
             role="combobox"
             aria-expanded={open}
             className="justify-between flex items-center gap-1 p-2 rounded-md shadow-md group bg-background text-sm"
-            {...buttonProps}
           >
             <span>{fullMapboxStyle.name}</span>
             <LuChevronDown />
