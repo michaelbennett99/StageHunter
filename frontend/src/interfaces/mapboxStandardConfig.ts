@@ -1,5 +1,23 @@
-export type MapboxTheme = 'default' | 'faded' | 'monochrome'
-export type MapboxLightPreset = 'day' | 'night' | 'dawn' | 'dusk'
+interface ConfigOption {
+  value: string;
+  label: string;
+}
+
+export const themeOptions: ConfigOption[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'faded', label: 'Faded' },
+  { value: 'monochrome', label: 'Monochrome' }
+] as const;
+
+export const lightPresetOptions: ConfigOption[] = [
+  { value: 'day', label: 'Day' },
+  { value: 'night', label: 'Night' },
+  { value: 'dawn', label: 'Dawn' },
+  { value: 'dusk', label: 'Dusk' }
+] as const;
+
+export type MapboxTheme = typeof themeOptions[number]['value'];
+export type MapboxLightPreset = typeof lightPresetOptions[number]['value'];
 
 export interface MapboxStandardConfig {
   showPedestrianRoads: boolean;
@@ -35,15 +53,9 @@ export const configLabels: Record<keyof MapboxStandardConfig, string> = {
   lightPreset: 'Light Preset'
 };
 
-export const themeOptions = [
-  { value: 'default', label: 'Default' },
-  { value: 'faded', label: 'Faded' },
-  { value: 'monochrome', label: 'Monochrome' }
-] as const;
-
-export const lightPresetOptions = [
-  { value: 'day', label: 'Day' },
-  { value: 'night', label: 'Night' },
-  { value: 'dawn', label: 'Dawn' },
-  { value: 'dusk', label: 'Dusk' }
-] as const;
+export const configOptions: Partial<
+  Record<keyof MapboxStandardConfig, ConfigOption[]>
+> = {
+  theme: themeOptions,
+  lightPreset: lightPresetOptions
+};

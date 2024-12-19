@@ -18,8 +18,7 @@ import { Switch } from '@/components/ui/switch';
 import {
   MapboxStandardConfig,
   configLabels,
-  themeOptions,
-  lightPresetOptions
+  configOptions
 } from '@/interfaces/mapboxStandardConfig';
 
 import MapButton, { MapButtonProps } from './mapButton';
@@ -83,10 +82,7 @@ export default function MapConfigButton(
                       </SelectTrigger>
                       <SelectContent>
                         {
-                          (key === 'theme'
-                            ? themeOptions
-                            : lightPresetOptions
-                          ).map((option) => (
+                          configOptions[configKey]?.map((option) => (
                             <SelectItem
                               key={option.value}
                               value={option.value}
