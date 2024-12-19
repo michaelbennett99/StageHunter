@@ -86,6 +86,7 @@ export default function MapConfigButton(
                             <SelectItem
                               key={option.value}
                               value={option.value}
+                              className="p-1"
                             >
                               {option.label}
                             </SelectItem>
