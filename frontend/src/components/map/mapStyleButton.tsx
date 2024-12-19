@@ -59,7 +59,7 @@ export default function MapStyleButton(
             <LuChevronDown />
           </button>
         </PopoverTrigger>
-        <PopoverContent>
+        <PopoverContent className="p-0">
           <Command>
             <CommandInput placeholder="Search style..." />
             <CommandList>
