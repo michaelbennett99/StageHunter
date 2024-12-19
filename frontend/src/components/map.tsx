@@ -44,7 +44,7 @@ export default function Map(
 
     mapRef.current = map;
 
-    map.on('load', () => {
+    function initialiseLayers() {
       map.addSource('route', {
         type: 'geojson',
         data: track
@@ -81,12 +81,18 @@ export default function Map(
           'circle-radius': 10
         }
       });
+    }
 
+    map.on('load', () => {
       map.fitBounds(bounds, {
         padding: 100
       });
 
       setIsMapReady(true);
+    });
+
+    map.on('style.load', () => {
+      initialiseLayers();
     });
 
     return () => {
