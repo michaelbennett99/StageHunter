@@ -39,6 +39,7 @@ export default function Map(
       container: mapContainerRef.current!,
       center: bounds.getCenter(),
       zoom: INITIAL_ZOOM,
+      style: mapboxStyleMap[DEFAULT_STYLE].url
     });
 
     mapRef.current = map;
@@ -86,10 +87,6 @@ export default function Map(
       });
 
       setIsMapReady(true);
-    });
-
-    map.on('style.load', () => {
-      map.setStyle(mapboxStyleMap[DEFAULT_STYLE].url);
     });
 
     return () => {
