@@ -5,7 +5,7 @@ import { twJoin } from 'tailwind-merge';
 import mapboxgl from 'mapbox-gl';
 import { along } from '@turf/along';
 
-import { MapResetButton } from './buttons';
+import MapResetButton from './map/mapResetButton';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -112,26 +112,14 @@ export default function Map(
     }
   }, [point, isMapReady]);
 
-  const handleButtonClick = () => {
-    mapRef.current?.fitBounds(bounds, {
-      padding: 100
-    });
-  };
-
   return (
     <div
       id="map-container-container"
       className="h-full relative"
     >
       <MapResetButton
-        onClick={handleButtonClick}
-        className={twJoin(
-          'absolute top-2 right-2 z-10',
-          'p-2 rounded-md shadow-md',
-          'bg-opacity-50 hover:bg-opacity-100 group',
-          'bg-map-button-background text-map-button-foreground dark:invert'
-        )}
-        iconClassName="group-hover:animate-spin-once"
+        mapRef={mapRef}
+        bounds={bounds}
         id="map-reset-button"
       />
       <div
