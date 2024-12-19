@@ -38,7 +38,7 @@ export default function MapStyleButton(
           <button
             role="combobox"
             aria-expanded={open}
-            className="w-40 justify-between flex items-center p-2 rounded-md shadow-md bg-opacity-50 hover:bg-opacity-100 group bg-map-button-background"
+            className="w-40 justify-between flex items-center p-2 rounded-md shadow-md group bg-background text-sm"
           >
             <span>{fullMapboxStyle.name}</span>
             <LuChevronDown />

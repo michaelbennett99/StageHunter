@@ -26,7 +26,7 @@ export default function MapResetButton(
       className={cn(
         'p-2 rounded-md shadow-md',
         'bg-opacity-50 hover:bg-opacity-100 group',
-        'bg-map-button-background'
+        'bg-background'
       )}
     >
       <FaArrowsRotate className="group-hover:animate-spin-once" />

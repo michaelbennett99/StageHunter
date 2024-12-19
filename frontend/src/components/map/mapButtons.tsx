@@ -12,7 +12,7 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
     <div
       className={cn(
         'absolute top-2 right-2 z-10 flex flex-row justify-end gap-2',
-        'text-map-button-foreground'
+        'text-foreground'
       )}
     >
       <MapStyleButton isMapReady={isMapReady} />
