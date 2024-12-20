@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
 import { MapboxStyleId } from "@/interfaces/mapboxStyles";
+import { trySetMapConfig } from "@/lib/map";
 
 export default function useMapDarkMode(
   mapRef: React.RefObject<mapboxgl.Map>,
@@ -13,14 +14,10 @@ export default function useMapDarkMode(
   useEffect(() => {
     if (!map) return;
 
+    trySetMapConfig(map, 'lightPreset', lightPreset);
+
     map.once('style.load', () => {
-      try {
-        console.log('Setting light preset:', lightPreset);
-        map.setConfigProperty(
-          'basemap', 'lightPreset', lightPreset);
-      } catch (error) {
-        console.error('Error setting light preset:', error);
-      }
+      trySetMapConfig(map, 'lightPreset', lightPreset);
     });
     return () => {}
   }, [map, lightPreset, selectedStyle]);
