@@ -1,13 +1,22 @@
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
-// import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
+import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
 import MapConfigButton, { MapConfigButtonProps } from "./mapConfigButton";
 
-export type MapButtonsProps = MapResetButtonProps & MapConfigButtonProps;
+export type MapButtonsProps = MapResetButtonProps
+& MapConfigButtonProps
+& MapStyleButtonProps;
 
 export default function MapButtons(props: MapButtonsProps): JSX.Element {
-  const { mapRef, bounds, isMapReady, defaultConfig, ...buttonProps } = props;
+  const {
+    mapRef,
+    bounds,
+    isMapReady,
+    defaultConfig,
+    defaultStyle,
+    ...buttonProps
+  } = props;
 
   return (
     <div
@@ -16,18 +25,18 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
         'text-foreground'
       )}
     >
-      {/* <MapStyleButton
-        mapRef={mapRef}
-        isMapReady={isMapReady}
-        id="map-style-button"
-        defaultStyle={defaultStyle}
-        {...buttonProps}
-      /> */}
       <MapConfigButton
         mapRef={mapRef}
         defaultConfig={defaultConfig}
         isMapReady={isMapReady}
         id="map-config-button"
+        {...buttonProps}
+      />
+      <MapStyleButton
+        mapRef={mapRef}
+        isMapReady={isMapReady}
+        id="map-style-button"
+        defaultStyle={defaultStyle}
         {...buttonProps}
       />
       <MapResetButton

@@ -142,6 +142,7 @@ export default function Map(
         bounds={bounds}
         isMapReady={isMapReady}
         defaultConfig={DEFAULT_CONFIG}
+        defaultStyle={DEFAULT_STYLE}
       />
       <div
         className="h-full rounded-md shadow-md"
