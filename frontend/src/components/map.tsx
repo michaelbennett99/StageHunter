@@ -9,6 +9,7 @@ import useMap from '@/hooks/useMap';
 import usePoint from '@/hooks/usePoint';
 import useBounds from '@/hooks/useBounds';
 import useUpdatePoint from '@/hooks/useUpdatePoint';
+import useTerrain from '@/hooks/useTerrain';
 
 import { INITIAL_ZOOM, DEFAULT_STYLE, DEFAULT_CONFIG } from '@/config/map';
 
@@ -24,6 +25,7 @@ export default function Map(
 
   // Update point location
   useUpdatePoint(mapRef, isMapReady, point);
+  useTerrain(mapRef, isMapReady, 2);
 
   if (error) {
     return (
