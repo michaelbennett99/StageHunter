@@ -14,5 +14,5 @@ export default function useChangeMapConfig(
     Object.entries(config).forEach(([key, value]) => {
       trySetMapConfig(map, key, value);
     });
-  }, [config, isMapReady, mapRef]);
+  }, [config, isMapReady]);
 }
