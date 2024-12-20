@@ -40,13 +40,13 @@ export default function Map(
   } = useTerrain(mapRef, isMapReady, selectedStyle);
   useMapDarkMode(mapRef, isMapReady, selectedStyle);
 
-  // if (error) {
-  //   return (
-  //     <div className="h-full flex items-center justify-center bg-destructive/10 rounded-md">
-  //       <p className="text-destructive">Failed to load map: {error}</p>
-  //     </div>
-  //   );
-  // }
+  if (error) {
+    return (
+      <div className="h-full flex items-center justify-center bg-destructive/10 rounded-md">
+        <p className="text-destructive">Failed to load map: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div
