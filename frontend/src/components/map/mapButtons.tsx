@@ -12,28 +12,23 @@ import useChangeMapStyle from "@/hooks/useChangeMapStyle";
 import useChangeMapConfig from "@/hooks/useChangeMapConfig";
 
 export type MapButtonsProps = MapResetButtonProps
-  & Omit<MapConfigButtonProps, 'config' | 'setConfig'>
-  & Omit<MapStyleButtonProps, 'selectedStyle' | 'setSelectedStyle'>
-  & MapTerrainButtonProps
-  & {
-    defaultConfig: MapboxStandardConfig,
-    defaultStyle: MapboxStyleId,
-  };
+  & MapConfigButtonProps
+  & MapStyleButtonProps
+  & MapTerrainButtonProps;
 
 export default function MapButtons(props: MapButtonsProps): JSX.Element {
   const {
     mapRef,
     bounds,
     isMapReady,
-    defaultConfig,
-    defaultStyle,
+    config,
+    setConfig,
+    selectedStyle,
+    setSelectedStyle,
     terrainExaggeration,
     onTerrainExaggerationChange,
     ...buttonProps
   } = props;
-
-  const [selectedStyle, setSelectedStyle] = useState(defaultStyle);
-  const [config, setConfig] = useState(defaultConfig);
 
   const standardStyleSelected = selectedStyle.includes('standard');
 

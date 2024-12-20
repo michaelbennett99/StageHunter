@@ -12,6 +12,8 @@ import useUpdatePoint from '@/hooks/useUpdatePoint';
 import useTerrain from '@/hooks/useTerrain';
 
 import { INITIAL_ZOOM, DEFAULT_STYLE, DEFAULT_CONFIG } from '@/config/map';
+import useMapConfig from '@/hooks/useMapConfig';
+import useMapStyle from '@/hooks/useMapStyle';
 
 export default function Map(
   { track, distance }: { track: GeoJSON.LineString, distance: number | null }
@@ -25,10 +27,15 @@ export default function Map(
 
   // Update point location
   useUpdatePoint(mapRef, isMapReady, point);
+
+  const { config, setConfig } = useMapConfig(mapRef, DEFAULT_CONFIG);
+  const { selectedStyle, setSelectedStyle } = useMapStyle(
+    mapRef, DEFAULT_STYLE, config
+  );
   const {
     terrainExaggeration,
     setTerrainExaggeration
-  } = useTerrain(mapRef, isMapReady);
+  } = useTerrain(mapRef, isMapReady, selectedStyle);
 
   // if (error) {
   //   return (
@@ -47,8 +54,10 @@ export default function Map(
         mapRef={mapRef}
         bounds={bounds}
         isMapReady={isMapReady}
-        defaultConfig={DEFAULT_CONFIG}
-        defaultStyle={DEFAULT_STYLE}
+        config={config}
+        setConfig={setConfig}
+        selectedStyle={selectedStyle}
+        setSelectedStyle={setSelectedStyle}
         terrainExaggeration={terrainExaggeration}
         onTerrainExaggerationChange={setTerrainExaggeration}
       />

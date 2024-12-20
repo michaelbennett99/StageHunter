@@ -1,8 +1,10 @@
 import { useEffect, useCallback, useState } from "react";
+import { MapboxStyleId } from "@/interfaces/mapboxStyles";
 
 export default function useTerrain(
   mapRef: React.RefObject<mapboxgl.Map>,
   isMapReady: boolean,
+  currentStyle: MapboxStyleId
 ) {
   const map = mapRef.current;
 
@@ -23,14 +25,14 @@ export default function useTerrain(
   }, [map]);
 
   useEffect(() => {
-    if (!map || !isMapReady) return;
+    if (!map || !isMapReady || !currentStyle.includes('standard')) return;
 
     updateTerrain(terrainExaggeration);
 
     map.on('style.load', () => {
       updateTerrain(terrainExaggeration);
     });
-  }, [map, isMapReady, terrainExaggeration, updateTerrain]);
+  }, [map, isMapReady, terrainExaggeration, updateTerrain, currentStyle]);
 
   return { terrainExaggeration, setTerrainExaggeration };
 }
