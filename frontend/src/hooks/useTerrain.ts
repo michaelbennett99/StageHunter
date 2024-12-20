@@ -11,6 +11,7 @@ export default function useTerrain(
   const updateTerrain = useCallback((value: number) => {
     if (!map) return;
     const terrain = map.getTerrain();
+    console.log(terrain);
 
     try {
       map.setTerrain({
