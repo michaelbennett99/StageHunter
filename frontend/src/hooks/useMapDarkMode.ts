@@ -9,11 +9,11 @@ export default function useMapDarkMode(
   const lightPreset = resolvedTheme === 'dark' ? 'night' : 'day';
   const map = mapRef.current;
   useEffect(() => {
-    const map = mapRef.current;
     if (!map || !isMapReady) return;
 
     map.once('style.load', () => {
       try {
+        console.log('Setting light preset:', lightPreset);
         map.setConfigProperty(
           'basemap', 'lightPreset', lightPreset);
       } catch (error) {
@@ -21,5 +21,5 @@ export default function useMapDarkMode(
       }
     });
     return () => {}
-  }, [map, isMapReady, lightPreset]);
+  }, [map, isMapReady, lightPreset, ]);
 }

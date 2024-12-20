@@ -39,7 +39,12 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
     // Set new style and wait for it to load
     map.once('style.load', () => {
       if (standardStyleSelected) {
-        map.setConfig('basemap', config as mapboxgl.ConfigSpecification);
+        Object.entries(config).forEach(([key, value]) => {
+          console.log('Setting config property:', key, value);
+          map.setConfigProperty(
+            'basemap', key, value
+          );
+        });
       }
     });
 
