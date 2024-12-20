@@ -62,7 +62,6 @@ export default function useMap(
           type: 'raster-dem',
           url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
           tileSize: 512,
-          maxzoom: 14
         })
 
         map.addSource('route', {
