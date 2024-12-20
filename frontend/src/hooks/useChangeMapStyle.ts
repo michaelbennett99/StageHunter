@@ -6,6 +6,7 @@ import { trySetMapConfig } from "@/lib/map";
 
 export default function useChangeMapStyle(
   mapRef: React.RefObject<mapboxgl.Map>,
+  isMapReady: boolean,
   selectedStyle: MapboxStyleId,
   config: MapboxStandardConfig
 ) {
@@ -13,7 +14,8 @@ export default function useChangeMapStyle(
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map || !isMapReady) return;
+
 
     map.once('style.load', () => {
       Object.entries(config).forEach(([key, value]) => {
@@ -22,5 +24,5 @@ export default function useChangeMapStyle(
     });
 
     map.setStyle(fullMapboxStyle.url);
-  }, [selectedStyle]);
+  }, [selectedStyle, isMapReady, mapRef]);
 }

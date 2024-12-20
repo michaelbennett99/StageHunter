@@ -28,9 +28,11 @@ export default function Map(
   // Update point location
   useUpdatePoint(mapRef, isMapReady, point);
 
-  const { config, setConfig } = useMapConfig(mapRef, DEFAULT_CONFIG);
+  const { config, setConfig } = useMapConfig(
+    mapRef, isMapReady, DEFAULT_CONFIG
+  );
   const { selectedStyle, setSelectedStyle } = useMapStyle(
-    mapRef, DEFAULT_STYLE, config
+    mapRef, isMapReady, DEFAULT_STYLE, config
   );
   const {
     terrainExaggeration,

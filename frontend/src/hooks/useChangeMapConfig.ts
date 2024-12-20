@@ -4,13 +4,15 @@ import { trySetMapConfig } from "@/lib/map";
 
 export default function useChangeMapConfig(
   mapRef: React.RefObject<mapboxgl.Map>,
+  isMapReady: boolean,
   config: MapboxStandardConfig
 ) {
   useEffect(() => {
-    if (!mapRef.current) return;
+    const map = mapRef.current;
+    if (!map || !isMapReady) return;
 
     Object.entries(config).forEach(([key, value]) => {
-      trySetMapConfig(mapRef.current!, key, value);
+      trySetMapConfig(map, key, value);
     });
-  }, [config]);
+  }, [config, isMapReady, mapRef]);
 }
