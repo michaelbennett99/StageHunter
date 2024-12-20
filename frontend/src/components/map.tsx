@@ -4,7 +4,7 @@ import { useRef, useEffect, useMemo, useState } from 'react';
 import mapboxgl, { ConfigSpecification } from 'mapbox-gl';
 import { along } from '@turf/along';
 
-import useMapDarkMode from '@/hooks/useMapDarkMode';
+import useUpdatePoint from '@/hooks/useUpdatePoint';
 import { mapboxStyleMap } from '@/interfaces/mapboxStyles';
 import { defaultConfig } from '@/interfaces/mapboxStandardConfig';
 import MapButtons from './map/mapButtons';
@@ -111,22 +111,7 @@ export default function Map(
   }, []);
 
   // Update point location
-  useEffect(() => {
-    if (!isMapReady || !mapRef.current) return;
-
-    try {
-      const source = mapRef
-        .current
-        ?.getSource('point') as mapboxgl.GeoJSONSource;
-
-      source.setData({
-        type: 'FeatureCollection',
-        features: point ? [point] : []
-      });
-    } catch (error) {
-      console.error('Error updating point:', error);
-    }
-  }, [point, isMapReady]);
+  useUpdatePoint(mapRef, isMapReady, point);
 
   return (
     <div
