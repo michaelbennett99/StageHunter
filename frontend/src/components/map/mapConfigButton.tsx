@@ -32,6 +32,17 @@ export type MapConfigButtonProps = {
 export default function MapConfigButton(
   { mapRef, defaultConfig, ...buttonProps }: MapConfigButtonProps
 ): JSX.Element {
+  if (!mapRef.current || !mapRef.current.isStyleLoaded()) {
+    return <></>;
+  }
+
+  // Only show config button if a standard style is loaded
+  // A standard style will have an imports property
+  const currentStyle = mapRef.current?.getStyle();
+  if (!currentStyle?.imports) {
+    return <></>;
+  }
+
   const [config, setConfig] = useState(defaultConfig);
 
   function handleConfigChange(

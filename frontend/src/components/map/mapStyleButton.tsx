@@ -38,7 +38,7 @@ export default function MapStyleButton(
 
   // Set map style when selected style changes
   useEffect(() => {
-    props.mapRef.current?.setStyle(fullMapboxStyle.url);
+    mapRef.current?.setStyle(fullMapboxStyle.url);
   }, [selectedStyle]);
 
   return (
