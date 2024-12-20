@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { LuLayers } from 'react-icons/lu';
 
 import {
@@ -19,17 +19,15 @@ import MapButton, { MapButtonProps } from './mapButton';
 
 export type MapStyleButtonProps = MapButtonProps & {
   mapRef: React.RefObject<mapboxgl.Map>,
-  defaultStyle: MapboxStyleId,
+  selectedStyle: MapboxStyleId,
+  setSelectedStyle: Dispatch<SetStateAction<MapboxStyleId>>,
 }
 
 export default function MapStyleButton(
   props: MapStyleButtonProps
 ): JSX.Element {
-  const { mapRef, defaultStyle, ...buttonProps } = props;
+  const { mapRef, selectedStyle, setSelectedStyle, ...buttonProps } = props;
 
-  const [selectedStyle, setSelectedStyle] = useState<MapboxStyleId>(
-    defaultStyle
-  );
   const fullMapboxStyle = mapboxStyleMap[selectedStyle];
 
   const handleSelectStyle = (styleId: MapboxStyleId) => {

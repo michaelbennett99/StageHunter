@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { LuSettings } from 'react-icons/lu';
 
 import {
@@ -25,25 +25,15 @@ import {
 import MapButton, { MapButtonProps } from './mapButton';
 
 export type MapConfigButtonProps = {
-  defaultConfig: MapboxStandardConfig;
+  config: MapboxStandardConfig;
+  setConfig: Dispatch<SetStateAction<MapboxStandardConfig>>;
   mapRef: React.RefObject<mapboxgl.Map>;
 } & MapButtonProps;
 
 export default function MapConfigButton(
-  { mapRef, defaultConfig, ...buttonProps }: MapConfigButtonProps
+  { mapRef, config, setConfig, ...buttonProps }: MapConfigButtonProps
 ): JSX.Element {
-  if (!mapRef.current || !mapRef.current.isStyleLoaded()) {
-    return <></>;
-  }
 
-  // Only show config button if a standard style is loaded
-  // A standard style will have an imports property
-  const currentStyle = mapRef.current?.getStyle();
-  if (!currentStyle?.imports) {
-    return <></>;
-  }
-
-  const [config, setConfig] = useState(defaultConfig);
 
   function handleConfigChange(
     key: keyof MapboxStandardConfig,

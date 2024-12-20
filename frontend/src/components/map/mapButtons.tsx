@@ -1,12 +1,20 @@
+import { useState } from "react";
+
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
+import { MapboxStyleId } from "@/interfaces/mapboxStyles";
 import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
 import MapConfigButton, { MapConfigButtonProps } from "./mapConfigButton";
+import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
 
 export type MapButtonsProps = MapResetButtonProps
-& MapConfigButtonProps
-& MapStyleButtonProps;
+  & Omit<MapConfigButtonProps, 'config' | 'setConfig'>
+  & Omit<MapStyleButtonProps, 'selectedStyle' | 'setSelectedStyle'>
+  & {
+    defaultConfig: MapboxStandardConfig,
+    defaultStyle: MapboxStyleId,
+  };
 
 export default function MapButtons(props: MapButtonsProps): JSX.Element {
   const {
@@ -18,6 +26,11 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
     ...buttonProps
   } = props;
 
+  const [selectedStyle, setSelectedStyle] = useState(defaultStyle);
+  const [config, setConfig] = useState(defaultConfig);
+
+  const standardStyleSelected = selectedStyle.includes('standard');
+
   return (
     <div
       className={cn(
@@ -25,18 +38,22 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
         'text-foreground'
       )}
     >
-      <MapConfigButton
-        mapRef={mapRef}
-        defaultConfig={defaultConfig}
-        isMapReady={isMapReady}
-        id="map-config-button"
-        {...buttonProps}
-      />
+      {standardStyleSelected && (
+        <MapConfigButton
+          mapRef={mapRef}
+          config={config}
+          setConfig={setConfig}
+          isMapReady={isMapReady}
+          id="map-config-button"
+          {...buttonProps}
+        />
+      )}
       <MapStyleButton
         mapRef={mapRef}
         isMapReady={isMapReady}
         id="map-style-button"
-        defaultStyle={defaultStyle}
+        selectedStyle={selectedStyle}
+        setSelectedStyle={setSelectedStyle}
         {...buttonProps}
       />
       <MapResetButton
