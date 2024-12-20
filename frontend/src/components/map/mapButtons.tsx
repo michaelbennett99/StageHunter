@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { Mountain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
@@ -10,6 +10,12 @@ import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
 import useMapDarkMode from "@/hooks/useMapDarkMode";
 import useChangeMapStyle from "@/hooks/useChangeMapStyle";
 import useChangeMapConfig from "@/hooks/useChangeMapConfig";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import MapTerrainButton from "./mapTerrainButton";
 
 export type MapButtonsProps = MapResetButtonProps
   & Omit<MapConfigButtonProps, 'config' | 'setConfig'>
@@ -75,20 +81,10 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
         id="map-reset-button"
         {...buttonProps}
       />
-      <div className="bg-background rounded-lg shadow-md p-2">
-        <label className="text-sm font-medium">
-          Terrain Exaggeration
-          <input
-            type="number"
-            min={0}
-            max={10}
-            step={0.1}
-            value={terrainExaggeration}
-            onChange={(e) => onTerrainExaggerationChange(parseFloat(e.target.value))}
-            className="w-full mt-1 h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
-          />
-        </label>
-      </div>
+      <MapTerrainButton
+        terrainExaggeration={terrainExaggeration}
+        onTerrainExaggerationChange={onTerrainExaggerationChange}
+      />
     </div>
   );
 }
