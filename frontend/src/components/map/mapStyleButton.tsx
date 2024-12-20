@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { LuChevronDown, LuCheck } from 'react-icons/lu';
 
 import {
   Select,

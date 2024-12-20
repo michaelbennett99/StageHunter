@@ -13,5 +13,6 @@ export default function useMapDarkMode(
       map.setConfigProperty(
         'basemap', 'lightPreset', lightPreset);
     }
+    return () => {}
   }, [map, isMapReady, lightPreset]);
 }
