@@ -16,7 +16,6 @@ import { INITIAL_ZOOM, DEFAULT_STYLE, DEFAULT_CONFIG } from '@/config/map';
 export default function Map(
   { track, distance }: { track: GeoJSON.LineString, distance: number | null }
 ): JSX.Element {
-  const [terrainExaggeration, setTerrainExaggeration] = useState(2);
   const point = usePoint(track, distance);
   const bounds = useBounds(track);
 
@@ -26,7 +25,10 @@ export default function Map(
 
   // Update point location
   useUpdatePoint(mapRef, isMapReady, point);
-  const { updateTerrain } = useTerrain(mapRef, isMapReady, terrainExaggeration);
+  const {
+    terrainExaggeration,
+    setTerrainExaggeration
+  } = useTerrain(mapRef, isMapReady);
 
   if (error) {
     return (

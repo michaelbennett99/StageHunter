@@ -1,11 +1,12 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 
 export default function useTerrain(
   mapRef: React.RefObject<mapboxgl.Map>,
   isMapReady: boolean,
-  exaggeration: number
 ) {
   const map = mapRef.current;
+
+  const [terrainExaggeration, setTerrainExaggeration] = useState(1);
 
   const updateTerrain = useCallback((value: number) => {
     if (!map) return;
@@ -23,8 +24,13 @@ export default function useTerrain(
 
   useEffect(() => {
     if (!map || !isMapReady) return;
-    updateTerrain(exaggeration);
-  }, [map, isMapReady, exaggeration, updateTerrain]);
 
-  return { updateTerrain };
+    updateTerrain(terrainExaggeration);
+
+    map.on('style.load', () => {
+      updateTerrain(terrainExaggeration);
+    });
+  }, [map, isMapReady, terrainExaggeration, updateTerrain]);
+
+  return { terrainExaggeration, setTerrainExaggeration };
 }
