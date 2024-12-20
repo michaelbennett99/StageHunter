@@ -11,7 +11,7 @@ export default function useTerrain(
   const [terrainExaggeration, setTerrainExaggeration] = useState(1);
 
   const updateTerrain = useCallback((value: number) => {
-    if (!map) return;
+    if (!map || !isMapReady || !currentStyle.includes('standard')) return;
     const terrain = map.getTerrain();
 
     try {
@@ -22,7 +22,7 @@ export default function useTerrain(
     } catch (err) {
       console.error(err);
     }
-  }, [map]);
+  }, [map, isMapReady, currentStyle]);
 
   useEffect(() => {
     if (!map || !isMapReady || !currentStyle.includes('standard')) return;
@@ -32,6 +32,12 @@ export default function useTerrain(
     map.on('style.load', () => {
       updateTerrain(terrainExaggeration);
     });
+
+    return () => {
+      map.off('style.load', () => {
+        updateTerrain(terrainExaggeration);
+      });
+    };
   }, [map, isMapReady, terrainExaggeration, updateTerrain, currentStyle]);
 
   return { terrainExaggeration, setTerrainExaggeration };
