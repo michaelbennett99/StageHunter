@@ -8,6 +8,7 @@ import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
 import MapConfigButton, { MapConfigButtonProps } from "./mapConfigButton";
 import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
 import useMapDarkMode from "@/hooks/useMapDarkMode";
+import { trySetMapConfig } from "@/lib/map";
 
 export type MapButtonsProps = MapResetButtonProps
   & Omit<MapConfigButtonProps, 'config' | 'setConfig'>
@@ -41,10 +42,7 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
     map.once('style.load', () => {
       if (standardStyleSelected) {
         Object.entries(config).forEach(([key, value]) => {
-          console.log('Setting config property:', key, value);
-          map.setConfigProperty(
-            'basemap', key, value
-          );
+          trySetMapConfig(map, key, value);
         });
       }
     });

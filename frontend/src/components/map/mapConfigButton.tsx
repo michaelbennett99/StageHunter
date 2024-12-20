@@ -23,6 +23,7 @@ import {
 } from '@/interfaces/mapboxStandardConfig';
 
 import MapButton, { MapButtonProps } from './mapButton';
+import { trySetMapConfig } from '@/lib/map';
 
 export type MapConfigButtonProps = {
   config: MapboxStandardConfig;
@@ -41,9 +42,7 @@ export default function MapConfigButton(
       ...prevConfig,
       [key]: value
     }));
-    mapRef.current?.setConfigProperty(
-      'basemap', key, value
-    );
+    trySetMapConfig(mapRef.current!, key, value);
   }
 
   return (
