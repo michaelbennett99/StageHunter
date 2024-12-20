@@ -42,7 +42,6 @@ export default function MapConfigButton(
       ...prevConfig,
       [key]: value
     }));
-    trySetMapConfig(mapRef.current!, key, value);
   }
 
   return (
