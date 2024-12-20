@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { LuLayers } from 'react-icons/lu';
 
 import {
   Select,
@@ -50,7 +51,7 @@ export default function MapStyleButton(
           <SelectValue
             className="justify-between flex items-center gap-1"
           >
-            <span>{fullMapboxStyle.name}</span>
+            <LuLayers />
           </SelectValue>
         </SelectTrigger>
         <SelectContent className="p-0 w-52">
