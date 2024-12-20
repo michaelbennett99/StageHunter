@@ -43,7 +43,10 @@ export default function MapStyleButton(
   return (
     <MapButton {...buttonProps} asChild>
       <Select defaultValue={selectedStyle} onValueChange={handleSelectStyle}>
-        <SelectTrigger className="p-2 rounded-md shadow-md group bg-background text-sm">
+        <SelectTrigger
+          className="p-2 rounded-md shadow-md group bg-background text-sm"
+          icon={false}
+        >
           <SelectValue
             className="justify-between flex items-center gap-1"
           >
