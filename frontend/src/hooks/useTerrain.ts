@@ -6,43 +6,47 @@ export default function useTerrain(
   isMapReady: boolean,
   currentStyle: MapboxStyleId
 ) {
-  const map = mapRef.current;
-
   const [terrainExaggeration, setTerrainExaggeration] = useState(1);
 
-  const canUpdateTerrain = useCallback(() => {
-    return map && isMapReady && currentStyle.includes('standard');
-  }, [map, isMapReady, currentStyle]);
+  const canUpdateTerrain = isMapReady && currentStyle.includes('standard');
 
   const updateTerrain = useCallback((value: number) => {
-    if (!canUpdateTerrain()) return;
-    const terrain = map!.getTerrain();
+    const map = mapRef.current;
+    if (!canUpdateTerrain || !map) return;
+
+    const terrain = map.getTerrain();
+    if (!terrain) return;
 
     try {
-      map!.setTerrain({
+      map.setTerrain({
         exaggeration: value,
-        source: terrain!.source
+        source: terrain.source
       });
     } catch (err) {
-      console.error(err);
+      console.error('Failed to update terrain:', err);
     }
-  }, [canUpdateTerrain, terrainExaggeration, map]);
+  }, [canUpdateTerrain, mapRef]);
 
   useEffect(() => {
-    if (!canUpdateTerrain()) return;
+    const map = mapRef.current;
+    if (!canUpdateTerrain || !map) return;
 
+    // Initial terrain update
     updateTerrain(terrainExaggeration);
 
-    map!.on('style.load', () => {
+    // Create a single listener function
+    const handleStyleLoad = () => {
       updateTerrain(terrainExaggeration);
-    });
-
-    return () => {
-      map!.off('style.load', () => {
-        updateTerrain(terrainExaggeration);
-      });
     };
-  }, [canUpdateTerrain, terrainExaggeration, updateTerrain, map]);
+
+    // Add the listener
+    map.on('style.load', handleStyleLoad);
+
+    // Cleanup with the same function reference
+    return () => {
+      map.off('style.load', handleStyleLoad);
+    };
+  }, [canUpdateTerrain, terrainExaggeration, updateTerrain, mapRef]);
 
   return { terrainExaggeration, setTerrainExaggeration };
 }
