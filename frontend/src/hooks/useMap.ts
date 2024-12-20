@@ -53,7 +53,7 @@ export default function useMap(
       });
 
       // Add navigation controls
-      map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
       mapRef.current = map;
 
