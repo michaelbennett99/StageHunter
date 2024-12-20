@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
-import { MapboxStyleId } from "@/interfaces/mapboxStyles";
+import { MapboxStyleId, mapboxStyleMap } from "@/interfaces/mapboxStyles";
 import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
 import MapConfigButton, { MapConfigButtonProps } from "./mapConfigButton";
 import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
@@ -30,6 +30,11 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
   const [config, setConfig] = useState(defaultConfig);
 
   const standardStyleSelected = selectedStyle.includes('standard');
+  const fullMapboxStyle = mapboxStyleMap[selectedStyle];
+
+  useEffect(() => {
+    mapRef.current?.setStyle(fullMapboxStyle.url);
+  }, [selectedStyle]);
 
   return (
     <div
