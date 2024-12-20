@@ -45,7 +45,7 @@ export default function MapStyleButton(
     <MapButton {...buttonProps} asChild>
       <Select defaultValue={selectedStyle} onValueChange={handleSelectStyle}>
         <SelectTrigger
-          className="p-2 rounded-md shadow-md group bg-background text-sm"
+          className="rounded-md shadow-md group bg-background text-sm"
           icon={false}
         >
           <SelectValue
