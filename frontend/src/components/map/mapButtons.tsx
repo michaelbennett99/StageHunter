@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
-import { MapboxStyleId, mapboxStyleMap } from "@/interfaces/mapboxStyles";
+import { MapboxStyleId } from "@/interfaces/mapboxStyles";
 import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
 import MapConfigButton, { MapConfigButtonProps } from "./mapConfigButton";
 import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
 import useMapDarkMode from "@/hooks/useMapDarkMode";
-import { trySetMapConfig } from "@/lib/map";
+import useChangeMapStyle from "@/hooks/useChangeMapStyle";
 
 export type MapButtonsProps = MapResetButtonProps
   & Omit<MapConfigButtonProps, 'config' | 'setConfig'>
@@ -32,24 +32,9 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
   const [config, setConfig] = useState(defaultConfig);
 
   const standardStyleSelected = selectedStyle.includes('standard');
-  const fullMapboxStyle = mapboxStyleMap[selectedStyle];
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    // Set new style and wait for it to load
-    map.once('style.load', () => {
-      if (standardStyleSelected) {
-        Object.entries(config).forEach(([key, value]) => {
-          trySetMapConfig(map, key, value);
-        });
-      }
-    });
-
-    map.setStyle(fullMapboxStyle.url);
-  }, [selectedStyle]);
-
+  // Hooks to change the map style and implement dark mode
+  useChangeMapStyle(mapRef, selectedStyle, config);
   useMapDarkMode(mapRef, selectedStyle);
 
   return (
