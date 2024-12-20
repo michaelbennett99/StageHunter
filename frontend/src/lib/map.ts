@@ -4,6 +4,6 @@ export function trySetMapConfig(map: mapboxgl.Map, key: string, value: any) {
       'basemap', key, value
     );
   } catch (error) {
-    console.error('Error setting config property:', error);
+    console.warn('Error setting config property:', error);
   }
 }
