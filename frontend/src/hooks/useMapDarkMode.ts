@@ -5,6 +5,7 @@ import { trySetMapConfig } from "@/lib/map";
 
 export default function useMapDarkMode(
   mapRef: React.RefObject<mapboxgl.Map>,
+  isMapReady: boolean,
   selectedStyle: MapboxStyleId
 ) {
   const { resolvedTheme } = useTheme();
@@ -12,13 +13,12 @@ export default function useMapDarkMode(
   const map = mapRef.current;
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || !isMapReady) return;
 
     trySetMapConfig(map, 'lightPreset', lightPreset);
 
     map.once('style.load', () => {
       trySetMapConfig(map, 'lightPreset', lightPreset);
     });
-    return () => {}
-  }, [map, lightPreset, selectedStyle]);
+  }, [map, lightPreset, selectedStyle, isMapReady]);
 }

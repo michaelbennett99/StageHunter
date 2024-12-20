@@ -34,8 +34,8 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
   const standardStyleSelected = selectedStyle.includes('standard');
 
   // Hooks to change the map style and implement dark mode
-  useChangeMapStyle(mapRef, selectedStyle, config);
-  useMapDarkMode(mapRef, selectedStyle);
+  useChangeMapStyle(mapRef, isMapReady, selectedStyle, config);
+  useMapDarkMode(mapRef, isMapReady, selectedStyle);
 
   return (
     <div
