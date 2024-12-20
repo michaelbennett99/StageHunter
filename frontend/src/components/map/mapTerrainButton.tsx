@@ -24,7 +24,7 @@ export default function MapTerrainButton({
           type="button"
           id={id}
           className={cn(
-            "h-10 w-10 rounded-md border bg-background",
+            "p-2 rounded-md border bg-background",
             "flex items-center justify-center",
             "hover:bg-accent hover:text-accent-foreground"
           )}
