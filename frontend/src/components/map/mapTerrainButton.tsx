@@ -44,8 +44,8 @@ export default function MapTerrainButton({
           <input
             type="range"
             min={0}
-            max={10}
-            step={0.1}
+            max={2.5}
+            step={0.05}
             value={terrainExaggeration}
             onChange={(e) => onTerrainExaggerationChange(parseFloat(e.target.value))}
             className="w-full"
@@ -53,7 +53,7 @@ export default function MapTerrainButton({
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Flat</span>
             <span>{terrainExaggeration.toFixed(1)}x</span>
-            <span>10x</span>
+            <span>2.5x</span>
           </div>
         </div>
       </PopoverContent>
