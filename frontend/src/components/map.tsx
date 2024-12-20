@@ -1,6 +1,6 @@
 'use client';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import MapButtons from './map/mapButtons';
 import { Loader2 } from 'lucide-react';
@@ -16,6 +16,7 @@ import { INITIAL_ZOOM, DEFAULT_STYLE, DEFAULT_CONFIG } from '@/config/map';
 export default function Map(
   { track, distance }: { track: GeoJSON.LineString, distance: number | null }
 ): JSX.Element {
+  const [terrainExaggeration, setTerrainExaggeration] = useState(2);
   const point = usePoint(track, distance);
   const bounds = useBounds(track);
 
@@ -25,7 +26,7 @@ export default function Map(
 
   // Update point location
   useUpdatePoint(mapRef, isMapReady, point);
-  useTerrain(mapRef, isMapReady, 2);
+  const { updateTerrain } = useTerrain(mapRef, isMapReady, terrainExaggeration);
 
   if (error) {
     return (
@@ -46,6 +47,8 @@ export default function Map(
         isMapReady={isMapReady}
         defaultConfig={DEFAULT_CONFIG}
         defaultStyle={DEFAULT_STYLE}
+        terrainExaggeration={terrainExaggeration}
+        onTerrainExaggerationChange={setTerrainExaggeration}
       />
       {!isMapReady && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/50 rounded-md">

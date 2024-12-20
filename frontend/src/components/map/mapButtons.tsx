@@ -17,6 +17,8 @@ export type MapButtonsProps = MapResetButtonProps
   & {
     defaultConfig: MapboxStandardConfig,
     defaultStyle: MapboxStyleId,
+    terrainExaggeration: number,
+    onTerrainExaggerationChange: (value: number) => void,
   };
 
 export default function MapButtons(props: MapButtonsProps): JSX.Element {
@@ -26,6 +28,8 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
     isMapReady,
     defaultConfig,
     defaultStyle,
+    terrainExaggeration,
+    onTerrainExaggerationChange,
     ...buttonProps
   } = props;
 
@@ -71,6 +75,20 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
         id="map-reset-button"
         {...buttonProps}
       />
+      <div className="bg-background rounded-lg shadow-md p-2">
+        <label className="text-sm font-medium">
+          Terrain Exaggeration
+          <input
+            type="number"
+            min={0}
+            max={10}
+            step={0.1}
+            value={terrainExaggeration}
+            onChange={(e) => onTerrainExaggerationChange(parseFloat(e.target.value))}
+            className="w-full mt-1 h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
+          />
+        </label>
+      </div>
     </div>
   );
 }

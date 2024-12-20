@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
 export default function useTerrain(
   mapRef: React.RefObject<mapboxgl.Map>,
@@ -7,18 +7,24 @@ export default function useTerrain(
 ) {
   const map = mapRef.current;
 
-  useEffect(() => {
-    if (!map || !isMapReady) return;
-
+  const updateTerrain = useCallback((value: number) => {
+    if (!map) return;
     const terrain = map.getTerrain();
 
     try {
       map.setTerrain({
-        exaggeration,
-        source: terrain!.source
+        exaggeration: value,
+        source: terrain?.source || 'mapbox-dem'
       });
     } catch (err) {
       console.error(err);
     }
-  }, [map, isMapReady, exaggeration]);
+  }, [map]);
+
+  useEffect(() => {
+    if (!map || !isMapReady) return;
+    updateTerrain(exaggeration);
+  }, [map, isMapReady, exaggeration, updateTerrain]);
+
+  return { updateTerrain };
 }
