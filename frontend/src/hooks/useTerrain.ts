@@ -15,7 +15,7 @@ export default function useTerrain(
     try {
       map.setTerrain({
         exaggeration: value,
-        source: terrain?.source || 'mapbox-dem'
+        source: terrain!.source
       });
     } catch (err) {
       console.error(err);
