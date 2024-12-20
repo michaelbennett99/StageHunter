@@ -5,11 +5,10 @@ import useChangeMapStyle from "@/hooks/useChangeMapStyle";
 
 export default function useMapStyle(
     mapRef: React.RefObject<mapboxgl.Map>,
-    isMapReady: boolean,
     defaultStyle: MapboxStyleId,
     config: MapboxStandardConfig
 ) {
     const [selectedStyle, setSelectedStyle] = useState(defaultStyle);
-    useChangeMapStyle(mapRef, isMapReady, selectedStyle, config);
+    useChangeMapStyle(mapRef, selectedStyle, config);
     return { selectedStyle, setSelectedStyle };
 }

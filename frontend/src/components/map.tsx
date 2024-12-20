@@ -32,7 +32,7 @@ export default function Map(
     mapRef, isMapReady, DEFAULT_CONFIG
   );
   const { selectedStyle, setSelectedStyle } = useMapStyle(
-    mapRef, isMapReady, DEFAULT_STYLE, config
+    mapRef, DEFAULT_STYLE, config
   );
   const {
     terrainExaggeration,
