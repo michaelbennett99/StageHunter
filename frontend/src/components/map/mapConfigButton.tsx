@@ -1,4 +1,4 @@
-import { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { LuSettings } from 'react-icons/lu';
 
 import {
@@ -33,8 +33,6 @@ export type MapConfigButtonProps = {
 export default function MapConfigButton(
   { mapRef, config, setConfig, ...buttonProps }: MapConfigButtonProps
 ): JSX.Element {
-
-
   function handleConfigChange(
     key: keyof MapboxStandardConfig,
     value: boolean | string

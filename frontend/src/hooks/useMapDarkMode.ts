@@ -1,15 +1,17 @@
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
+import { MapboxStyleId } from "@/interfaces/mapboxStyles";
 
 export default function useMapDarkMode(
-    mapRef: React.RefObject<mapboxgl.Map>,
-    isMapReady: boolean
+  mapRef: React.RefObject<mapboxgl.Map>,
+  selectedStyle: MapboxStyleId
 ) {
   const { resolvedTheme } = useTheme();
   const lightPreset = resolvedTheme === 'dark' ? 'night' : 'day';
   const map = mapRef.current;
+
   useEffect(() => {
-    if (!map || !isMapReady) return;
+    if (!map) return;
 
     map.once('style.load', () => {
       try {
@@ -21,5 +23,5 @@ export default function useMapDarkMode(
       }
     });
     return () => {}
-  }, [map, isMapReady, lightPreset, ]);
+  }, [map, lightPreset, selectedStyle]);
 }

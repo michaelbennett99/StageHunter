@@ -129,9 +129,6 @@ export default function Map(
     }
   }, [point, isMapReady]);
 
-  // Set map dark mode
-  useMapDarkMode(mapRef, isMapReady);
-
   return (
     <div
       id="map-container-container"

@@ -7,6 +7,7 @@ import { MapboxStyleId, mapboxStyleMap } from "@/interfaces/mapboxStyles";
 import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
 import MapConfigButton, { MapConfigButtonProps } from "./mapConfigButton";
 import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
+import useMapDarkMode from "@/hooks/useMapDarkMode";
 
 export type MapButtonsProps = MapResetButtonProps
   & Omit<MapConfigButtonProps, 'config' | 'setConfig'>
@@ -50,6 +51,8 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
 
     map.setStyle(fullMapboxStyle.url);
   }, [selectedStyle]);
+
+  useMapDarkMode(mapRef, selectedStyle);
 
   return (
     <div
