@@ -58,6 +58,13 @@ export default function useMap(
       mapRef.current = map;
 
       function initialiseLayers() {
+        map.addSource('mapbox-dem', {
+          type: 'raster-dem',
+          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          tileSize: 512,
+          maxzoom: 14
+        })
+
         map.addSource('route', {
           type: 'geojson',
           data: track
