@@ -1,10 +1,10 @@
 'use client';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useCallback, useState } from 'react';
 
 import MapButtons from './map/mapButtons';
 import { Loader2 } from 'lucide-react';
 
+import useMapDarkMode from '@/hooks/useMapDarkMode';
 import useMap from '@/hooks/useMap';
 import usePoint from '@/hooks/usePoint';
 import useBounds from '@/hooks/useBounds';
@@ -38,6 +38,7 @@ export default function Map(
     terrainExaggeration,
     setTerrainExaggeration
   } = useTerrain(mapRef, isMapReady, selectedStyle);
+  useMapDarkMode(mapRef, isMapReady, selectedStyle);
 
   // if (error) {
   //   return (
