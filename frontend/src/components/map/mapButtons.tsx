@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Mountain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
@@ -10,11 +9,6 @@ import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
 import useMapDarkMode from "@/hooks/useMapDarkMode";
 import useChangeMapStyle from "@/hooks/useChangeMapStyle";
 import useChangeMapConfig from "@/hooks/useChangeMapConfig";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import MapTerrainButton from "./mapTerrainButton";
 
 export type MapButtonsProps = MapResetButtonProps
@@ -57,14 +51,20 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
       )}
     >
       {standardStyleSelected && (
-        <MapConfigButton
-          mapRef={mapRef}
-          config={config}
-          setConfig={setConfig}
-          isMapReady={isMapReady}
-          id="map-config-button"
-          {...buttonProps}
-        />
+        <>
+          <MapTerrainButton
+            terrainExaggeration={terrainExaggeration}
+            onTerrainExaggerationChange={onTerrainExaggerationChange}
+          />
+          <MapConfigButton
+            mapRef={mapRef}
+            config={config}
+            setConfig={setConfig}
+            isMapReady={isMapReady}
+            id="map-config-button"
+            {...buttonProps}
+          />
+        </>
       )}
       <MapStyleButton
         mapRef={mapRef}
@@ -80,10 +80,6 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
         isMapReady={isMapReady}
         id="map-reset-button"
         {...buttonProps}
-      />
-      <MapTerrainButton
-        terrainExaggeration={terrainExaggeration}
-        onTerrainExaggerationChange={onTerrainExaggerationChange}
       />
     </div>
   );

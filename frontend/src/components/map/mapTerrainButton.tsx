@@ -1,4 +1,4 @@
-import { Mountain } from "lucide-react";
+import { LuMountain } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -29,7 +29,7 @@ export default function MapTerrainButton({
             "hover:bg-accent hover:text-accent-foreground"
           )}
         >
-          <Mountain className="h-4 w-4" />
+          <LuMountain className="h-4 w-4" />
         </button>
       </PopoverTrigger>
       <PopoverContent
