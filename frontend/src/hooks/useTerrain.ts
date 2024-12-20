@@ -10,35 +10,39 @@ export default function useTerrain(
 
   const [terrainExaggeration, setTerrainExaggeration] = useState(1);
 
+  const canUpdateTerrain = useCallback(() => {
+    return map && isMapReady && currentStyle.includes('standard');
+  }, [map, isMapReady, currentStyle]);
+
   const updateTerrain = useCallback((value: number) => {
-    if (!map || !isMapReady || !currentStyle.includes('standard')) return;
-    const terrain = map.getTerrain();
+    if (!canUpdateTerrain()) return;
+    const terrain = map!.getTerrain();
 
     try {
-      map.setTerrain({
+      map!.setTerrain({
         exaggeration: value,
         source: terrain!.source
       });
     } catch (err) {
       console.error(err);
     }
-  }, [map, isMapReady, currentStyle]);
+  }, [canUpdateTerrain, terrainExaggeration, map]);
 
   useEffect(() => {
-    if (!map || !isMapReady || !currentStyle.includes('standard')) return;
+    if (!canUpdateTerrain()) return;
 
     updateTerrain(terrainExaggeration);
 
-    map.on('style.load', () => {
+    map!.on('style.load', () => {
       updateTerrain(terrainExaggeration);
     });
 
     return () => {
-      map.off('style.load', () => {
+      map!.off('style.load', () => {
         updateTerrain(terrainExaggeration);
       });
     };
-  }, [map, isMapReady, terrainExaggeration, updateTerrain, currentStyle]);
+  }, [canUpdateTerrain, terrainExaggeration, updateTerrain, map]);
 
   return { terrainExaggeration, setTerrainExaggeration };
 }
