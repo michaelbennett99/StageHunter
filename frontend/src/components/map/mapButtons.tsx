@@ -33,7 +33,17 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
   const fullMapboxStyle = mapboxStyleMap[selectedStyle];
 
   useEffect(() => {
-    mapRef.current?.setStyle(fullMapboxStyle.url);
+    const map = mapRef.current;
+    if (!map) return;
+
+    // Set new style and wait for it to load
+    map.once('style.load', () => {
+      if (standardStyleSelected) {
+        map.setConfig('basemap', config as mapboxgl.ConfigSpecification);
+      }
+    });
+
+    map.setStyle(fullMapboxStyle.url);
   }, [selectedStyle]);
 
   return (

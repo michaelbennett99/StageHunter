@@ -1,4 +1,4 @@
-import { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { LuLayers } from 'react-icons/lu';
 
 import {
@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/select';
 
 import {
-  mapboxStyleMap,
   mapboxStyles,
   type MapboxStyleId
 } from '@/interfaces/mapboxStyles';
@@ -28,16 +27,12 @@ export default function MapStyleButton(
 ): JSX.Element {
   const { mapRef, selectedStyle, setSelectedStyle, ...buttonProps } = props;
 
-  const fullMapboxStyle = mapboxStyleMap[selectedStyle];
-
   const handleSelectStyle = (styleId: MapboxStyleId) => {
     setSelectedStyle(styleId);
   };
 
   // Set map style when selected style changes
-  useEffect(() => {
-    mapRef.current?.setStyle(fullMapboxStyle.url);
-  }, [selectedStyle]);
+
 
   return (
     <MapButton {...buttonProps} asChild>
