@@ -2,23 +2,22 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
-import { MapboxStyleId } from "@/interfaces/mapboxStyles";
 import MapStyleButton, { MapStyleButtonProps } from "./mapStyleButton";
 import MapConfigButton, { MapConfigButtonProps } from "./mapConfigButton";
+import MapTerrainButton, { MapTerrainButtonProps } from "./mapTerrainButton";
+import { MapboxStyleId } from "@/interfaces/mapboxStyles";
 import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
 import useMapDarkMode from "@/hooks/useMapDarkMode";
 import useChangeMapStyle from "@/hooks/useChangeMapStyle";
 import useChangeMapConfig from "@/hooks/useChangeMapConfig";
-import MapTerrainButton from "./mapTerrainButton";
 
 export type MapButtonsProps = MapResetButtonProps
   & Omit<MapConfigButtonProps, 'config' | 'setConfig'>
   & Omit<MapStyleButtonProps, 'selectedStyle' | 'setSelectedStyle'>
+  & MapTerrainButtonProps
   & {
     defaultConfig: MapboxStandardConfig,
     defaultStyle: MapboxStyleId,
-    terrainExaggeration: number,
-    onTerrainExaggerationChange: (value: number) => void,
   };
 
 export default function MapButtons(props: MapButtonsProps): JSX.Element {
@@ -55,6 +54,7 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
           <MapTerrainButton
             terrainExaggeration={terrainExaggeration}
             onTerrainExaggerationChange={onTerrainExaggerationChange}
+            id="map-terrain-button"
           />
           <MapConfigButton
             mapRef={mapRef}
