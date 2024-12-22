@@ -44,12 +44,14 @@ export default function MapButtons({
             <MapConfigButton
               config={config}
               setConfig={setConfig}
+              mapRef={mapRef}
             />
           </>
         )}
         <MapStyleButton
           selectedStyle={selectedStyle}
           setSelectedStyle={setSelectedStyle}
+          mapRef={mapRef}
         />
         <MapResetButton
           mapRef={mapRef}

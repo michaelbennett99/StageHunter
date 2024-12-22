@@ -1,28 +1,40 @@
 import { cn } from "@/lib/utils";
+import { Slot } from "@radix-ui/react-slot";
+import { forwardRef } from "react";
 
-export const mapButtonStyles = "flex h-10 w-10 items-center justify-center rounded-lg bg-background/90 backdrop-blur-sm hover:bg-background/80 border border-border";
-
-export const mapButtonSpinStyles = "hover:[&>svg]:animate-spin-once";
-
-export default function MapButtonBase({
-  spinning = false,
-  children,
-  className,
-  ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+interface MapButtonBaseProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   spinning?: boolean;
-}) {
+  asChild?: boolean;
+}
+
+const MapButtonBase = forwardRef<HTMLButtonElement, MapButtonBaseProps>(({
+  spinning = false,
+  asChild = false,
+  className,
+  children,
+  ...props
+}, ref) => {
+  const Comp = asChild ? Slot : "button";
+
   return (
-    <button
+    <Comp
+      ref={ref}
       type="button"
       className={cn(
-        mapButtonStyles,
-        spinning && mapButtonSpinStyles,
+        "flex h-10 w-10 items-center justify-center rounded-lg",
+        "bg-background/90 backdrop-blur-sm",
+        "hover:bg-background/80",
+        "border border-border",
+        spinning && "hover:[&>svg]:animate-spin-once",
         className
       )}
       {...props}
     >
       {children}
-    </button>
+    </Comp>
   );
-}
+});
+
+MapButtonBase.displayName = "MapButtonBase";
+
+export default MapButtonBase;

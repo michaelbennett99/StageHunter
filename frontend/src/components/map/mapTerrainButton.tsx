@@ -1,24 +1,41 @@
 import { LuMountain } from "react-icons/lu";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { mapButtonStyles } from "./mapButtonBase";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export interface MapTerrainButtonProps {
   terrainExaggeration: number;
   onTerrainExaggerationChange: (value: number) => void;
+  id?: string;
 }
 
 export default function MapTerrainButton({
   terrainExaggeration,
   onTerrainExaggerationChange,
+  id = "map-terrain-button"
 }: MapTerrainButtonProps): JSX.Element {
   return (
     <Popover>
-      <PopoverTrigger>
-        <div className={mapButtonStyles}>
-          <LuMountain className="h-6 w-6" />
-        </div>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          id={id}
+          className={cn(
+            "p-2 rounded-md border bg-background",
+            "flex items-center justify-center",
+            "hover:bg-accent hover:text-accent-foreground"
+          )}
+        >
+          <LuMountain className="h-4 w-4" />
+        </button>
       </PopoverTrigger>
-      <PopoverContent className="w-60 p-3" align="end">
+      <PopoverContent
+        className="w-60 p-3"
+        align="end"
+      >
         <div className="space-y-2">
           <h4 className="font-medium leading-none">Terrain Exaggeration</h4>
           <p className="text-sm text-muted-foreground">
