@@ -23,7 +23,6 @@ import {
 } from '@/interfaces/mapboxStandardConfig';
 
 import MapButton, { MapButtonProps } from './mapButton';
-import { trySetMapConfig } from '@/lib/map';
 
 export type MapConfigButtonProps = {
   config: MapboxStandardConfig;
@@ -45,31 +44,29 @@ export default function MapConfigButton(
   }
 
   return (
-    <MapButton {...buttonProps} asChild>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button className="p-2 rounded-md shadow-md bg-background group">
-            <LuSettings className="group-hover:animate-spin-once" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent>
-          <div className="flex flex-col gap-2">
-            {Object.entries(config).map(([key, value]) => {
-              return (
-                showOptions[key as keyof MapboxStandardConfig] && (
-                  <ConfigOption
-                    key={key}
-                    configKey={key as keyof MapboxStandardConfig}
-                    value={value}
-                    onChange={handleConfigChange}
-                  />
-                )
-              );
-            })}
-          </div>
-        </PopoverContent>
-      </Popover>
-    </MapButton>
+    <Popover>
+      <PopoverTrigger asChild>
+        <MapButton className="p-2 rounded-md shadow-md bg-background group">
+          <LuSettings className="group-hover:animate-spin-once" />
+        </MapButton>
+      </PopoverTrigger>
+      <PopoverContent>
+        <div className="flex flex-col gap-2">
+          {Object.entries(config).map(([key, value]) => {
+            return (
+              showOptions[key as keyof MapboxStandardConfig] && (
+                <ConfigOption
+                  key={key}
+                  configKey={key as keyof MapboxStandardConfig}
+                  value={value}
+                  onChange={handleConfigChange}
+                />
+              )
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
