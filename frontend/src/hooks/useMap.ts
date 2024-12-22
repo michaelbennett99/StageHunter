@@ -133,29 +133,25 @@ export default function useMap(
           }
         });
 
-        // Add point shadow
-        map.addLayer({
-          id: 'point-shadow',
-          type: 'circle',
-          source: 'point',
-          paint: {
-            'circle-radius': 12,
-            'circle-color': '#000',
-            'circle-opacity': 0.4,
-            'circle-blur': 1
-          }
-        });
+        // Load custom marker image
+        map.loadImage('/assets/icons/map/marker.png', (error, image) => {
+          if (error) throw error;
+          if (image) {
+            map.addImage('custom-marker', image);
 
-        // Add main point
-        map.addLayer({
-          id: 'point',
-          type: 'circle',
-          source: 'point',
-          paint: {
-            'circle-color': '#fff',
-            'circle-radius': 8,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#000'
+            // Add point marker
+            map.addLayer({
+              id: 'point',
+              type: 'symbol',
+              source: 'point',
+              layout: {
+                'icon-image': 'custom-marker',
+                'icon-size': 0.5,
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true,
+                'icon-offset': [0, -25]
+              }
+            });
           }
         });
       }
