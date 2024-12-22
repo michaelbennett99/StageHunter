@@ -1,14 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { LuLayers } from 'react-icons/lu';
 
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectGroup,
-  SelectItem
-} from '@/components/ui/select';
+import * as Select from '@radix-ui/react-select'
 
 import {
   mapboxStyles,
@@ -32,28 +25,28 @@ export default function MapStyleButton(
   };
 
   return (
-    <Select defaultValue={selectedStyle} onValueChange={handleSelectStyle}>
-      <SelectTrigger
+    <Select.Root defaultValue={selectedStyle} onValueChange={handleSelectStyle}>
+      <Select.Trigger
         className="p-2 rounded-md shadow-md group bg-background text-sm"
-        icon={false}
         asChild
       >
         <MapButton>
           <LuLayers className="w-4 h-4" />
         </MapButton>
-      </SelectTrigger>
-      <SelectContent className="p-0 w-52">
-        <SelectGroup>
+      </Select.Trigger>
+      <Select.Content className="p-0 w-52 bg-background">
+        <Select.Group>
           {mapboxStyles.map((style) => (
-            <SelectItem
+            <Select.Item
               key={style.id}
               value={style.id}
+              className="p-2 rounded-md shadow-md group bg-background text-sm"
             >
               <span>{style.name}</span>
-            </SelectItem>
+            </Select.Item>
           ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+        </Select.Group>
+      </Select.Content>
+    </Select.Root>
   );
 }
