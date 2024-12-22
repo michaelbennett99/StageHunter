@@ -1,4 +1,4 @@
-import { MutableRefObject, useRef, useState, useMemo, useEffect } from "react";
+import { MutableRefObject, useRef, useState, useEffect } from "react";
 
 import mapboxgl, { ConfigSpecification } from "mapbox-gl";
 
@@ -41,6 +41,9 @@ export default function useMap(
 
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
+    const firstPoint = track.coordinates[0];
+    const lastPoint = track.coordinates[track.coordinates.length - 1];
+
     try {
       const map = new mapboxgl.Map({
         container: mapContainerRef.current!,
@@ -60,12 +63,14 @@ export default function useMap(
       mapRef.current = map;
 
       function initialiseLayers() {
+        // Add terrain layer
         map.addSource('mapbox-dem', {
           type: 'raster-dem',
           url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
           tileSize: 512,
         })
 
+        // Add route layer
         map.addSource('route', {
           type: 'geojson',
           data: track
@@ -125,6 +130,77 @@ export default function useMap(
           }
         }, 'route');
 
+        // Add start point layer
+        map.addSource('start', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {
+              'name': 'Start'
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: firstPoint
+            }
+          }
+        });
+
+        map.loadImage('/assets/icons/map/start.png', (error, image) => {
+          if (error) throw error;
+          if (image) {
+            map.addImage('start', image);
+
+            map.addLayer({
+              id: 'start',
+              type: 'symbol',
+              source: 'start',
+              layout: {
+                'icon-image': 'start',
+                'icon-size': 0.5,
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true,
+                'icon-offset': [0, -25]
+              }
+            });
+          }
+        });
+
+        // Add finish point layer
+        map.addSource('finish', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {
+              'name': 'Finish'
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: lastPoint
+            }
+          }
+        });
+
+        map.loadImage('/assets/icons/map/finish.png', (error, image) => {
+          if (error) throw error;
+          if (image) {
+            map.addImage('finish', image);
+
+            map.addLayer({
+              id: 'finish',
+              type: 'symbol',
+              source: 'finish',
+              layout: {
+                'icon-image': 'finish',
+                'icon-size': 0.5,
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true,
+                'icon-offset': [0, -25]
+              }
+            });
+          }
+        });
+
+        // Add point on route layer
         map.addSource('point', {
           type: 'geojson',
           data: {
