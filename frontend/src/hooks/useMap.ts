@@ -80,10 +80,50 @@ export default function useMap(
             'line-cap': 'round'
           },
           paint: {
-            'line-color': '#000',
-            'line-width': 4
+            'line-color': '#3b82f6',
+            'line-width': [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              0,
+              2,
+              10,
+              4,
+              16,
+              8,
+              22,
+              24
+            ],
+            'line-emissive-strength': 1,
           }
         });
+
+        map.addLayer({
+          id: 'route-outline',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#1d4ed8',
+            'line-width': [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              0,
+              2.8,
+              10,
+              5.6,
+              16,
+              11.3,
+              22,
+              33.6
+            ],
+            'line-emissive-strength': 1,
+          }
+        }, 'route');
 
         map.addSource('point', {
           type: 'geojson',
