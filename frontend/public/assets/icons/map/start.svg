@@ -1,0 +1,22 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="#15803d"
+  stroke="#15803d"
+  stroke-width="0"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path
+    d="M 18 10.012 C 18 15.005 12.461 20.205 10.601 21.811 C 10.245 22.078 9.755 22.078 9.399 21.811 C 7.539 20.205 2 15.005 2 10.012 C 2 3.853 8.667 0.004 14 3.084 C 16.475 4.513 18 7.154 18 10.012"
+    id="pin"
+  />
+  <polygon
+    points="7 6 15 10 7 14"
+    stroke-width="1"
+    stroke="white"
+    fill="white"
+  />
+</svg>
