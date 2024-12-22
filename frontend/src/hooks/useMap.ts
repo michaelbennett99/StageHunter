@@ -62,6 +62,30 @@ export default function useMap(
 
       mapRef.current = map;
 
+      function addSymbolLayer(
+        sourceId: string,
+        image: string
+      ) {
+        map.loadImage(image, (error, image) => {
+          if (error) throw error;
+          if (image) {
+            map.addImage(sourceId, image);
+
+            map.addLayer({
+              id: sourceId,
+              type: 'symbol',
+              source: sourceId,
+              layout: {
+                'icon-image': sourceId,
+                'icon-size': 0.5,
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true
+              }
+            });
+          }
+        });
+      }
+
       function initialiseLayers() {
         // Add terrain layer
         map.addSource('mapbox-dem', {
@@ -145,25 +169,7 @@ export default function useMap(
           }
         });
 
-        map.loadImage('/assets/icons/map/start.png', (error, image) => {
-          if (error) throw error;
-          if (image) {
-            map.addImage('start', image);
-
-            map.addLayer({
-              id: 'start',
-              type: 'symbol',
-              source: 'start',
-              layout: {
-                'icon-image': 'start',
-                'icon-size': 0.5,
-                'icon-allow-overlap': true,
-                'icon-ignore-placement': true,
-                'icon-offset': [0, -25]
-              }
-            });
-          }
-        });
+        addSymbolLayer('start', '/assets/icons/map/start-64.png');
 
         // Add finish point layer
         map.addSource('finish', {
@@ -180,25 +186,7 @@ export default function useMap(
           }
         });
 
-        map.loadImage('/assets/icons/map/finish.png', (error, image) => {
-          if (error) throw error;
-          if (image) {
-            map.addImage('finish', image);
-
-            map.addLayer({
-              id: 'finish',
-              type: 'symbol',
-              source: 'finish',
-              layout: {
-                'icon-image': 'finish',
-                'icon-size': 0.5,
-                'icon-allow-overlap': true,
-                'icon-ignore-placement': true,
-                'icon-offset': [0, -25]
-              }
-            });
-          }
-        });
+        addSymbolLayer('finish', '/assets/icons/map/finish-64.png');
 
         // Add point on route layer
         map.addSource('point', {
@@ -210,25 +198,7 @@ export default function useMap(
         });
 
         // Load custom marker image
-        map.loadImage('/assets/icons/map/marker-64.png', (error, image) => {
-          if (error) throw error;
-          if (image) {
-            map.addImage('custom-marker', image);
-
-            // Add point marker
-            map.addLayer({
-              id: 'point',
-              type: 'symbol',
-              source: 'point',
-              layout: {
-                'icon-image': 'custom-marker',
-                'icon-size': 0.5,
-                'icon-allow-overlap': true,
-                'icon-ignore-placement': true
-              }
-            });
-          }
-        });
+        addSymbolLayer('point', '/assets/icons/map/marker-64.png');
       }
 
       // Handle window resize
