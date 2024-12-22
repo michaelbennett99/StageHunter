@@ -210,7 +210,7 @@ export default function useMap(
         });
 
         // Load custom marker image
-        map.loadImage('/assets/icons/map/marker.png', (error, image) => {
+        map.loadImage('/assets/icons/map/marker-64.png', (error, image) => {
           if (error) throw error;
           if (image) {
             map.addImage('custom-marker', image);
@@ -224,8 +224,7 @@ export default function useMap(
                 'icon-image': 'custom-marker',
                 'icon-size': 0.5,
                 'icon-allow-overlap': true,
-                'icon-ignore-placement': true,
-                'icon-offset': [0, -25]
+                'icon-ignore-placement': true
               }
             });
           }
