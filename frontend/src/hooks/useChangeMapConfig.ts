@@ -7,6 +7,8 @@ export default function useChangeMapConfig(
   isMapReady: boolean,
   config: MapboxStandardConfig
 ) {
+  // Hook that watches for changes to the config and updates the map
+  // Also updates when the map is ready
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !isMapReady) return;
