@@ -1,35 +1,23 @@
-import { FaArrowsRotate } from "react-icons/fa6";
-
+import { LuRefreshCcw } from "react-icons/lu";
+import { mapButtonStyles, mapButtonSpinStyles } from "./mapButtonBase";
 import { cn } from "@/lib/utils";
 
-import MapButton, { MapButtonProps } from "./mapButton";
-
-export type MapResetButtonProps = MapButtonProps & {
+export type MapResetButtonProps = {
   mapRef: React.RefObject<mapboxgl.Map>,
   bounds: mapboxgl.LngLatBounds,
 }
 
-export default function MapResetButton(
-  props: MapResetButtonProps
-): JSX.Element {
-  const { mapRef, bounds, ...buttonProps } = props;
-
-  const handleClick = () => {
-    mapRef.current?.fitBounds(bounds, {
-      padding: 100
-    });
-  };
+export default function MapResetButton({
+  mapRef,
+  bounds,
+}: MapResetButtonProps): JSX.Element {
   return (
-    <MapButton
-      {...buttonProps}
-      onClick={handleClick}
-      className={cn(
-        'p-2 rounded-md shadow-md',
-        'bg-opacity-50 hover:bg-opacity-100 group',
-        'bg-background'
-      )}
+    <button
+      type="button"
+      onClick={() => mapRef.current?.fitBounds(bounds, { padding: 100 })}
+      className={cn(mapButtonStyles, mapButtonSpinStyles)}
     >
-      <FaArrowsRotate className="group-hover:animate-spin-once" />
-    </MapButton>
+      <LuRefreshCcw className="h-6 w-6" />
+    </button>
   );
 }

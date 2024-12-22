@@ -1,19 +1,10 @@
 import { Dispatch, SetStateAction } from 'react';
 import { LuSettings } from 'react-icons/lu';
-
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent
-} from '@/components/ui/popover';
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue
-} from '@/components/ui/select';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { mapButtonStyles, mapButtonSpinStyles } from "./mapButtonBase";
+import { cn } from "@/lib/utils";
 
 import {
   MapboxStandardConfig,
@@ -22,18 +13,17 @@ import {
   showOptions
 } from '@/interfaces/mapboxStandardConfig';
 
-import MapButton, { MapButtonProps } from './mapButton';
-import { trySetMapConfig } from '@/lib/map';
+import MapButtonBase from './mapButtonBase';
 
 export type MapConfigButtonProps = {
   config: MapboxStandardConfig;
   setConfig: Dispatch<SetStateAction<MapboxStandardConfig>>;
-  mapRef: React.RefObject<mapboxgl.Map>;
-} & MapButtonProps;
+};
 
-export default function MapConfigButton(
-  { mapRef, config, setConfig, ...buttonProps }: MapConfigButtonProps
-): JSX.Element {
+export default function MapConfigButton({
+  config,
+  setConfig
+}: MapConfigButtonProps): JSX.Element {
   function handleConfigChange(
     key: keyof MapboxStandardConfig,
     value: boolean | string
@@ -45,31 +35,29 @@ export default function MapConfigButton(
   }
 
   return (
-    <MapButton {...buttonProps} asChild>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button className="p-2 rounded-md shadow-md bg-background group">
-            <LuSettings className="group-hover:animate-spin-once" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent>
-          <div className="flex flex-col gap-2">
-            {Object.entries(config).map(([key, value]) => {
-              return (
-                showOptions[key as keyof MapboxStandardConfig] && (
-                  <ConfigOption
-                    key={key}
-                    configKey={key as keyof MapboxStandardConfig}
-                    value={value}
-                    onChange={handleConfigChange}
-                  />
-                )
-              );
-            })}
-          </div>
-        </PopoverContent>
-      </Popover>
-    </MapButton>
+    <Popover>
+      <PopoverTrigger>
+        <div className={cn(mapButtonStyles, mapButtonSpinStyles)}>
+          <LuSettings className="h-6 w-6" />
+        </div>
+      </PopoverTrigger>
+      <PopoverContent>
+        <div className="flex flex-col gap-2">
+          {Object.entries(config).map(([key, value]) => {
+            return (
+              showOptions[key as keyof MapboxStandardConfig] && (
+                <ConfigOption
+                  key={key}
+                  configKey={key as keyof MapboxStandardConfig}
+                  value={value}
+                  onChange={handleConfigChange}
+                />
+              )
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 

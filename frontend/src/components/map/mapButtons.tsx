@@ -9,22 +9,22 @@ import MapTerrainButton, { MapTerrainButtonProps } from "./mapTerrainButton";
 export type MapButtonsProps = MapResetButtonProps
   & MapConfigButtonProps
   & MapStyleButtonProps
-  & MapTerrainButtonProps;
+  & MapTerrainButtonProps
+  & {
+    isMapReady: boolean;
+  };
 
-export default function MapButtons(props: MapButtonsProps): JSX.Element {
-  const {
-    mapRef,
-    bounds,
-    isMapReady,
-    config,
-    setConfig,
-    selectedStyle,
-    setSelectedStyle,
-    terrainExaggeration,
-    onTerrainExaggerationChange,
-    ...buttonProps
-  } = props;
-
+export default function MapButtons({
+  mapRef,
+  bounds,
+  isMapReady,
+  config,
+  setConfig,
+  selectedStyle,
+  setSelectedStyle,
+  terrainExaggeration,
+  onTerrainExaggerationChange,
+}: MapButtonsProps): JSX.Element {
   const standardStyleSelected = selectedStyle.includes('standard');
 
   return (
@@ -40,32 +40,20 @@ export default function MapButtons(props: MapButtonsProps): JSX.Element {
             <MapTerrainButton
               terrainExaggeration={terrainExaggeration}
               onTerrainExaggerationChange={onTerrainExaggerationChange}
-              id="map-terrain-button"
             />
             <MapConfigButton
-              mapRef={mapRef}
               config={config}
               setConfig={setConfig}
-              isMapReady={isMapReady}
-              id="map-config-button"
-              {...buttonProps}
             />
           </>
         )}
         <MapStyleButton
-          mapRef={mapRef}
-          isMapReady={isMapReady}
-          id="map-style-button"
           selectedStyle={selectedStyle}
           setSelectedStyle={setSelectedStyle}
-          {...buttonProps}
         />
         <MapResetButton
           mapRef={mapRef}
           bounds={bounds}
-          isMapReady={isMapReady}
-          id="map-reset-button"
-          {...buttonProps}
         />
       </div>
     ) : <></>
