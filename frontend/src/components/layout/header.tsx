@@ -16,7 +16,7 @@ export default function Header() {
     >
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">StageHunter</h1>
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-4">
           <p className="text-sm">{headerInfo}</p>
           <DarkModeToggle className="h-6 w-6" />
         </div>
