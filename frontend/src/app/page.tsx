@@ -8,7 +8,7 @@ export default async function Page(): Promise<JSX.Element> {
   const dailyStage = await serverApiClient.getDailyStage();
 
   const dateString = dailyStage.date.toLocaleDateString(
-    undefined, {
+    "en-GB", {
       weekday: "long",
       year: "numeric",
       month: "long",
