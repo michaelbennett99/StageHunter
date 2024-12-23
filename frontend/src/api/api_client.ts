@@ -6,7 +6,8 @@ import {
   GradientData,
   NewInfoData,
   Info,
-  InfoData
+  InfoData,
+  DailyStage
 } from './types';
 
 export class APIClient {
@@ -50,8 +51,12 @@ export class APIClient {
     return this.fetchJSON('/random');
   }
 
-  async getDailyStageId(): Promise<number> {
+  async getDailyStage(): Promise<DailyStage> {
     return this.fetchJSON('/daily');
+  }
+
+  async getDailyStageId(): Promise<number> {
+    return this.getDailyStage().then(dailyStage => dailyStage.stage_id);
   }
 
   async getAllStageIDs(): Promise<number[]> {

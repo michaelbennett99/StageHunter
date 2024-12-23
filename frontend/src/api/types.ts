@@ -4,6 +4,16 @@ export enum GrandTour {
   VUELTA = 'VUELTA',
 }
 
+export class DailyStage {
+  stage_id: number;
+  date: Date;
+
+  constructor(stage_id: number, date: string) {
+    this.stage_id = stage_id;
+    this.date = new Date(date);
+  }
+}
+
 export interface Result {
   name: string;
   rank: number;
