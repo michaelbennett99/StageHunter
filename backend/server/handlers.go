@@ -45,13 +45,13 @@ func DefaultHandler(w http.ResponseWriter, r *http.Request) {
 
 // GetDailyHandler returns the ID of the daily stage from the database.
 func GetDailyHandler(w http.ResponseWriter, r *http.Request, conn *db.Queries) {
-	stage_id, err := conn.GetDailyStage(context.Background())
+	dailyStage, err := conn.GetDailyStage(context.Background())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(stage_id)
+	json.NewEncoder(w).Encode(dailyStage)
 }
 
 // GetRandomHandler returns a random stage ID from the database.

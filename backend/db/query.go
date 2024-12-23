@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/michaelbennett99/stagehunter/backend/lib"
 )
@@ -20,31 +19,28 @@ INSERT INTO racedata.daily (stage_id)
 SELECT racedata.get_random_stage_id();
 `
 
-func (q *Queries) GetDailyStage(ctx context.Context) (int, error) {
+func (q *Queries) GetDailyStage(ctx context.Context) (DailyStage, error) {
 	rows, err := q.conn.Query(ctx, getDailyStageQuery)
 	if err != nil {
-		return 0, err
+		return DailyStage{}, err
 	}
 	defer rows.Close()
 
-	rowValues, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[struct {
-		StageID int
-		Date    pgtype.Date
-	}])
+	rowValues, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[DailyStage])
 	if err != nil {
-		return 0, err
+		return DailyStage{}, err
 	}
 	dateValue, err := rowValues.Date.DateValue()
 	if err != nil {
-		return 0, err
+		return DailyStage{}, err
 	}
 	if !lib.IsToday(dateValue.Time) {
 		if _, err := q.conn.Exec(ctx, addDailyStageQuery); err != nil {
-			return 0, err
+			return DailyStage{}, err
 		}
 		return q.GetDailyStage(ctx)
 	}
-	return rowValues.StageID, nil
+	return rowValues, nil
 }
 
 const getRandomStageQuery = `

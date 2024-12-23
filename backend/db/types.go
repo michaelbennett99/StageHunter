@@ -68,6 +68,13 @@ type StageInfo struct {
 	StageLength float64   `json:"stage_length"`
 }
 
+// DailyStage struct
+
+type DailyStage struct {
+	StageID int         `json:"stage_id"`
+	Date    pgtype.Date `json:"date"`
+}
+
 // ElevationPoint struct
 type OrderedElevationPoint interface {
 	Less(other OrderedElevationPoint) bool
