@@ -5,9 +5,9 @@ import {
   Select,
   SelectContent,
   SelectGroup,
-  SelectItem,
-  SelectTrigger,
+  SelectItem
 } from '@/components/ui/select'
+import { SelectTrigger as SelectTriggerRadix } from '@radix-ui/react-select';
 
 import {
   mapboxStyles,
@@ -30,17 +30,13 @@ export default function MapStyleButton(
 
   return (
     <Select defaultValue={selectedStyle} onValueChange={handleSelectStyle}>
-      <SelectTrigger
-        className="p-2 rounded-md shadow-md group bg-background text-sm"
-        asChild
-      >
+      <SelectTriggerRadix asChild>
         <MapButton
           {...buttonProps}
-          className="p-2 rounded-md shadow-md group bg-background text-sm"
         >
           <LuLayers className="w-4 h-4" />
         </MapButton>
-      </SelectTrigger>
+      </SelectTriggerRadix>
       <SelectContent>
         <SelectGroup>
           {mapboxStyles.map((style) => (

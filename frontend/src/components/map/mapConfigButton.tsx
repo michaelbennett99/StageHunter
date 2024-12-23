@@ -47,7 +47,7 @@ export default function MapConfigButton(
       <PopoverTrigger asChild>
         <MapButton
           {...buttonProps}
-          className="p-2 rounded-md shadow-md bg-background group"
+          className="group"
         >
           <LuSettings className="group-hover:animate-spin-once" />
         </MapButton>

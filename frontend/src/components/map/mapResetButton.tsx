@@ -1,7 +1,5 @@
 import { FaArrowsRotate } from "react-icons/fa6";
 
-import { cn } from "@/lib/utils";
-
 import MapButton, { MapButtonProps } from "./mapButton";
 
 export type MapResetButtonProps = MapButtonProps & {
@@ -23,11 +21,7 @@ export default function MapResetButton(
     <MapButton
       {...buttonProps}
       onClick={handleClick}
-      className={cn(
-        'p-2 rounded-md shadow-md',
-        'bg-opacity-50 hover:bg-opacity-100 group',
-        'bg-background'
-      )}
+      className="group"
     >
       <FaArrowsRotate className="group-hover:animate-spin-once" />
     </MapButton>
