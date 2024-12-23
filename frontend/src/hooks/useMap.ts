@@ -230,6 +230,7 @@ export default function useMap(
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to initialize map');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

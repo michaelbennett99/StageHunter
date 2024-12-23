@@ -16,5 +16,6 @@ export default function useChangeMapConfig(
     Object.entries(config).forEach(([key, value]) => {
       trySetMapConfig(map, key, value);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, isMapReady]);
 }

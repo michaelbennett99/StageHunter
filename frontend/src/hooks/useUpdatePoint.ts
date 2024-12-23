@@ -20,5 +20,6 @@ export default function useUpdatePoint(
     } catch (error) {
       console.error('Error updating point:', error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [point, isMapReady]);
 }

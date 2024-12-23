@@ -4,6 +4,11 @@ export enum GrandTour {
   VUELTA = 'VUELTA',
 }
 
+interface DailyStageJSON {
+  stage_id: number;
+  date: string;
+}
+
 export class DailyStage {
   stage_id: number;
   date: Date;
@@ -13,7 +18,7 @@ export class DailyStage {
     this.date = new Date(date);
   }
 
-  static fromJSON(json: any): DailyStage {
+  static fromJSON(json: DailyStageJSON): DailyStage {
     return new DailyStage(json.stage_id, json.date);
   }
 }

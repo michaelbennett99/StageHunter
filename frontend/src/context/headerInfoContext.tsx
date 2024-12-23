@@ -35,7 +35,7 @@ export function HeaderInfoSetter(
 
   useEffect(() => {
     setHeaderInfo(headerInfo);
-  }, [headerInfo]);
+  }, [headerInfo, setHeaderInfo]);
 
   return <></>;
 }

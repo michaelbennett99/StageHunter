@@ -23,5 +23,7 @@ export default function useChangeMapStyle(
     });
 
     map.setStyle(fullMapboxStyle.url);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStyle]);
 }
