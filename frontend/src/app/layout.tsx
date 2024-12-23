@@ -3,7 +3,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 import Header from "@/components/layout/header";
-
+import { HeaderInfoProvider } from "@/context/headerInfoContext";
 
 export const metadata: Metadata = {
   title: "StageHunter",
@@ -24,8 +24,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
-            {children}
+            <HeaderInfoProvider>
+              <Header />
+              {children}
+            </HeaderInfoProvider>
           </ThemeProvider>
         </body>
     </html>
