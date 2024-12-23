@@ -27,11 +27,10 @@ import MapButton, { MapButtonProps } from './mapButton';
 export type MapConfigButtonProps = {
   config: MapboxStandardConfig;
   setConfig: Dispatch<SetStateAction<MapboxStandardConfig>>;
-  mapRef: React.RefObject<mapboxgl.Map>;
 } & MapButtonProps;
 
 export default function MapConfigButton(
-  { mapRef, config, setConfig, ...buttonProps }: MapConfigButtonProps
+  { config, setConfig, ...buttonProps }: MapConfigButtonProps
 ): JSX.Element {
   function handleConfigChange(
     key: keyof MapboxStandardConfig,
@@ -46,7 +45,10 @@ export default function MapConfigButton(
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <MapButton className="p-2 rounded-md shadow-md bg-background group">
+        <MapButton
+          {...buttonProps}
+          className="p-2 rounded-md shadow-md bg-background group"
+        >
           <LuSettings className="group-hover:animate-spin-once" />
         </MapButton>
       </PopoverTrigger>

@@ -7,7 +7,6 @@ import {
   SelectGroup,
   SelectItem,
   SelectTrigger,
-  SelectValue
 } from '@/components/ui/select'
 
 import {
@@ -15,18 +14,15 @@ import {
   type MapboxStyleId
 } from '@/interfaces/mapboxStyles';
 import MapButton, { MapButtonProps } from './mapButton';
-import { cn } from '@/lib/utils';
 
 export type MapStyleButtonProps = MapButtonProps & {
-  mapRef: React.RefObject<mapboxgl.Map>,
   selectedStyle: MapboxStyleId,
   setSelectedStyle: Dispatch<SetStateAction<MapboxStyleId>>,
 }
 
 export default function MapStyleButton(
-  props: MapStyleButtonProps
+  { selectedStyle, setSelectedStyle, ...buttonProps }: MapStyleButtonProps
 ): JSX.Element {
-  const { mapRef, selectedStyle, setSelectedStyle, ...buttonProps } = props;
 
   const handleSelectStyle = (styleId: MapboxStyleId) => {
     setSelectedStyle(styleId);
@@ -38,7 +34,10 @@ export default function MapStyleButton(
         className="p-2 rounded-md shadow-md group bg-background text-sm"
         asChild
       >
-        <MapButton>
+        <MapButton
+          {...buttonProps}
+          className="p-2 rounded-md shadow-md group bg-background text-sm"
+        >
           <LuLayers className="w-4 h-4" />
         </MapButton>
       </SelectTrigger>

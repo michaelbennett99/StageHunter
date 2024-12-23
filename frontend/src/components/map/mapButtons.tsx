@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 import MapResetButton, { MapResetButtonProps } from "./mapResetButton";
@@ -44,14 +43,12 @@ export default function MapButtons({
             <MapConfigButton
               config={config}
               setConfig={setConfig}
-              mapRef={mapRef}
             />
           </>
         )}
         <MapStyleButton
           selectedStyle={selectedStyle}
           setSelectedStyle={setSelectedStyle}
-          mapRef={mapRef}
         />
         <MapResetButton
           mapRef={mapRef}

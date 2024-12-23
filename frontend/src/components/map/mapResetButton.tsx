@@ -10,9 +10,8 @@ export type MapResetButtonProps = MapButtonProps & {
 }
 
 export default function MapResetButton(
-  props: MapResetButtonProps
+  { mapRef, bounds, ...buttonProps }: MapResetButtonProps
 ): JSX.Element {
-  const { mapRef, bounds, ...buttonProps } = props;
 
   const handleClick = () => {
     mapRef.current?.fitBounds(bounds, {

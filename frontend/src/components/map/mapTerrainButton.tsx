@@ -4,22 +4,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import MapButton from "./mapButton";
-export interface MapTerrainButtonProps {
+import MapButton, { MapButtonProps } from "./mapButton";
+
+export type MapTerrainButtonProps = {
   terrainExaggeration: number;
   onTerrainExaggerationChange: (value: number) => void;
-  id?: string;
-}
+} & MapButtonProps;
 
 export default function MapTerrainButton({
   terrainExaggeration,
   onTerrainExaggerationChange,
-  id = "map-terrain-button"
+  ...buttonProps
 }: MapTerrainButtonProps): JSX.Element {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <MapButton>
+        <MapButton {...buttonProps}>
           <LuMountain className="h-4 w-4" />
         </MapButton>
       </PopoverTrigger>

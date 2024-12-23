@@ -1,13 +1,10 @@
 import { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export interface MapButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  asChild?: boolean;
-}
+export type MapButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default function MapButton({
   className,
-  asChild,
   ...props
 }: MapButtonProps): JSX.Element {
   return (
