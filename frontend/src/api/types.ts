@@ -12,6 +12,10 @@ export class DailyStage {
     this.stage_id = stage_id;
     this.date = new Date(date);
   }
+
+  static fromJSON(json: any): DailyStage {
+    return new DailyStage(json.stage_id, json.date);
+  }
 }
 
 export interface Result {

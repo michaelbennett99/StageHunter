@@ -52,7 +52,7 @@ export class APIClient {
   }
 
   async getDailyStage(): Promise<DailyStage> {
-    return this.fetchJSON('/daily');
+    return DailyStage.fromJSON(await this.fetchJSON('/daily'));
   }
 
   async getDailyStageId(): Promise<number> {
