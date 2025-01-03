@@ -35,7 +35,7 @@ jobs:
 
             echo "Cloning from github"
             # Clone fresh
-            git clone -b dev git@github.com:michaelbennett99/StageHunter.git && \
+            git clone -b main git@github.com:michaelbennett99/StageHunter.git && \
             cd ./StageHunter
 
             echo "Downloading SQL dump from S3"
