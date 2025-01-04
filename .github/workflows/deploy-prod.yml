@@ -31,7 +31,9 @@ jobs:
 
             # Prune unused docker images and volumes
             docker system prune --volumes -af
-            docker volume prune -af
+            docker volume prune -af \
+              --filter "label!=com.docker.compose.project=stagehunter" \
+              --filter "label!=com.docker.compose.volume=pgdata"
 
             echo "Cloning from github"
             # Clone fresh
