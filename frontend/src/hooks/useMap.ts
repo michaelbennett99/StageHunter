@@ -55,11 +55,6 @@ export default function useMap(
         }
       });
 
-      // Add navigation controls
-      map.addControl(new mapboxgl.NavigationControl({
-        visualizePitch: true
-      }), 'top-left');
-
       mapRef.current = map;
 
       function addSymbolLayer(
