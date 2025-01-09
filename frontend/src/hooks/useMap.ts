@@ -65,18 +65,18 @@ export default function useMap(
           if (error) throw error;
           if (image) {
             map.addImage(sourceId, image);
+          }
+        });
 
-            map.addLayer({
-              id: sourceId,
-              type: 'symbol',
-              source: sourceId,
-              layout: {
-                'icon-image': sourceId,
-                'icon-size': 0.5,
-                'icon-allow-overlap': true,
-                'icon-ignore-placement': true
-              }
-            });
+        map.addLayer({
+          id: sourceId,
+          type: 'symbol',
+          source: sourceId,
+          layout: {
+            'icon-image': sourceId,
+            'icon-size': 0.5,
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true
           }
         });
       }
