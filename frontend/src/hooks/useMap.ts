@@ -61,22 +61,39 @@ export default function useMap(
         sourceId: string,
         image: string
       ) {
+        // If the image already exists, add the layer
+        if (map.hasImage(sourceId)) {
+          map.addLayer({
+            id: sourceId,
+            type: 'symbol',
+            source: sourceId,
+            layout: {
+              'icon-image': sourceId,
+              'icon-size': 0.5,
+              'icon-allow-overlap': true,
+              'icon-ignore-placement': true
+            }
+          });
+          return;
+        }
+
+        // If the image doesn't exist, load it
         map.loadImage(image, (error, image) => {
           if (error) throw error;
           if (image) {
             map.addImage(sourceId, image);
-          }
-        });
 
-        map.addLayer({
-          id: sourceId,
-          type: 'symbol',
-          source: sourceId,
-          layout: {
-            'icon-image': sourceId,
-            'icon-size': 0.5,
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true
+            map.addLayer({
+              id: sourceId,
+              type: 'symbol',
+              source: sourceId,
+              layout: {
+                'icon-image': sourceId,
+                'icon-size': 0.5,
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true
+              }
+            });
           }
         });
       }
