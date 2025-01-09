@@ -15,10 +15,15 @@ export default function useMapDarkMode(
   useEffect(() => {
     if (!map || !isMapReady) return;
 
+    if (process.env.NEXT_PUBLIC_DEBUG === 'true') {
+      console.info("setting map dark mode");
+    }
+
     trySetMapConfig(map, 'lightPreset', lightPreset);
 
     map.once('style.load', () => {
       trySetMapConfig(map, 'lightPreset', lightPreset);
     });
-  }, [map, lightPreset, selectedStyle, isMapReady]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightPreset, selectedStyle, isMapReady]);
 }

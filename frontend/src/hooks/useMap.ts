@@ -220,6 +220,10 @@ export default function useMap(
       window.addEventListener('resize', resizeHandler);
 
       map.on('load', () => {
+        if (process.env.NEXT_PUBLIC_DEBUG === 'true') {
+          console.info("map loaded");
+        }
+
         map.fitBounds(bounds, {
           padding: 100
         });
@@ -227,10 +231,18 @@ export default function useMap(
       });
 
       map.on('style.load', () => {
+        if (process.env.NEXT_PUBLIC_DEBUG === 'true') {
+          console.info("style loaded");
+        }
+
         initialiseLayers();
       });
 
       map.on('error', (e) => {
+        if (process.env.NEXT_PUBLIC_DEBUG === 'true') {
+          console.info("error", e);
+        }
+
         setError(e.error.message);
       });
 

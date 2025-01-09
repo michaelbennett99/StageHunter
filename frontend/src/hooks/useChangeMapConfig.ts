@@ -13,6 +13,10 @@ export default function useChangeMapConfig(
     const map = mapRef.current;
     if (!map || !isMapReady) return;
 
+    if (process.env.NEXT_PUBLIC_DEBUG === 'true') {
+      console.info("changing map config");
+    }
+
     Object.entries(config).forEach(([key, value]) => {
       trySetMapConfig(map, key, value);
     });

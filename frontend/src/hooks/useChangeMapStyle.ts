@@ -23,6 +23,9 @@ export default function useChangeMapStyle(
     const map = mapRef.current;
     if (!map) return;
 
+    if (process.env.NEXT_PUBLIC_DEBUG === 'true') {
+      console.info("changing map style");
+    }
 
     map.once('style.load', () => {
       Object.entries(config).forEach(([key, value]) => {
