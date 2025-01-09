@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { MapboxStyleId, mapboxStyleMap } from "@/interfaces/mapboxStyles";
 import { MapboxStandardConfig } from "@/interfaces/mapboxStandardConfig";
@@ -9,9 +9,17 @@ export default function useChangeMapStyle(
   selectedStyle: MapboxStyleId,
   config: MapboxStandardConfig
 ) {
+  // Map style will already be set on the first render, so we don't need to
+  // set it again.
+  const isFirstRender = useRef(true);
   const fullMapboxStyle = mapboxStyleMap[selectedStyle];
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const map = mapRef.current;
     if (!map) return;
 
